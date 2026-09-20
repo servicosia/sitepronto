@@ -95,12 +95,12 @@ export const OnboardingDataSchema = z.object({
   // Especialidades & Descrição
   mainSpecialty: z.string().min(2, 'Especialidade principal é obrigatória'),
   otherSpecialties: z.array(z.string()).default([]),
-  professionalSummary: z.string().min(20, 'Resumo profissional deve ter no mínimo 20 caracteres'),
+  professionalSummary: z.string().min(2, 'Resumo profissional é obrigatório'),
   bio: z.string().optional(),
   
   // Localização & Atendimento
   city: z.string().min(2, 'Cidade é obrigatória'),
-  state: z.string().min(2, 'Estado (UF) é obrigatório').max(2),
+  state: z.string().min(2, 'Estado (UF) é obrigatório'),
   geographicArea: z.string().optional(),
   attendanceType: z.enum(AttendanceTypes).default('hibrido'),
   

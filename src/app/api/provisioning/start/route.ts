@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
 
     const parseResult = OnboardingDataSchema.safeParse(session.data);
     if (!parseResult.success) {
-      return NextResponse.json({ error: 'Dados do onboarding incompletos ou inválidos.' }, { status: 400 });
+      const errorMsg = parseResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(' | ');
+      return NextResponse.json({ error: `Dados do onboarding incompletos ou inválidos: ${errorMsg}` }, { status: 400 });
     }
 
     // Cria ou atualiza conta do usuário

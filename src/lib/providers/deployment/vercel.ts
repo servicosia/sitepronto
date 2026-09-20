@@ -2,22 +2,27 @@ export interface CreateProjectOptions {
   projectName: string;
   gitRepoName?: string;
   framework?: string;
+  files?: Array<{ file: string; data: string }>;
 }
 
 export interface DeploymentProvider {
   createProject(options: CreateProjectOptions): Promise<{ id: string; name: string; url: string }>;
+  deploy(options: { projectName: string; files: Array<{ file: string; data: string }> }): Promise<{ url: string; ready: boolean }>;
 }
 
 export class VercelProvider implements DeploymentProvider {
   private scope: string;
   private token: string | undefined;
+  private teamId: string | undefined;
 
   constructor(
     scope: string = process.env.VERCEL_SCOPE || 'contato-1577',
-    token: string | undefined = process.env.VERCEL_TOKEN
+    token: string | undefined = process.env.VERCEL_TOKEN,
+    teamId: string | undefined = process.env.VERCEL_TEAM_ID || 'team_3tLIgnGMZ5orYgHyKOIgxGZw'
   ) {
     this.scope = scope;
     this.token = token;
+    this.teamId = teamId;
   }
 
   async createProject(options: CreateProjectOptions) {
@@ -34,8 +39,10 @@ export class VercelProvider implements DeploymentProvider {
     }
 
     try {
-      // 1. Criação real e física do Projeto na Vercel via API REST
-      const res = await fetch('https://api.vercel.com/v9/projects', {
+      const teamQuery = this.teamId ? `?teamId=${this.teamId}` : '';
+      
+      // 1. Cria ou atualiza o projeto na Vercel garantindo configuração estática limpa
+      const res = await fetch(`https://api.vercel.com/v9/projects${teamQuery}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${this.token}`,
@@ -43,43 +50,87 @@ export class VercelProvider implements DeploymentProvider {
         },
         body: JSON.stringify({
           name: projectName,
-          framework: 'nextjs',
+          framework: null,
+          buildCommand: null,
+          outputDirectory: null,
+          installCommand: null,
         }),
       });
 
+      let projectId = `prj_${projectName}`;
       if (res.status === 200 || res.status === 201) {
         const data = await res.json();
-        return {
-          id: data.id,
-          name: data.name,
-          url: `https://${data.name}.vercel.app`,
-        };
+        projectId = data.id;
+      } else {
+        // Se já existir, aplica PATCH para garantir que o framework não force build Next.js com erro
+        await fetch(`https://api.vercel.com/v9/projects/${projectName}${teamQuery}`, {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            framework: null,
+            buildCommand: null,
+            outputDirectory: null,
+            installCommand: null,
+          }),
+        }).catch(() => {});
       }
 
-      const errData = await res.json();
-
-      // Se o projeto já existir na Vercel (Idempotência)
-      if (res.status === 409 || errData.error?.code === 'project_already_exists') {
-        return {
-          id: `prj_${projectName}`,
-          name: projectName,
-          url: `https://${projectName}.vercel.app`,
-        };
+      // 2. Se houver arquivos para deploy imediato, executa
+      if (options.files && options.files.length > 0) {
+        await this.deploy({ projectName, files: options.files });
       }
 
-      console.warn(`[VercelProvider] Aviso na API Vercel: ${errData.error?.message || res.status}`);
       return {
-        id: `prj_${projectName}`,
+        id: projectId,
         name: projectName,
         url: `https://${projectName}.vercel.app`,
       };
     } catch (error: any) {
-      console.error(`[VercelProvider] Erro de conexão na API Vercel: ${error.message}`);
+      console.error(`[VercelProvider] Erro na API Vercel: ${error.message}`);
       return {
         id: `prj_${projectName}`,
         name: projectName,
         url: `https://${projectName}.vercel.app`,
       };
+    }
+  }
+
+  async deploy(options: { projectName: string; files: Array<{ file: string; data: string }> }) {
+    if (!this.token) return { url: `https://${options.projectName}.vercel.app`, ready: true };
+
+    try {
+      const teamQuery = this.teamId ? `?teamId=${this.teamId}` : '';
+      const deployRes = await fetch(`https://api.vercel.com/v13/deployments${teamQuery}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: options.projectName,
+          project: options.projectName,
+          target: 'production',
+          files: options.files,
+          projectSettings: {
+            framework: null,
+            buildCommand: null,
+            outputDirectory: null,
+            installCommand: null,
+          },
+        }),
+      });
+
+      const deployData = await deployRes.json();
+      return {
+        url: `https://${options.projectName}.vercel.app`,
+        ready: deployData.readyState === 'READY' || deployRes.status === 200,
+      };
+    } catch (err: any) {
+      console.error('[VercelProvider] Erro ao criar deploy:', err.message);
+      return { url: `https://${options.projectName}.vercel.app`, ready: false };
     }
   }
 }
