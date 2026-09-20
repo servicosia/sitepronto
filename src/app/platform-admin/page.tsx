@@ -11,7 +11,10 @@ import {
   Clock, 
   RefreshCw,
   ExternalLink,
-  Layers
+  Layers,
+  Zap,
+  Sparkles,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -24,6 +27,14 @@ export default function PlatformAdminPage() {
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [description, setDescription] = useState('');
+
+  // Gerador Rápido de Testes (Simulador de UI & Stitch)
+  const [quickModalOpen, setQuickModalOpen] = useState(false);
+  const [quickProfession, setQuickProfession] = useState('Churrasqueiro & Buffet');
+  const [quickSpecialty, setQuickSpecialty] = useState('Churrasco Corporativo, Parrilla e Eventos');
+  const [quickProfessionalName, setQuickProfessionalName] = useState('Mestre Alessandro Carnes');
+  const [quickTemplate, setQuickTemplate] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
+  const [generatingQuickSite, setGeneratingQuickSite] = useState(false);
 
   async function loadData() {
     setLoading(true);
@@ -65,10 +76,63 @@ export default function PlatformAdminPage() {
     }
   }
 
+  async function handleExecuteQuickPreview() {
+    setGeneratingQuickSite(true);
+    try {
+      const payload = {
+        fullName: quickProfessionalName || 'Alessandro Especialista',
+        professionalName: quickProfessionalName || 'Alessandro Especialista',
+        companyName: quickProfessionalName || 'Alessandro Especialista',
+        publicEmail: 'contato@teste.com.br',
+        whatsapp: '11999999999',
+        profession: quickProfession || 'Profissional Liberal',
+        mainSpecialty: quickSpecialty || 'Atendimento de Alta Performance',
+        professionalSummary: 'Especialista dedicado a entregar atendimento humanizado, rigor técnico e excelência em cada projeto.',
+        attendanceType: 'hibrido',
+        city: 'São Paulo',
+        state: 'SP',
+        services: [
+          { title: `Atendimento & Diagnóstico em ${quickProfession}`, shortDescription: 'Análise técnica especializada e personalizada de acordo com seu objetivo.', ctaText: 'Saber Mais' },
+          { title: `Soluções em ${quickSpecialty}`, shortDescription: 'Planejamento estratégico e execução prática focada em excelência.', ctaText: 'Agendar' },
+          { title: 'Consultoria Especializada', shortDescription: 'Acompanhamento dedicado com suporte contínuo para os melhores resultados.', ctaText: 'Consultar' }
+        ],
+        hasProfessionalCouncil: false,
+        primaryColor: '#0f172a',
+        secondaryColor: '#3b82f6',
+        selectedDesignVariant: quickTemplate
+      };
+
+      const res = await fetch('/api/onboarding/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const resData = await res.json();
+      if (resData.success && resData.previews && resData.previews[quickTemplate]) {
+        const previewHtml = resData.previews[quickTemplate].html;
+        const win = window.open('', '_blank');
+        if (win) {
+          win.document.open();
+          win.document.write(previewHtml);
+          win.document.close();
+          setQuickModalOpen(false);
+        } else {
+          alert('Por favor, permita pop-ups no seu navegador para abrir o site gerado.');
+        }
+      } else {
+        alert('Erro ao gerar prévia: ' + (resData.error || 'Verifique os dados informados'));
+      }
+    } catch (err: any) {
+      alert('Falha na comunicação: ' + err.message);
+    } finally {
+      setGeneratingQuickSite(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top Header */}
-      <header className="bg-slate-900 text-white">
+      <header className="bg-slate-900 text-white sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg bg-emerald-500 text-slate-950 flex items-center justify-center font-bold">
@@ -76,7 +140,14 @@ export default function PlatformAdminPage() {
             </div>
             <span className="font-bold text-lg tracking-tight">SitePronto Platform Admin</span>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setQuickModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-bold shadow-sm transition border border-emerald-400/30"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>⚡ Gerador Rápido (Testes)</span>
+            </button>
             <Link href="/" className="text-sm text-slate-300 hover:text-white">
               Voltar ao Site
             </Link>
@@ -368,6 +439,222 @@ export default function PlatformAdminPage() {
             </table>
           </div>
         </div>
+
+        {/* Modal Interativo: Gerador Rápido de Testes (Simulador de UI & Stitch) */}
+        {quickModalOpen && (
+          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]">
+              {/* Header do Modal */}
+              <div className="p-6 bg-slate-900 text-white flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-bold text-xl shadow-md">
+                    ⚡
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base">Gerador Rápido de Sites (Modo Testes)</h3>
+                    <p className="text-xs text-slate-400">Escolha a profissão e o modelo para sintetizar e visualizar em segundos.</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setQuickModalOpen(false)} 
+                  className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Corpo do Modal */}
+              <div className="p-6 overflow-y-auto space-y-5 text-sm">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">Profissão / Nicho de Teste</label>
+                  <div className="grid grid-cols-2 gap-2 mb-2.5">
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setQuickProfession('Churrasqueiro & Buffet');
+                        setQuickSpecialty('Churrasco Corporativo, Parrilla e Eventos');
+                        setQuickProfessionalName('Mestre Alessandro Carnes');
+                      }} 
+                      className="p-2.5 border rounded-xl text-left text-xs hover:border-slate-900 bg-slate-50 font-medium transition"
+                    >
+                      🥩 Churrasqueiro
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setQuickProfession('Advogado Especialista');
+                        setQuickSpecialty('Direito Civil, Empresarial e Contratos');
+                        setQuickProfessionalName('Dr. Alessandro Advocacia');
+                      }} 
+                      className="p-2.5 border rounded-xl text-left text-xs hover:border-slate-900 bg-slate-50 font-medium transition"
+                    >
+                      ⚖️ Advogado
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setQuickProfession('Médico Especialista');
+                        setQuickSpecialty('Clínica Geral, Preventiva e Diagnósticos');
+                        setQuickProfessionalName('Dr. Alessandro Silva');
+                      }} 
+                      className="p-2.5 border rounded-xl text-left text-xs hover:border-slate-900 bg-slate-50 font-medium transition"
+                    >
+                      🩺 Médico
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setQuickProfession('Personal Trainer');
+                        setQuickSpecialty('Consultoria Fitness, Treino Funcional e Saúde');
+                        setQuickProfessionalName('Alessandro Trainer');
+                      }} 
+                      className="p-2.5 border rounded-xl text-left text-xs hover:border-slate-900 bg-slate-50 font-medium transition"
+                    >
+                      🏋️ Personal Trainer
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setQuickProfession('Arquiteto & Designer');
+                        setQuickSpecialty('Projetos Residenciais, Comerciais e Interiores');
+                        setQuickProfessionalName('Studio Alessandro Arquitetura');
+                      }} 
+                      className="p-2.5 border rounded-xl text-left text-xs hover:border-slate-900 bg-slate-50 font-medium transition"
+                    >
+                      📐 Arquiteto
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setQuickProfession('Mecânico Automotivo');
+                        setQuickSpecialty('Manutenção Preventiva, Injeção Eletrônica e Motores');
+                        setQuickProfessionalName('Oficina Alessandro Motors');
+                      }} 
+                      className="p-2.5 border rounded-xl text-left text-xs hover:border-slate-900 bg-slate-50 font-medium transition"
+                    >
+                      🔧 Mecânico
+                    </button>
+                  </div>
+
+                  <input 
+                    type="text" 
+                    value={quickProfession} 
+                    onChange={(e) => setQuickProfession(e.target.value)}
+                    placeholder="Ou digite outra profissão..." 
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-slate-900 focus:outline-none bg-white font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Nome Profissional / Empresa</label>
+                  <input 
+                    type="text" 
+                    value={quickProfessionalName} 
+                    onChange={(e) => setQuickProfessionalName(e.target.value)}
+                    placeholder="Ex: Dr. Roberto Alencar..." 
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-slate-900 focus:outline-none bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Especialidade / Foco Principal</label>
+                  <input 
+                    type="text" 
+                    value={quickSpecialty} 
+                    onChange={(e) => setQuickSpecialty(e.target.value)}
+                    placeholder="Ex: Carnes Nobres, Direito Imobiliário..." 
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-slate-900 focus:outline-none bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">Modelo Visual (Design Template)</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setQuickTemplate('MODEL_A')}
+                      className={`p-3 rounded-2xl border-2 text-center transition flex flex-col items-center ${
+                        quickTemplate === 'MODEL_A' 
+                          ? 'border-slate-900 bg-slate-50 shadow-sm font-bold' 
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <span className="text-xs text-slate-900">Modelo A</span>
+                      <span className="text-[10px] text-slate-500 font-normal">Institucional</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setQuickTemplate('MODEL_B')}
+                      className={`p-3 rounded-2xl border-2 text-center transition flex flex-col items-center ${
+                        quickTemplate === 'MODEL_B' 
+                          ? 'border-slate-900 bg-slate-50 shadow-sm font-bold' 
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <span className="text-xs text-slate-900">Modelo B</span>
+                      <span className="text-[10px] text-slate-500 font-normal">Dark Premium</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setQuickTemplate('MODEL_C')}
+                      className={`p-3 rounded-2xl border-2 text-center transition flex flex-col items-center ${
+                        quickTemplate === 'MODEL_C' 
+                          ? 'border-slate-900 bg-slate-50 shadow-sm font-bold' 
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <span className="text-xs text-slate-900">Modelo C</span>
+                      <span className="text-[10px] text-slate-500 font-normal">Editorial</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setQuickTemplate('MODEL_D')}
+                      className={`p-3 rounded-2xl border-2 text-center transition flex flex-col items-center ${
+                        quickTemplate === 'MODEL_D' 
+                          ? 'border-emerald-600 bg-emerald-50 shadow-sm font-bold' 
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <span className="text-xs text-emerald-700">Modelo D</span>
+                      <span className="text-[10px] text-emerald-600 font-normal">Stitch Pulse</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer do Modal */}
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2.5">
+                <button 
+                  type="button"
+                  onClick={() => setQuickModalOpen(false)} 
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="button"
+                  onClick={handleExecuteQuickPreview} 
+                  disabled={generatingQuickSite}
+                  className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md transition"
+                >
+                  {generatingQuickSite ? (
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                      <span>Sintetizando Site...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>🚀 Visualizar Site Imediatamente</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </main>
     </div>

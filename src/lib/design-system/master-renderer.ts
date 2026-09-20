@@ -51,12 +51,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         </div>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <button onclick="openQuickGeneratorModal()" class="text-xs bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-3.5 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1.5 border border-emerald-400/30">
-          <span>⚡</span>
-          <span>Gerador Rápido (Testes)</span>
-        </button>
-        <span class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-400 text-xs font-semibold">
+      <div class="flex items-center space-x-4">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-400 text-xs font-semibold">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           Neon & Vercel Conectados
         </span>
@@ -427,75 +423,6 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
 
   </main>
 
-  <!-- MODAL DE TESTE: GERADOR RÁPIDO DE SITE -->
-  <div id="quickGeneratorModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="p-6 bg-slate-900 text-white flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="w-9 h-9 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-lg">⚡</div>
-          <div>
-            <h3 class="font-bold text-base">Gerador Rápido de Site (Modo Testes)</h3>
-            <p class="text-xs text-slate-400">Escolha a profissão e o modelo para simular e visualizar instantaneamente.</p>
-          </div>
-        </div>
-        <button onclick="closeQuickGeneratorModal()" class="text-slate-400 hover:text-white text-xl font-bold p-1">✕</button>
-      </div>
-
-      <div class="p-6 overflow-y-auto space-y-5 text-sm">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Profissão / Nicho de Teste</label>
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <button type="button" onclick="setQuickProfession('Churrasqueiro & Buffet', 'Churrasco Corporativo e Eventos')" class="p-2 border rounded-lg text-left text-xs hover:border-slate-900 bg-slate-50 font-medium">🥩 Churrasqueiro</button>
-            <button type="button" onclick="setQuickProfession('Advogado Especialista', 'Direito Civil e Empresarial')" class="p-2 border rounded-lg text-left text-xs hover:border-slate-900 bg-slate-50 font-medium">⚖️ Advogado</button>
-            <button type="button" onclick="setQuickProfession('Médico Especialista', 'Clínica Geral e Preventiva')" class="p-2 border rounded-lg text-left text-xs hover:border-slate-900 bg-slate-50 font-medium">🩺 Médico</button>
-            <button type="button" onclick="setQuickProfession('Personal Trainer', 'Consultoria Fitness e Treinos')" class="p-2 border rounded-lg text-left text-xs hover:border-slate-900 bg-slate-50 font-medium">🏋️ Personal Trainer</button>
-            <button type="button" onclick="setQuickProfession('Arquiteto & Designer', 'Projetos Residenciais e Comerciais')" class="p-2 border rounded-lg text-left text-xs hover:border-slate-900 bg-slate-50 font-medium">📐 Arquiteto</button>
-            <button type="button" onclick="setQuickProfession('Mecânico Automotivo', 'Manutenção Preventiva e Motores')" class="p-2 border rounded-lg text-left text-xs hover:border-slate-900 bg-slate-50 font-medium">🔧 Mecânica</button>
-          </div>
-          <input type="text" id="quickProfessionInput" value="${profession}" placeholder="Ou digite outra profissão..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-slate-900 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Especialidade / Foco</label>
-          <input type="text" id="quickSpecialtyInput" value="${data.mainSpecialty || 'Atendimento e Consultoria de Excelência'}" placeholder="Ex: Carnes Nobres, Direito Imobiliário..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-slate-900 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Modelo Visual (Template)</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-900 bg-slate-50" id="label-quick-model-a">
-              <input type="radio" name="quickTemplate" value="MODEL_A" checked onchange="updateQuickTemplateHighlight('MODEL_A')" class="hidden">
-              <span class="font-bold text-xs text-slate-900">Modelo A</span>
-              <span class="text-[10px] text-slate-500">Institucional</span>
-            </label>
-            <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-200 bg-white" id="label-quick-model-b">
-              <input type="radio" name="quickTemplate" value="MODEL_B" onchange="updateQuickTemplateHighlight('MODEL_B')" class="hidden">
-              <span class="font-bold text-xs text-slate-900">Modelo B</span>
-              <span class="text-[10px] text-slate-500">Dark</span>
-            </label>
-            <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-200 bg-white" id="label-quick-model-c">
-              <input type="radio" name="quickTemplate" value="MODEL_C" onchange="updateQuickTemplateHighlight('MODEL_C')" class="hidden">
-              <span class="font-bold text-xs text-slate-900">Modelo C</span>
-              <span class="text-[10px] text-slate-500">Editorial</span>
-            </label>
-            <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-200 bg-white" id="label-quick-model-d">
-              <input type="radio" name="quickTemplate" value="MODEL_D" onchange="updateQuickTemplateHighlight('MODEL_D')" class="hidden">
-              <span class="font-bold text-xs text-emerald-600">Modelo D</span>
-              <span class="text-[10px] text-slate-500">Stitch Pulse</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-        <button onclick="closeQuickGeneratorModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900">Cancelar</button>
-        <button onclick="executeQuickPreviewGeneration()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm transition">
-          <span>🚀 Visualizar Site Imediatamente</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <footer class="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
     Painel /master • Isolamento criptográfico e persistência Neon PostgreSQL.
   </footer>
@@ -540,110 +467,6 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         activeEl.classList.remove('border-slate-200', 'bg-white');
         activeBadge.classList.remove('hidden');
         activeBadge.classList.add('flex');
-      }
-    }
-
-    function openQuickGeneratorModal() {
-      const modal = document.getElementById('quickGeneratorModal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      }
-    }
-
-    function closeQuickGeneratorModal() {
-      const modal = document.getElementById('quickGeneratorModal');
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
-    }
-
-    function setQuickProfession(prof, spec) {
-      document.getElementById('quickProfessionInput').value = prof;
-      document.getElementById('quickSpecialtyInput').value = spec;
-    }
-
-    function updateQuickTemplateHighlight(model) {
-      ['MODEL_A', 'MODEL_B', 'MODEL_C', 'MODEL_D'].forEach(m => {
-        const key = m.toLowerCase().replace('_', '-');
-        const lbl = document.getElementById('label-quick-' + key);
-        if (lbl) {
-          if (m === model) {
-            lbl.className = 'cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-900 bg-slate-50';
-          } else {
-            lbl.className = 'cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-200 bg-white';
-          }
-        }
-      });
-    }
-
-    async function executeQuickPreviewGeneration() {
-      const profession = document.getElementById('quickProfessionInput').value || 'Profissional';
-      const specialty = document.getElementById('quickSpecialtyInput').value || 'Especialista';
-      const templateRadios = document.getElementsByName('quickTemplate');
-      let selectedTemplate = 'MODEL_A';
-      for (const r of templateRadios) {
-        if (r.checked) {
-          selectedTemplate = r.value;
-          break;
-        }
-      }
-
-      const payload = {
-        fullName: document.getElementById('profName') ? document.getElementById('profName').value : '${name}',
-        professionalName: document.getElementById('profName') ? document.getElementById('profName').value : '${name}',
-        companyName: document.getElementById('profName') ? document.getElementById('profName').value : '${name}',
-        publicEmail: 'contato@teste.com.br',
-        whatsapp: '${data.whatsapp || '11999999999'}',
-        profession: profession,
-        mainSpecialty: specialty,
-        professionalSummary: 'Especialista dedicado a entregar atendimento humanizado, excelência técnica e máxima satisfação aos clientes.',
-        attendanceType: 'hibrido',
-        city: '${data.city || 'São Paulo'}',
-        state: '${data.state || 'SP'}',
-        services: [
-          { title: 'Atendimento & Diagnóstico ' + profession, shortDescription: 'Análise técnica especializada e personalizada de acordo com seu objetivo.', ctaText: 'Saber Mais' },
-          { title: 'Soluções em ' + specialty, shortDescription: 'Planejamento estratégico e execução prática focada em excelência.', ctaText: 'Agendar' },
-          { title: 'Consultoria Especializada', shortDescription: 'Acompanhamento dedicado com suporte contínuo para os melhores resultados.', ctaText: 'Consultar' }
-        ],
-        hasProfessionalCouncil: false,
-        primaryColor: '${data.primaryColor || '#0f172a'}',
-        secondaryColor: '${data.secondaryColor || '#3b82f6'}',
-        selectedDesignVariant: selectedTemplate
-      };
-
-      const btn = event.target.closest('button');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<span>⏳ Sintetizando Proposta...</span>';
-      btn.disabled = true;
-
-      try {
-        const res = await fetch('/api/onboarding/preview', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.success && data.previews && data.previews[selectedTemplate]) {
-          const previewHtml = data.previews[selectedTemplate].html;
-          const win = window.open('', '_blank');
-          if (win) {
-            win.document.open();
-            win.document.write(previewHtml);
-            win.document.close();
-            closeQuickGeneratorModal();
-          } else {
-            alert('Por favor, permita pop-ups para visualizar o novo site em outra aba.');
-          }
-        } else {
-          alert('Erro ao gerar site: ' + (data.error || 'Verifique os dados informados'));
-        }
-      } catch (err) {
-        alert('Falha na comunicação com o gerador: ' + err.message);
-      } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
       }
     }
 
