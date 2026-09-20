@@ -122,7 +122,10 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
     await prisma.site.update({ where: { id: siteId }, data: { status: 'CREATING_VERCEL' } });
     
     const { renderCompleteSiteHtml } = await import('../design-system/template-renderer');
+    const { renderMasterDashboardHtml } = await import('../design-system/master-renderer');
+    
     const fullSiteHtml = renderCompleteSiteHtml(params.data, params.designSpec);
+    const masterHtml = renderMasterDashboardHtml(params.data, siteId);
 
     const vercelProject = await vercel.createProject({
       projectName: slug,
@@ -130,6 +133,14 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
         {
           file: 'index.html',
           data: fullSiteHtml,
+        },
+        {
+          file: 'master.html',
+          data: masterHtml,
+        },
+        {
+          file: 'master/index.html',
+          data: masterHtml,
         },
       ],
     });

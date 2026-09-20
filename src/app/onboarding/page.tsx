@@ -59,6 +59,11 @@ function OnboardingContent() {
   const [accountPassword, setAccountPassword] = useState('');
   const [provisioning, setProvisioning] = useState(false);
 
+  // Estados do Google Stitch / Live Previews
+  const [synthesizing, setSynthesizing] = useState(false);
+  const [stitchEngineUsed, setStitchEngineUsed] = useState<string>('GoogleStitch');
+  const [previewsData, setPreviewsData] = useState<Record<string, { title: string; description: string; html: string }>>({});
+
   // Estado do formulário de onboarding
   const [formData, setFormData] = useState<Partial<OnboardingData>>({
     fullName: '',
@@ -151,6 +156,34 @@ function OnboardingContent() {
 
     return () => clearTimeout(timer);
   }, [formData, currentStep, selectedModel, voucherCode, loading]);
+
+  // Síntese de propostas visuais com Google Stitch ao entrar na Etapa 6
+  async function generatePreviews() {
+    setSynthesizing(true);
+    try {
+      const res = await fetch('/api/onboarding/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.previews) {
+        setPreviewsData(data.previews);
+        setStitchEngineUsed(data.providerUsed || 'InternalSynthesizer');
+      }
+    } catch (err) {
+      console.error('Erro ao gerar previews de UI:', err);
+    } finally {
+      // Simula uma validação de síntese refinada de 1.2s para suavidade visual
+      setTimeout(() => setSynthesizing(false), 800);
+    }
+  }
+
+  useEffect(() => {
+    if (currentStep === 6 && Object.keys(previewsData).length === 0) {
+      generatePreviews();
+    }
+  }, [currentStep]);
 
   function handleInputChange(field: keyof OnboardingData, value: any) {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -636,90 +669,178 @@ function OnboardingContent() {
           {/* ETAPA 6: Modelos de UI & Previews com dados reais */}
           {currentStep === 6 && (
             <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">Escolha uma das 3 Propostas Visuais</h2>
-                <p className="text-slate-600 text-sm mt-1">
-                  Os 3 modelos abaixo foram gerados com seus dados reais e possuem diagramações e experiências distintas.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <Sparkles className="w-6 h-6 text-amber-500" />
+                    Propostas Visuais & Design DNA (Google Stitch)
+                  </h2>
+                  <p className="text-slate-600 text-sm mt-1">
+                    {synthesizing 
+                      ? 'Processando e validando diagramação estética com inteligência artificial...' 
+                      : `3 propostas estruturadas geradas via ${stitchEngineUsed === 'GoogleStitch' ? 'Google Stitch AI' : 'Motor Visual Integrado'}.`}
+                  </p>
+                </div>
+
+                {!synthesizing && (
+                  <button
+                    type="button"
+                    onClick={generatePreviews}
+                    className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 mr-1.5 text-slate-900" />
+                    Recalcular Propostas
+                  </button>
+                )}
               </div>
 
-              {/* Seletor de Modelo */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Modelo A */}
-                <div 
-                  onClick={() => setSelectedModel('MODEL_A')}
-                  className={`cursor-pointer p-6 rounded-2xl border-2 transition-all ${
-                    selectedModel === 'MODEL_A'
-                      ? 'border-slate-900 bg-slate-50/80 shadow-md ring-2 ring-slate-900'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Modelo A</span>
-                    {selectedModel === 'MODEL_A' && (
-                      <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
-                    )}
+              {synthesizing ? (
+                <div className="p-12 text-center rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+                  <div className="relative w-16 h-16 mx-auto">
+                    <div className="w-16 h-16 rounded-full border-4 border-slate-100 border-t-slate-900 animate-spin" />
+                    <Sparkles className="w-6 h-6 text-amber-500 absolute inset-0 m-auto" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">Institucional Confiável</h3>
-                  <p className="text-xs text-slate-600 mb-4">
-                    Estrutura clássica, hero com contato rápido, cartões simétricos e alta legibilidade.
+                  <h3 className="text-lg font-bold text-slate-900">Sintetizando UI com Google Stitch...</h3>
+                  <p className="text-sm text-slate-500 max-w-md mx-auto">
+                    Aplicando paleta de cores ({formData.primaryColor}, {formData.secondaryColor}), combinando tipografia institucional e gerando estrutura completa com seções e formulário.
                   </p>
-                  <div className="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700">
-                    <strong>{formData.professionalName || 'Seu Nome'}</strong>
-                    <div className="text-[11px] text-slate-500">{formData.profession || 'Sua Profissão'}</div>
-                  </div>
                 </div>
+              ) : (
+                <>
+                  {/* Seletor de Modelo */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Modelo A */}
+                    <div 
+                      onClick={() => setSelectedModel('MODEL_A')}
+                      className={`cursor-pointer p-6 rounded-2xl border-2 transition-all ${
+                        selectedModel === 'MODEL_A'
+                          ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Modelo A</span>
+                        {selectedModel === 'MODEL_A' && (
+                          <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
+                        )}
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 mb-1">Institucional Confiável</h3>
+                      <p className="text-xs text-slate-600 mb-4">
+                        Estrutura clássica, hero com contato rápido, cartões simétricos e alta legibilidade.
+                      </p>
+                      <div className="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700">
+                        <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
+                        <div className="text-[11px] text-slate-500">{formData.profession || 'Sua Profissão'}</div>
+                      </div>
+                    </div>
 
-                {/* Modelo B */}
-                <div 
-                  onClick={() => setSelectedModel('MODEL_B')}
-                  className={`cursor-pointer p-6 rounded-2xl border-2 transition-all ${
-                    selectedModel === 'MODEL_B'
-                      ? 'border-slate-900 bg-slate-50/80 shadow-md ring-2 ring-slate-900'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Modelo B</span>
-                    {selectedModel === 'MODEL_B' && (
-                      <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
-                    )}
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">Moderno Premium</h3>
-                  <p className="text-xs text-slate-600 mb-4">
-                    Forte impacto visual, tipografia contemporânea, cartões dinâmicos e sofisticação.
-                  </p>
-                  <div className="p-3 bg-slate-900 rounded-lg text-xs text-white">
-                    <strong>{formData.professionalName || 'Seu Nome'}</strong>
-                    <div className="text-[11px] text-slate-300">{formData.mainSpecialty || 'Especialidade'}</div>
-                  </div>
-                </div>
+                    {/* Modelo B */}
+                    <div 
+                      onClick={() => setSelectedModel('MODEL_B')}
+                      className={`cursor-pointer p-6 rounded-2xl border-2 transition-all ${
+                        selectedModel === 'MODEL_B'
+                          ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Modelo B</span>
+                        {selectedModel === 'MODEL_B' && (
+                          <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
+                        )}
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 mb-1">Moderno Premium</h3>
+                      <p className="text-xs text-slate-600 mb-4">
+                        Forte impacto visual, tipografia contemporânea, cartões dinâmicos e sofisticação.
+                      </p>
+                      <div className="p-3 bg-slate-900 rounded-lg text-xs text-white">
+                        <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
+                        <div className="text-[11px] text-slate-300">{formData.mainSpecialty || 'Especialidade'}</div>
+                      </div>
+                    </div>
 
-                {/* Modelo C */}
-                <div 
-                  onClick={() => setSelectedModel('MODEL_C')}
-                  className={`cursor-pointer p-6 rounded-2xl border-2 transition-all ${
-                    selectedModel === 'MODEL_C'
-                      ? 'border-slate-900 bg-slate-50/80 shadow-md ring-2 ring-slate-900'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Modelo C</span>
-                    {selectedModel === 'MODEL_C' && (
-                      <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
-                    )}
+                    {/* Modelo C */}
+                    <div 
+                      onClick={() => setSelectedModel('MODEL_C')}
+                      className={`cursor-pointer p-6 rounded-2xl border-2 transition-all ${
+                        selectedModel === 'MODEL_C'
+                          ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Modelo C</span>
+                        {selectedModel === 'MODEL_C' && (
+                          <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
+                        )}
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 mb-1">Minimalista Editorial</h3>
+                      <p className="text-xs text-slate-600 mb-4">
+                        Espaçamento generoso, foco total na escrita, tipografia serifada e elegância sem ruídos.
+                      </p>
+                      <div className="p-3 bg-stone-100 rounded-lg border-l-2 border-stone-800 text-xs text-stone-800 font-serif">
+                        <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
+                        <div className="text-[11px] text-stone-600">{formData.city || 'Cidade'} - {formData.state || 'UF'}</div>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">Minimalista Editorial</h3>
-                  <p className="text-xs text-slate-600 mb-4">
-                    Espaçamento generoso, foco total na escrita, tipografia serifada e elegância sem ruídos.
-                  </p>
-                  <div className="p-3 bg-stone-100 rounded-lg border-l-2 border-stone-800 text-xs text-stone-800 font-serif">
-                    <strong>{formData.professionalName || 'Seu Nome'}</strong>
-                    <div className="text-[11px] text-stone-600">{formData.city} - {formData.state}</div>
+
+                  {/* Live Interactive Preview Box */}
+                  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-6">
+                    <div className="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+                      <div className="flex items-center space-x-2">
+                        <span className="w-3 h-3 rounded-full bg-red-400 inline-block" />
+                        <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" />
+                        <span className="w-3 h-3 rounded-full bg-emerald-400 inline-block" />
+                        <span className="text-xs font-mono text-slate-500 ml-2">
+                          Pré-visualização Interativa • {selectedModel === 'MODEL_A' ? 'Modelo A (Institucional)' : selectedModel === 'MODEL_B' ? 'Modelo B (Moderno)' : 'Modelo C (Editorial)'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewViewport('desktop')}
+                          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
+                            previewViewport === 'desktop' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border'
+                          }`}
+                        >
+                          Desktop
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewViewport('mobile')}
+                          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
+                            previewViewport === 'mobile' ? 'bg-slate-900 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border'
+                          }`}
+                        >
+                          Mobile
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-slate-100 flex justify-center items-center min-h-[500px]">
+                      <div className={`transition-all duration-300 bg-white rounded-xl shadow-lg overflow-hidden border border-slate-300 ${
+                        previewViewport === 'mobile' ? 'w-[375px] h-[640px]' : 'w-full h-[640px]'
+                      }`}>
+                        {previewsData[selectedModel]?.html ? (
+                          <iframe
+                            title="Live UI Preview"
+                            srcDoc={previewsData[selectedModel].html}
+                            className="w-full h-full border-0"
+                            sandbox="allow-scripts allow-same-origin"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 text-sm">
+                            <Loader2 className="w-8 h-8 animate-spin mb-2" />
+                            Renderizando modelo...
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           )}
 

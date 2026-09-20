@@ -1,17 +1,26 @@
-import { OnboardingData } from '../validation/onboarding';
-import { DesignSpec } from './specs';
+import type { OnboardingData } from '../validation/onboarding';
+import type { DesignSpec } from './specs';
 
 /**
  * Gera o template completo e fiel com todas as seções institucionais, áreas de atuação, 
  * sobre o profissional, artigos, formulário interativo de contato e integração /master.
  */
-export function renderCompleteSiteHtml(data: OnboardingData, spec: DesignSpec, adminToken?: string): string {
+export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, adminToken?: string): string {
   const name = data.professionalName || data.fullName;
   const profession = data.profession || 'Advogado';
   const specialty = data.mainSpecialty || 'Direito Especializado';
   const whatsappDigits = (data.whatsapp || '').replace(/[^0-9]/g, '');
   const oabBadge = data.councilNumber ? `${data.councilType || 'OAB'} ${data.councilNumber}` : 'Registro Ativo';
+  const variant = spec?.variant || 'MODEL_A';
   
+  // Customização de tipografia e estilo por variante
+  const isEditorial = variant === 'MODEL_C';
+  const isModern = variant === 'MODEL_B';
+  const bodyFont = isEditorial ? 'font-serif' : isModern ? "font-['Plus_Jakarta_Sans']" : "font-['Inter']";
+  const headingFont = isEditorial ? "font-['Cinzel']" : isModern ? "font-['Plus_Jakarta_Sans']" : "font-['Outfit']";
+  const primaryBg = data.primaryColor || (isEditorial ? '#111827' : isModern ? '#0f172a' : '#1e293b');
+  const accentColor = data.accentColor || '#10b981';
+
   const servicesList = data.services && data.services.length > 0 ? data.services : [
     {
       title: 'Consultoria Especializada',
@@ -29,15 +38,14 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec: DesignSpec, a
   <title>${name} — ${profession} | ${specialty}</title>
   <meta name="description" content="${data.professionalSummary || 'Atuação jurídica especializada, atendimento individualizado e compromisso com a defesa dos seus direitos.'}">
   
-  <!-- Tailwind CSS & Fontes -->
+  <!-- Tailwind CSS & Fontes Google Stitch -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&family=Cinzel:wght@600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .font-heading { font-family: 'Outfit', sans-serif; }
+    body { font-family: ${isEditorial ? "'Cinzel', Georgia, serif" : isModern ? "'Plus Jakarta Sans', sans-serif" : "'Inter', sans-serif"}; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased selection:bg-slate-900 selection:text-white">

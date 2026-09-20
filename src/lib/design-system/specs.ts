@@ -1,4 +1,4 @@
-import { OnboardingData } from '../validation/onboarding';
+import type { OnboardingData } from '../validation/onboarding';
 
 export interface DesignSpec {
   id: string;

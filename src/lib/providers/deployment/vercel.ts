@@ -41,7 +41,7 @@ export class VercelProvider implements DeploymentProvider {
     try {
       const teamQuery = this.teamId ? `?teamId=${this.teamId}` : '';
       
-      // 1. Cria ou atualiza o projeto na Vercel garantindo configuração estática limpa
+      // 1. Cria ou atualiza o projeto na Vercel garantindo configuração estática limpa e cleanUrls
       const res = await fetch(`https://api.vercel.com/v9/projects${teamQuery}`, {
         method: 'POST',
         headers: {
@@ -54,6 +54,8 @@ export class VercelProvider implements DeploymentProvider {
           buildCommand: null,
           outputDirectory: null,
           installCommand: null,
+          cleanUrls: true,
+          trailingSlash: false,
         }),
       });
 
@@ -103,6 +105,12 @@ export class VercelProvider implements DeploymentProvider {
 
     try {
       const teamQuery = this.teamId ? `?teamId=${this.teamId}` : '';
+      const routes = [
+        { handle: 'filesystem' },
+        { src: '/master/?$', dest: '/master/index.html' },
+        { src: '/master/(.*)', dest: '/master/index.html' },
+      ];
+
       const deployRes = await fetch(`https://api.vercel.com/v13/deployments${teamQuery}`, {
         method: 'POST',
         headers: {
@@ -113,6 +121,7 @@ export class VercelProvider implements DeploymentProvider {
           name: options.projectName,
           project: options.projectName,
           target: 'production',
+          routes,
           files: options.files,
           projectSettings: {
             framework: null,
