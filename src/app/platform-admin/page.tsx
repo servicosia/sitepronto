@@ -235,12 +235,13 @@ export default function PlatformAdminPage() {
                   <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4">Link de Resgate</th>
                   <th className="py-3 px-4">Data</th>
+                  <th className="py-3 px-4 text-right">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {data?.vouchers?.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-6 text-center text-slate-400">
+                    <td colSpan={6} className="py-6 text-center text-slate-400">
                       Nenhum voucher emitido ainda.
                     </td>
                   </tr>
@@ -274,6 +275,21 @@ export default function PlatformAdminPage() {
                       <td className="py-3 px-4 text-xs text-slate-400">
                         {new Date(v.createdAt).toLocaleDateString('pt-BR')}
                       </td>
+                      <td className="py-3 px-4 text-right">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (confirm(`Deseja realmente excluir o voucher ${v.code}?`)) {
+                              await fetch(`/api/vouchers/delete?id=${v.id}`, { method: 'DELETE' });
+                              loadData();
+                            }
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Excluir Voucher"
+                        >
+                          ✕ Excluir
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -285,7 +301,7 @@ export default function PlatformAdminPage() {
         {/* Sites Provisionados */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
           <h2 className="text-lg font-bold text-slate-900 mb-1">Sites Criados na Fábrica</h2>
-          <p className="text-xs text-slate-500 mb-6">Lista de sites provisionados e seus repositórios / URLs isoladas.</p>
+          <p className="text-xs text-slate-500 mb-6">Lista de sites provisionados e seus status.</p>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-600">
@@ -294,9 +310,9 @@ export default function PlatformAdminPage() {
                   <th className="py-3 px-4">Nome do Site</th>
                   <th className="py-3 px-4">Profissão</th>
                   <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">GitHub</th>
                   <th className="py-3 px-4">Deploy Vercel</th>
-                  <th className="py-3 px-4">Ação</th>
+                  <th className="py-3 px-4">Progresso</th>
+                  <th className="py-3 px-4 text-right">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -317,13 +333,6 @@ export default function PlatformAdminPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4 text-xs">
-                        {s.githubRepoUrl ? (
-                          <a href={s.githubRepoUrl} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">
-                            Ver Repo
-                          </a>
-                        ) : '-'}
-                      </td>
-                      <td className="py-3 px-4 text-xs">
                         {s.vercelUrl ? (
                           <a href={s.vercelUrl} target="_blank" rel="noreferrer" className="text-emerald-600 font-semibold hover:underline">
                             Ver Site
@@ -332,8 +341,22 @@ export default function PlatformAdminPage() {
                       </td>
                       <td className="py-3 px-4 text-xs">
                         <Link href={`/progresso/${s.id}`} className="text-slate-900 font-semibold hover:underline">
-                          Detalhes
+                          Ver Etapas
                         </Link>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (confirm(`Deseja excluir o site ${s.name} e remover recursos na Vercel/Neon?`)) {
+                              await fetch(`/api/sites/delete?id=${s.id}`, { method: 'DELETE' });
+                              loadData();
+                            }
+                          }}
+                          className="px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition-colors"
+                        >
+                          Excluir Projeto
+                        </button>
                       </td>
                     </tr>
                   ))
