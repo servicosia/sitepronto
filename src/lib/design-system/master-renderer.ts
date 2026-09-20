@@ -1,13 +1,15 @@
 import type { OnboardingData } from '../validation/onboarding';
 
 export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string): string {
-  const name = data.professionalName || data.fullName || 'Profissional';
-  const profession = data.profession || 'Advogado';
-  const oab = data.councilNumber ? `${data.councilType || 'OAB'} ${data.councilNumber}` : 'OAB/SP 123456';
+  const name = data.professionalName || data.fullName || 'Profissional / Empresa';
+  const profession = data.profession || 'Especialista';
+  const council = data.councilNumber 
+    ? `${data.councilType || 'Registro'} ${data.councilNumber}` 
+    : (data.hasProfessionalCouncil ? 'Registro Ativo' : 'Cadastro Regular');
   const services = data.services && data.services.length > 0 ? data.services : [
-    { title: 'Consultoria Especializada', shortDescription: 'Atendimento estratégico e análise técnica.' },
-    { title: 'Defesa Técnica', shortDescription: 'Representação em processos e procedimentos.' },
-    { title: 'Medidas Urgentes', shortDescription: 'Atuação célere para resguardo de direitos.' }
+    { title: 'Consultoria e Atendimento', shortDescription: 'Atendimento estratégico e análise técnica das necessidades.' },
+    { title: 'Diagnóstico e Estruturação', shortDescription: 'Planejamento e estruturação prática para alcance de metas.' },
+    { title: 'Suporte Contínuo', shortDescription: 'Acompanhamento dedicado com foco em excelência e resultados.' }
   ];
 
   return `<!DOCTYPE html>
@@ -169,8 +171,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
             <input type="text" id="profName" value="${name}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Registro (Conselho / OAB / Outro)</label>
-            <input type="text" id="profOab" value="${oab}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none">
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Registro (Conselho / Órgão de Classe)</label>
+            <input type="text" id="profOab" value="${council}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Cidade / Estado</label>
@@ -359,8 +361,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         <div class="space-y-3">
           <div class="p-4 rounded-xl border border-slate-200 bg-white flex items-center justify-between">
             <div>
-              <span class="text-xs font-bold text-emerald-700 uppercase">Guia Prático</span>
-              <h4 class="font-bold text-sm text-slate-900">Direitos Fundamentais e Orientações Iniciais em Demandas Urgentes</h4>
+              <span class="text-xs font-bold text-emerald-700 uppercase">Guia Informativo</span>
+              <h4 class="font-bold text-sm text-slate-900">Principais Cuidados e Estratégias para Escolher o Serviço Ideal</h4>
               <p class="text-xs text-slate-400">Publicado • Leitura: 4 min</p>
             </div>
             <button onclick="triggerSave('Artigo editado!')" class="text-xs font-bold text-slate-900 border px-3 py-1.5 rounded-lg hover:bg-slate-50">Editar</button>
@@ -368,7 +370,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
 
           <div class="p-4 rounded-xl border border-slate-200 bg-white flex items-center justify-between">
             <div>
-              <span class="text-xs font-bold text-emerald-700 uppercase">Informativo</span>
+              <span class="text-xs font-bold text-emerald-700 uppercase">Artigo Técnico</span>
               <h4 class="font-bold text-sm text-slate-900">A Importância do Acompanhamento Especializado e Prevenção</h4>
               <p class="text-xs text-slate-400">Publicado • Leitura: 3 min</p>
             </div>

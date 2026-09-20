@@ -72,7 +72,7 @@ function OnboardingContent() {
     profession: '',
     activityType: 'autonomo',
     hasProfessionalCouncil: false,
-    councilType: 'OAB/SP',
+    councilType: '',
     councilNumber: '',
     mainSpecialty: '',
     professionalSummary: '',

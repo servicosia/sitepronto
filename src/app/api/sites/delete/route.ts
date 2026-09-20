@@ -26,8 +26,8 @@ export async function DELETE(req: NextRequest) {
     if (site.vercelProjectId) {
       await vercel.deleteProject(site.vercelProjectId);
     }
-    if (site.subdomain && site.subdomain !== site.vercelProjectId) {
-      await vercel.deleteProject(site.subdomain);
+    if (site.slug && site.slug !== site.vercelProjectId) {
+      await vercel.deleteProject(site.slug);
     }
 
     // 2. Exclusão no Neon

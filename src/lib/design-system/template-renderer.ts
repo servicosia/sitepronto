@@ -160,14 +160,16 @@ function getContextualImages(profession: string, specialty: string) {
  * entre os modelos (MODEL_A, MODEL_B, MODEL_C) e aplicação rigorosa das cores e imagens contextuais.
  */
 export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, adminToken?: string): string {
-  const name = data.professionalName || data.fullName || 'Escritório Profissional';
-  const profession = data.profession || 'Advocacia';
-  const specialty = data.mainSpecialty || 'Direito Especializado';
+  const name = data.professionalName || data.fullName || 'Nome do Profissional / Empresa';
+  const profession = data.profession || 'Especialista / Consultoria';
+  const specialty = data.mainSpecialty || 'Atendimento e Serviços Especializados';
   const whatsappDigits = (data.whatsapp || '').replace(/[^0-9]/g, '');
-  const oabBadge = data.councilNumber ? `${data.councilType || 'OAB'} ${data.councilNumber}` : 'Registro Ativo';
+  const councilBadge = data.councilNumber 
+    ? `${data.councilType || 'Registro'} ${data.councilNumber}` 
+    : (data.hasProfessionalCouncil ? 'Registro Ativo' : 'Atendimento Certificado');
   const variant = spec?.variant || 'MODEL_A';
   
-  // Imagens temáticas contextuais
+  // Imagens temáticas contextuais de acordo com a profissão digitada
   const images = getContextualImages(profession, specialty);
   const heroImage = data.coverPhotoUrl || images.hero;
   const aboutImage = data.profilePhotoUrl || images.about;
@@ -187,9 +189,21 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
 
   const servicesList = data.services && data.services.length > 0 ? data.services : [
     {
-      title: 'Consultoria Especializada',
-      shortDescription: 'Atendimento e orientação estratégica com análise aprofundada de cada caso.',
+      title: 'Consultoria e Atendimento Especializado',
+      shortDescription: 'Atendimento e orientação personalizada com análise aprofundada das suas necessidades e soluções sob medida.',
       icon: 'Briefcase',
+      ctaText: 'Solicitar Atendimento'
+    },
+    {
+      title: 'Diagnóstico e Planejamento',
+      shortDescription: 'Avaliação técnica detalhada para estruturação das melhores etapas e estratégias práticas para o seu objetivo.',
+      icon: 'Target',
+      ctaText: 'Agendar Horário'
+    },
+    {
+      title: 'Acompanhamento Contínuo',
+      shortDescription: 'Suporte dedicado e acompanhamento próximo para garantir excelência, segurança e resultados consistentes.',
+      icon: 'Shield',
       ctaText: 'Falar no WhatsApp'
     }
   ];
@@ -200,7 +214,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${name} — ${profession} | ${specialty}</title>
-  <meta name="description" content="${data.professionalSummary || 'Atuação especializada, atendimento individualizado e compromisso com a defesa dos seus direitos.'}">
+  <meta name="description" content="${data.professionalSummary || 'Atuação de alto padrão, atendimento individualizado e compromisso com os melhores resultados para você.'}">
   
   <!-- Tailwind CSS & Fontes Google Stitch -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -238,13 +252,13 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
         </div>
         <div>
           <span class="font-bold text-lg leading-tight block ${isModern ? 'text-white' : isEditorial ? 'text-stone-900 font-serif' : 'text-slate-900'}">${name}</span>
-          <span class="text-xs font-medium block ${isModern ? 'text-slate-400' : 'text-slate-500'}">${profession} • ${oabBadge}</span>
+          <span class="text-xs font-medium block ${isModern ? 'text-slate-400' : 'text-slate-500'}">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</span>
         </div>
       </div>
 
       <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold ${isModern ? 'text-slate-300' : isEditorial ? 'text-stone-700' : 'text-slate-600'}">
         <a href="#inicio" class="hover:opacity-80 transition">Início</a>
-        <a href="#atuacao" class="hover:opacity-80 transition">Áreas de Atuação</a>
+        <a href="#servicos" class="hover:opacity-80 transition">Serviços</a>
         <a href="#como-funciona" class="hover:opacity-80 transition">Como Funciona</a>
         <a href="#sobre" class="hover:opacity-80 transition">Sobre</a>
         <a href="#artigos" class="hover:opacity-80 transition">Informativos</a>
@@ -268,15 +282,15 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
         <div class="lg:col-span-7 text-left">
           <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6 border shadow-sm" style="background-color: ${primary}25; border-color: ${primary}66; color: #ffffff">
             <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${accent}"></span>
-            Atendimento Online & Presencial • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
+            ${data.attendanceType === 'online' ? 'Atendimento 100% Online' : data.attendanceType === 'presencial' ? 'Atendimento Presencial' : 'Atendimento Online & Presencial'} • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
           </div>
           
           <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6">
-            ${data.companyName || specialty || 'Soluções Jurídicas Estratégicas e Alta Performance'}
+            ${data.companyName || specialty || 'Soluções Estratégicas e Atendimento de Alta Performance'}
           </h1>
           
           <p class="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
-            ${data.professionalSummary || 'Defesa técnica, ética e estratégica dos seus direitos com rigor e acompanhamento exclusivo.'}
+            ${data.professionalSummary || 'Atuação dedicada, ética e com rigor técnico para entregar os melhores resultados com atendimento próximo e transparente.'}
           </p>
 
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
@@ -284,7 +298,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
               Falar Diretamente no WhatsApp
             </a>
             <a href="#contato" class="px-8 py-4 bg-slate-900 border border-slate-700 text-white font-bold rounded-xl hover:bg-slate-800 transition text-center">
-              Formulário de Análise
+              Solicitar Contato
             </a>
           </div>
         </div>
@@ -294,7 +308,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
             <img src="${heroImage}" alt="${specialty}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
             <div class="absolute bottom-6 left-6 right-6 p-4 rounded-xl backdrop-blur-md bg-slate-900/80 border border-slate-700/60">
-              <span class="text-xs font-bold text-amber-400 block">${profession} • ${oabBadge}</span>
+              <span class="text-xs font-bold text-amber-400 block">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</span>
               <span class="text-sm font-semibold text-white block mt-0.5">${name}</span>
             </div>
           </div>
@@ -311,12 +325,12 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
           <div class="border-l-4 pl-6 sm:pl-8 mb-6" style="border-color: ${primary}">
             <span class="text-xs uppercase tracking-widest font-semibold text-stone-500 block mb-2">${profession} • ${data.city || 'São Paulo'}/${data.state || 'SP'}</span>
             <h1 class="text-4xl sm:text-5xl font-serif text-stone-900 leading-tight">
-              ${data.companyName || specialty || 'Defesa Ética e Excelência Jurídica'}
+              ${data.companyName || specialty || 'Excelência Profissional e Atendimento Dedicado'}
             </h1>
           </div>
           
           <p class="text-base sm:text-lg text-stone-700 leading-relaxed mb-8 font-serif">
-            ${data.professionalSummary || 'Atuação dedicada com rigor técnico, discrição e transparência em todas as fases do processo.'}
+            ${data.professionalSummary || 'Atuação orientada por princípios de qualidade, clareza e dedicação para proporcionar as soluções mais adequadas.'}
           </p>
 
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
@@ -324,7 +338,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
               CONSULTAR VIA WHATSAPP
             </a>
             <a href="#contato" class="px-8 py-4 border border-stone-400 text-stone-900 font-bold text-center tracking-wider text-xs hover:bg-stone-200 transition">
-              ENVIAR MENSAGEM FORMAL
+              ENVIAR MENSAGEM
             </a>
           </div>
         </div>
@@ -346,15 +360,15 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
         <div class="lg:col-span-7">
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-6 border" style="background-color: ${secondary}15; border-color: ${secondary}40; color: ${primary}">
             <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${accent}"></span>
-            Atendimento Online e Presencial • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
+            ${data.attendanceType === 'online' ? 'Atendimento 100% Online' : data.attendanceType === 'presencial' ? 'Atendimento Presencial' : 'Atendimento Online e Presencial'} • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
           </div>
           
           <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950 leading-[1.15] mb-6">
-            ${data.companyName || specialty || 'Atuação Jurídica Especializada e Atendimento Individualizado'}
+            ${data.companyName || specialty || 'Serviços Especializados com Atendimento Individualizado'}
           </h1>
           
           <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-8">
-            ${data.professionalSummary || 'Defesa técnica, ética e estratégica dos seus direitos com acompanhamento próximo e transparente em cada etapa.'}
+            ${data.professionalSummary || 'Atuação com alto padrão técnico, responsabilidade e transparência em todas as etapas de atendimento.'}
           </p>
 
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
@@ -362,7 +376,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
               Falar pelo WhatsApp
             </a>
             <a href="#contato" class="px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center transition">
-              Enviar Formulário de Análise
+              Enviar Mensagem
             </a>
           </div>
         </div>
@@ -382,25 +396,25 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   </section>
   `}
 
-  <!-- ÁREAS DE ATUAÇÃO -->
-  <section id="atuacao" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : 'bg-slate-50 border-b border-slate-200'}">
+  <!-- SERVIÇOS / ÁREAS DE ATUAÇÃO -->
+  <section id="servicos" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : 'bg-slate-50 border-b border-slate-200'}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16">
-        <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Especialidades</h2>
-        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl">Áreas de Atuação Profissional</p>
-        <p class="mt-3 text-sm ${isModern ? 'text-slate-400' : 'text-slate-600'}">Atendimento técnico e personalizado nas principais demandas da área.</p>
+        <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Serviços & Soluções</h2>
+        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl">Áreas de Atuação e Especialidades</p>
+        <p class="mt-3 text-sm ${isModern ? 'text-slate-400' : 'text-slate-600'}">Soluções estruturadas para atender às necessidades específicas do seu perfil.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        ${servicesList.map(s => `
+        ${servicesList.map((s, index) => `
           <div class="${isModern ? 'bg-slate-950 border-slate-800 hover:border-slate-700' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-2xl'} p-8 border shadow-sm hover:shadow-md transition-all">
             <div class="w-12 h-12 ${isEditorial ? 'rounded-none' : 'rounded-xl'} text-white flex items-center justify-center font-bold mb-6 text-xl shadow-md" style="background-color: ${primary}">
-              ⚖️
+              ${index === 0 ? '✨' : index === 1 ? '🎯' : '⭐'}
             </div>
             <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mb-3">${s.title}</h3>
             <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-6">${s.shortDescription}</p>
             <a href="https://wa.me/${whatsappDigits}?text=${encodeURIComponent('Olá, gostaria de informações sobre ' + s.title)}" target="_blank" class="text-sm font-bold inline-flex items-center hover:underline" style="color: ${primary}">
-              ${s.ctaText || 'Consultar sobre esta área'} →
+              ${s.ctaText || 'Saber mais'} →
             </a>
           </div>
         `).join('')}
@@ -412,31 +426,31 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   <section id="como-funciona" class="py-20 ${isModern ? 'bg-slate-950 border-b border-slate-800' : isEditorial ? 'bg-[#faf9f6] border-b border-stone-300' : 'bg-white border-b border-slate-200'}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16">
-        <h2 class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Transparência</h2>
+        <h2 class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Processo</h2>
         <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl">Como Funciona o Atendimento</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
           <div class="w-12 h-12 mx-auto rounded-full text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">1</div>
-          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Envio das Informações</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Você entra em contato pelo WhatsApp ou preenche o formulário com o resumo da situação.</p>
+          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Primeiro Contato</h3>
+          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Você entra em contato via WhatsApp ou formulário apresentando sua necessidade.</p>
         </div>
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
           <div class="w-12 h-12 mx-auto rounded-full text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">2</div>
-          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Análise Preliminar</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Avaliamos a viabilidade técnica e os documentos pertinentes ao seu caso com sigilo.</p>
+          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Diagnóstico Personalizado</h3>
+          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Avaliamos seu caso detalhadamente para estruturar a abordagem mais eficiente e sob medida.</p>
         </div>
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
           <div class="w-12 h-12 mx-auto rounded-full text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">3</div>
-          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Orientação Estratégica</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Apresentamos o melhor caminho jurídico e as medidas necessárias para defesa dos seus interesses.</p>
+          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Execução & Resultados</h3>
+          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Iniciamos os trabalhos com suporte contínuo, transparência e foco nos melhores resultados.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SOBRE O PROFISSIONAL COM FOTO/IMAGEM -->
+  <!-- SOBRE O PROFISSIONAL / EMPRESA COM FOTO -->
   <section id="sobre" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : 'bg-slate-50 border-b border-slate-200'}">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="${isModern ? 'bg-slate-950 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} p-8 sm:p-12 border shadow-sm">
@@ -448,12 +462,12 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
           </div>
 
           <div class="lg:col-span-8">
-            <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Perfil Profissional</h2>
+            <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Apresentação</h2>
             <h3 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} mb-3">${name}</h3>
-            <p class="text-sm font-semibold ${isModern ? 'text-slate-400' : 'text-slate-500'} mb-6">${profession} • ${oabBadge} • Atendimento em ${data.city || 'São Paulo'}/${data.state || 'SP'}</p>
+            <p class="text-sm font-semibold ${isModern ? 'text-slate-400' : 'text-slate-500'} mb-6">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''} • Atendimento em ${data.city || 'São Paulo'}/${data.state || 'SP'}</p>
             
             <p class="${isModern ? 'text-slate-300' : 'text-slate-700'} leading-relaxed mb-6">
-              ${data.bio || data.professionalSummary || 'Atuação dedicada à excelência profissional e atendimento personalizado, pautado pela ética, sigilo e rigor técnico.'}
+              ${data.bio || data.professionalSummary || 'Dedicado a oferecer soluções de alto nível com rigor técnico, ética e transparência, proporcionando uma experiência diferenciada a cada cliente.'}
             </p>
 
             <div class="pt-6 border-t ${isModern ? 'border-slate-800' : 'border-slate-100'} flex flex-wrap gap-4 text-xs font-semibold ${isModern ? 'text-slate-300' : 'text-slate-600'}">
@@ -471,35 +485,35 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   <section id="artigos" class="py-20 ${isModern ? 'bg-slate-950 border-b border-slate-800' : isEditorial ? 'bg-[#faf9f6] border-b border-stone-300' : 'bg-white border-b border-slate-200'}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16">
-        <h2 class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Informativos</h2>
+        <h2 class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo</h2>
         <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl">Artigos & Orientações</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border">
-          <span class="text-xs font-bold uppercase" style="color: ${secondary}">Guia Prático</span>
-          <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mt-2 mb-3">Direitos Fundamentais e Medidas Iniciais em Demandas Urgentes</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-4">Saiba quais documentos devem ser preservados e como agir imediatamente para resguardar direitos em situações críticas.</p>
+          <span class="text-xs font-bold uppercase" style="color: ${secondary}">Guia Informativo</span>
+          <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mt-2 mb-3">Principais Cuidados e Estratégias para Escolher o Serviço Ideal</h3>
+          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-4">Entenda os fatores determinantes na tomada de decisão e como um planejamento adequado pode economizar tempo e recursos.</p>
           <span class="text-xs text-slate-500 font-medium">Leitura: 4 min • Por ${name}</span>
         </div>
 
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border">
-          <span class="text-xs font-bold uppercase" style="color: ${secondary}">Artigo Jurídico</span>
+          <span class="text-xs font-bold uppercase" style="color: ${secondary}">Artigo Técnico</span>
           <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mt-2 mb-3">A Importância do Acompanhamento Especializado</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-4">Como uma consultoria técnica antecipada previne litígios desnecessários e assegura resoluções mais eficientes.</p>
+          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-4">Como a assistência profissional qualificada previne problemas e assegura a máxima eficiência em cada projeto.</p>
           <span class="text-xs text-slate-500 font-medium">Leitura: 3 min • Por ${name}</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FORMULÁRIO DE CONTATO SEGURO -->
+  <!-- FORMULÁRIO DE CONTATO DIRETO -->
   <section id="contato" class="py-20 ${isModern ? 'bg-slate-900' : isEditorial ? 'bg-[#f4f2eb]' : 'bg-slate-50'}">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="${isModern ? 'bg-slate-950 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} p-8 sm:p-12 border shadow-sm">
         <div class="text-center mb-8">
           <h2 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'}">Formulário de Contato Direto</h2>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm mt-2">Envie sua mensagem. Seus dados são confidenciais e tratados com sigilo profissional.</p>
+          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm mt-2">Envie sua mensagem. Seus dados são confidenciais e retornaremos o mais breve possível.</p>
         </div>
 
         <form onsubmit="event.preventDefault(); alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');" class="space-y-4">
@@ -522,16 +536,16 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
           <div>
             <label class="block text-xs font-bold ${isModern ? 'text-slate-300' : 'text-slate-700'} uppercase mb-1">Motivo do Contato *</label>
             <select class="w-full px-4 py-3 rounded-xl border ${isModern ? 'bg-slate-900 border-slate-700 text-white' : 'border-slate-300'} text-sm focus:outline-none">
-              <option>Agendamento de Consulta</option>
-              <option>Análise de Caso / Processo</option>
-              <option>Demanda Urgente</option>
+              <option>Solicitação de Orçamento / Proposta</option>
+              <option>Agendamento de Consulta / Reunião</option>
+              <option>Dúvidas Gerais sobre Serviços</option>
               <option>Outros Assuntos</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-xs font-bold ${isModern ? 'text-slate-300' : 'text-slate-700'} uppercase mb-1">Mensagem / Resumo do Caso *</label>
-            <textarea rows="4" required placeholder="Descreva brevemente a sua situação..." class="w-full px-4 py-3 rounded-xl border ${isModern ? 'bg-slate-900 border-slate-700 text-white' : 'border-slate-300'} text-sm focus:outline-none"></textarea>
+            <label class="block text-xs font-bold ${isModern ? 'text-slate-300' : 'text-slate-700'} uppercase mb-1">Mensagem / Resumo *</label>
+            <textarea rows="4" required placeholder="Descreva brevemente a sua solicitação..." class="w-full px-4 py-3 rounded-xl border ${isModern ? 'bg-slate-900 border-slate-700 text-white' : 'border-slate-300'} text-sm focus:outline-none"></textarea>
           </div>
 
           <p class="text-xs text-slate-500">Ao enviar este formulário, você concorda com a política de privacidade e o tratamento confidencial das informações.</p>
@@ -549,7 +563,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
       <div>
         <p class="font-bold text-lg">${name}</p>
-        <p class="text-xs text-slate-400 mt-1">${profession} • ${oabBadge}</p>
+        <p class="text-xs text-slate-400 mt-1">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</p>
       </div>
       <p class="text-xs text-slate-500 text-center sm:text-right">
         © ${new Date().getFullYear()} ${name}. Todos os direitos reservados.<br>
