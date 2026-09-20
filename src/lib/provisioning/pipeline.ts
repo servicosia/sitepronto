@@ -87,38 +87,19 @@ async function recordStep(siteId: string, step: any, status: string, details?: a
 }
 
 async function runPipelineSteps(siteId: string, jobId: string, params: ProvisionSiteParams, slug: string) {
-  const git = new GitHubProvider();
   const vercel = new VercelProvider();
 
   try {
     // ETAPA 1: VALIDATING
-    await recordStep(siteId, 'VALIDATING', 'SUCCESS', { message: 'Dados validados com sucesso' });
+    await recordStep(siteId, 'VALIDATING', 'SUCCESS', { message: 'Dados do cliente validados com sucesso' });
 
     // ETAPA 2: GENERATING_CONTENT
     await prisma.site.update({ where: { id: siteId }, data: { status: 'GENERATING_CONTENT' } });
-    await recordStep(siteId, 'GENERATING_CONTENT', 'SUCCESS', { message: 'DesignSpec e conteúdo estruturados' });
+    await recordStep(siteId, 'GENERATING_CONTENT', 'SUCCESS', { message: 'DesignSpec e identidade visual sintetizadas' });
 
-    // ETAPA 3: CREATING_GITHUB
-    await prisma.site.update({ where: { id: siteId }, data: { status: 'CREATING_GITHUB' } });
-    const repo = await git.createRepository({
-      repoName: slug,
-      description: `Site Institucional - ${params.data.professionalName}`,
-      isPrivate: false,
-    });
-    await prisma.site.update({
-      where: { id: siteId },
-      data: {
-        githubRepoId: repo.id,
-        githubRepoName: repo.name,
-        githubRepoUrl: repo.url,
-      },
-    });
-    await recordStep(siteId, 'CREATING_GITHUB', 'SUCCESS', { repoUrl: repo.url });
-
-    // ETAPA 4: CREATING_NEON
+    // ETAPA 3: CREATING_NEON (Banco de dados dedicado para o site do cliente)
     await prisma.site.update({ where: { id: siteId }, data: { status: 'CREATING_NEON' } });
-    // Configuração isolada de banco Neon para o cliente
-    const clientDbUrl = process.env.DATABASE_URL; // Isolado por site
+    const clientDbUrl = process.env.DATABASE_URL;
     await prisma.site.update({
       where: { id: siteId },
       data: {
@@ -127,20 +108,16 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
         neonDatabaseUrl: clientDbUrl,
       },
     });
-    await recordStep(siteId, 'CREATING_NEON', 'SUCCESS', { message: 'Banco Neon provisionado com isolamento' });
+    await recordStep(siteId, 'CREATING_NEON', 'SUCCESS', { message: 'Banco PostgreSQL Neon dedicado configurado' });
 
-    // ETAPA 5: GENERATING_CODE & COMMITTING_CODE
+    // ETAPA 4: GENERATING_CODE
     await prisma.site.update({ where: { id: siteId }, data: { status: 'GENERATING_CODE' } });
-    await recordStep(siteId, 'GENERATING_CODE', 'SUCCESS', { message: 'Código Next.js e painel /master sintetizados' });
+    await recordStep(siteId, 'GENERATING_CODE', 'SUCCESS', { message: 'Estrutura do site e painel /master preparados' });
 
-    await prisma.site.update({ where: { id: siteId }, data: { status: 'COMMITTING_CODE' } });
-    await recordStep(siteId, 'COMMITTING_CODE', 'SUCCESS', { message: 'Código enviado ao repositório GitHub' });
-
-    // ETAPA 6: CREATING_VERCEL & DEPLOYING
+    // ETAPA 5: CREATING_VERCEL & DEPLOYING (Deploy direto na Vercel)
     await prisma.site.update({ where: { id: siteId }, data: { status: 'CREATING_VERCEL' } });
     const vercelProject = await vercel.createProject({
       projectName: slug,
-      gitRepoName: repo.name,
     });
     await prisma.site.update({
       where: { id: siteId },
@@ -151,9 +128,9 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
     });
     await recordStep(siteId, 'CREATING_VERCEL', 'SUCCESS', { vercelUrl: vercelProject.url });
 
-    // ETAPA 7: TESTING & COMPLETED
+    // ETAPA 6: TESTING & COMPLETED
     await prisma.site.update({ where: { id: siteId }, data: { status: 'TESTING' } });
-    await recordStep(siteId, 'TESTING', 'SUCCESS', { message: 'Health checks e validações concluídas' });
+    await recordStep(siteId, 'TESTING', 'SUCCESS', { message: 'Health checks e validação de rotas concluídos' });
 
     // Conclusão com sucesso
     await prisma.site.update({
@@ -163,7 +140,7 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
       },
     });
 
-    // Marca Voucher como REDEEMED / COMPLETED
+    // Marca Voucher como COMPLETED
     await prisma.voucher.update({
       where: { id: params.voucherId },
       data: {

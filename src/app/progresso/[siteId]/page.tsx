@@ -57,11 +57,9 @@ export default function ProgressoPage() {
   const pipelineSteps = [
     { key: 'VALIDATING', label: 'Validação e Análise de Dados' },
     { key: 'GENERATING_CONTENT', label: 'Síntese de Conteúdo & DesignSpec' },
-    { key: 'CREATING_GITHUB', label: 'Criação do Repositório GitHub Isolado' },
     { key: 'CREATING_NEON', label: 'Provisionamento do Banco Neon PostgreSQL' },
-    { key: 'GENERATING_CODE', label: 'Geração do Código Next.js e Painel /master' },
-    { key: 'COMMITTING_CODE', label: 'Envio Seguro do Código ao GitHub' },
-    { key: 'CREATING_VERCEL', label: 'Criação do Projeto e Deploy na Vercel' },
+    { key: 'GENERATING_CODE', label: 'Geração da Estrutura e Painel /master' },
+    { key: 'CREATING_VERCEL', label: 'Publicação e Deploy na Vercel' },
     { key: 'TESTING', label: 'Health Checks e Testes de Integridade' },
   ];
 
