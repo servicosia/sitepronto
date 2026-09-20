@@ -3,6 +3,7 @@ import { generateSafeSlug } from '../security/crypto';
 import { GitHubProvider } from '../providers/git/github';
 import { VercelProvider } from '../providers/deployment/vercel';
 import { NeonProvider } from '../providers/database/neon';
+import { validateNeonProvisioning, validateVercelProject, validateSiteSecurity } from './validator';
 import { OnboardingData } from '../validation/onboarding';
 import { DesignSpec } from '../design-system/specs';
 import crypto from 'crypto';
@@ -131,11 +132,33 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
     });
     await recordStep(siteId, 'CREATING_VERCEL', 'SUCCESS', { vercelUrl: vercelProject.url });
 
-    // ETAPA 6: TESTING & COMPLETED
+    // ETAPA 6: TESTING & COMPLETED (Validação rigorosa de ponta a ponta)
     await prisma.site.update({ where: { id: siteId }, data: { status: 'TESTING' } });
-    await recordStep(siteId, 'TESTING', 'SUCCESS', { message: 'Health checks e validação de rotas concluídos' });
 
-    // Conclusão com sucesso
+    // 1. Validação do Neon
+    const neonCheck = await validateNeonProvisioning(neonDb.connectionUri, neonDb.id);
+    if (neonCheck.status === 'FAILED') {
+      throw new Error(`Validação de Infraestrutura [Neon]: ${neonCheck.message}`);
+    }
+
+    // 2. Validação da Vercel
+    const vercelCheck = await validateVercelProject(vercelProject.id, process.env.VERCEL_TOKEN);
+    if (vercelCheck.status === 'FAILED') {
+      throw new Error(`Validação de Infraestrutura [Vercel]: ${vercelCheck.message}`);
+    }
+
+    // 3. Validação de Segurança e Acesso /master
+    const securityCheck = await validateSiteSecurity(site.adminActivationToken || 'token_placeholder_secure');
+    if (securityCheck.status === 'FAILED') {
+      throw new Error(`Validação de Segurança: ${securityCheck.message}`);
+    }
+
+    await recordStep(siteId, 'TESTING', 'SUCCESS', {
+      message: 'Todos os checks de infraestrutura (Neon, Vercel e Segurança) foram aprovados.',
+      checks: [neonCheck, vercelCheck, securityCheck],
+    });
+
+    // Conclusão com sucesso real comprovado
     await prisma.site.update({
       where: { id: siteId },
       data: {
