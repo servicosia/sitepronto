@@ -18,7 +18,10 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+import { useRouter } from 'next/navigation';
+
 export default function PlatformAdminPage() {
+  const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [creatingVoucher, setCreatingVoucher] = useState(false);
@@ -35,6 +38,7 @@ export default function PlatformAdminPage() {
   const [quickProfessionalName, setQuickProfessionalName] = useState('Mestre Alessandro Carnes');
   const [quickTemplate, setQuickTemplate] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
   const [generatingQuickSite, setGeneratingQuickSite] = useState(false);
+  const [provisioningLiveSite, setProvisioningLiveSite] = useState(false);
 
   async function loadData() {
     setLoading(true);
@@ -126,6 +130,38 @@ export default function PlatformAdminPage() {
       alert('Falha na comunicação: ' + err.message);
     } finally {
       setGeneratingQuickSite(false);
+    }
+  }
+
+  async function handleExecuteRealProvision() {
+    setProvisioningLiveSite(true);
+    try {
+      const payload = {
+        profession: quickProfession || 'Profissional Liberal',
+        specialty: quickSpecialty || 'Atendimento de Alta Performance',
+        professionalName: quickProfessionalName || 'Alessandro Especialista',
+        selectedTemplate: quickTemplate,
+        clientEmail: `teste.${Date.now()}@sitepronto.com.br`,
+        clientPassword: 'SenhaTeste123!@#'
+      };
+
+      const res = await fetch('/api/platform-admin/quick-provision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const resData = await res.json();
+      if (res.ok && resData.success && resData.siteId) {
+        setQuickModalOpen(false);
+        router.push(`/progresso/${resData.siteId}`);
+      } else {
+        alert('Erro ao iniciar provisionamento: ' + (resData.error || 'Falha desconhecida.'));
+      }
+    } catch (err: any) {
+      alert('Falha de conexão com a esteira: ' + err.message);
+    } finally {
+      setProvisioningLiveSite(false);
     }
   }
 
@@ -626,31 +662,54 @@ export default function PlatformAdminPage() {
               </div>
 
               {/* Footer do Modal */}
-              <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2.5">
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
                 <button 
                   type="button"
                   onClick={() => setQuickModalOpen(false)} 
                   className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900"
                 >
-                  Cancelar
+                  Fechar
                 </button>
-                <button 
-                  type="button"
-                  onClick={handleExecuteQuickPreview} 
-                  disabled={generatingQuickSite}
-                  className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md transition"
-                >
-                  {generatingQuickSite ? (
-                    <>
-                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                      <span>Sintetizando Site...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>🚀 Visualizar Site Imediatamente</span>
-                    </>
-                  )}
-                </button>
+
+                <div className="flex items-center gap-2.5">
+                  <button 
+                    type="button"
+                    onClick={handleExecuteQuickPreview} 
+                    disabled={generatingQuickSite || provisioningLiveSite}
+                    className="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 disabled:opacity-50 text-slate-800 text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm transition"
+                    title="Abre o HTML do site em uma nova aba instantaneamente"
+                  >
+                    {generatingQuickSite ? (
+                      <>
+                        <span className="w-3.5 h-3.5 border-2 border-slate-400 border-t-slate-800 rounded-full animate-spin"></span>
+                        <span>Gerando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>👁️ Prévia Rápida (Aba Nova)</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button 
+                    type="button"
+                    onClick={handleExecuteRealProvision} 
+                    disabled={generatingQuickSite || provisioningLiveSite}
+                    className="px-5 py-2.5 bg-gradient-to-r from-slate-900 to-indigo-950 hover:from-slate-800 hover:to-indigo-900 disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md transition border border-indigo-500/20"
+                    title="Inicia a esteira completa: Banco Neon + Deploy Vercel + Repositório Git"
+                  >
+                    {provisioningLiveSite ? (
+                      <>
+                        <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        <span>Provisionando na Esteira...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>🚀 Provisionar Completo (Vercel + Neon)</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
