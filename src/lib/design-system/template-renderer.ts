@@ -23,8 +23,8 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('cref')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80', // Treinamento / Fitness
-      about: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1000&q=80', // Personal Trainer
+      hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1000&q=80',
       practicePattern: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
     };
   }
@@ -335,30 +335,59 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
 <div class="template-wrapper ${isModern ? 'bg-slate-950 text-slate-100' : isEditorial ? 'bg-[#faf9f6] text-stone-900' : isConversion ? 'bg-slate-50 text-slate-900' : 'bg-slate-50 text-slate-900'} antialiased min-h-screen flex flex-col" style="font-family: ${fontBody};">
 
   <!-- HEADER -->
-  <header class="sticky top-0 z-50 ${isModern ? 'bg-slate-900/90 border-slate-800' : isEditorial ? 'bg-[#faf9f6]/95 border-stone-300' : isConversion ? 'bg-white/95 border-slate-200/80 shadow-sm' : 'bg-white/95 border-slate-200'} backdrop-blur border-b">
+  <header class="sticky top-0 z-50 ${isModern ? 'bg-slate-900/95 border-slate-800' : isEditorial ? 'bg-[#faf9f6]/95 border-stone-300' : isConversion ? 'bg-white/95 border-slate-200/80 shadow-sm' : 'bg-white/95 border-slate-200'} backdrop-blur border-b">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-11 h-11 ${isEditorial ? 'rounded-none' : isConversion ? 'rounded-2xl' : 'rounded-xl'} text-white flex items-center justify-center font-bold text-lg shadow-md" style="background-color: ${primary}">
+        <div class="w-11 h-11 ${isEditorial ? 'rounded-none' : isConversion ? 'rounded-2xl' : 'rounded-xl'} text-white flex items-center justify-center font-bold text-lg shadow-md shrink-0" style="background-color: ${primary}">
           ${name.slice(0, 2).toUpperCase()}
         </div>
         <div>
-          <span class="font-bold text-lg leading-tight block ${isModern ? 'text-white' : isEditorial ? 'text-stone-900 font-serif' : 'text-slate-900'}">${name}</span>
+          <span class="font-bold text-base sm:text-lg leading-tight block ${isModern ? 'text-white' : isEditorial ? 'text-stone-900 font-serif' : 'text-slate-900'}">${name}</span>
           <span class="text-xs font-medium block ${isModern ? 'text-slate-400' : 'text-slate-500'}">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</span>
         </div>
       </div>
 
+      <!-- DESKTOP NAV -->
       <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold ${isModern ? 'text-slate-300' : isEditorial ? 'text-stone-700' : 'text-slate-600'}">
-        <a href="#inicio" class="hover:opacity-80 transition">Início</a>
-        <a href="#servicos" class="hover:opacity-80 transition">Serviços</a>
-        <a href="#como-funciona" class="hover:opacity-80 transition">Como Funciona</a>
-        <a href="#sobre" class="hover:opacity-80 transition">Sobre</a>
-        <a href="#artigos" class="hover:opacity-80 transition">Informativos</a>
-        <a href="#contato" class="hover:opacity-80 transition">Contato</a>
+        <a href="#inicio" class="hover:text-emerald-500 transition py-1">Início</a>
+        <a href="#servicos" class="hover:text-emerald-500 transition py-1">Serviços</a>
+        <a href="#como-funciona" class="hover:text-emerald-500 transition py-1">Como Funciona</a>
+        <a href="#sobre" class="hover:text-emerald-500 transition py-1">Sobre</a>
+        <a href="#artigos" class="hover:text-emerald-500 transition py-1">Informativos</a>
+        <a href="#contato" class="hover:text-emerald-500 transition py-1">Contato</a>
       </nav>
 
+      <!-- CTA & BOTÃO MENU MOBILE -->
       <div class="flex items-center space-x-3">
-        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-5 py-2.5 text-white text-sm font-bold ${isEditorial ? 'rounded-none uppercase tracking-wider' : isConversion ? 'rounded-2xl' : 'rounded-xl'} shadow-md transition-all flex items-center hover:opacity-90" style="background-color: ${isConversion ? accent : primary}">
+        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="hidden sm:inline-flex px-5 py-2.5 text-white text-sm font-bold ${isEditorial ? 'rounded-none uppercase tracking-wider' : isConversion ? 'rounded-2xl' : 'rounded-xl'} shadow-md transition-all items-center hover:opacity-90" style="background-color: ${isConversion ? accent : primary}">
           Agendar Atendimento
+        </a>
+        
+        <!-- Mobile hamburger button -->
+        <button type="button" onclick="toggleMobileNav(this)" aria-label="Abrir Menu" class="md:hidden p-2 rounded-xl border ${isModern ? 'border-slate-800 text-slate-200 hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-slate-100'} transition flex items-center justify-center">
+          <svg class="w-6 h-6 hamburger-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg class="w-6 h-6 close-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- MOBILE MENU DROPDOWN -->
+    <div class="mobile-nav-menu hidden md:hidden border-t ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-[#faf9f6] border-stone-300' : 'bg-white border-slate-200'} px-4 pt-3 pb-6 space-y-3 shadow-xl">
+      <div class="flex flex-col space-y-2 text-sm font-semibold ${isModern ? 'text-slate-200' : 'text-slate-800'}">
+        <a href="#inicio" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Início</a>
+        <a href="#servicos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Serviços</a>
+        <a href="#como-funciona" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Como Funciona</a>
+        <a href="#sobre" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Sobre</a>
+        <a href="#artigos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Informativos</a>
+        <a href="#contato" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Contato</a>
+      </div>
+      <div class="pt-2">
+        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="w-full text-center px-5 py-3 text-white text-sm font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2" style="background-color: ${isConversion ? accent : primary}">
+          <span>⚡</span> Agendar pelo WhatsApp
         </a>
       </div>
     </div>
@@ -754,6 +783,13 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
       --secondary-color: ${secondary};
       --accent-color: ${accent};
     }
+    html {
+      scroll-behavior: smooth;
+    }
+    /* Offset do cabeçalho sticky para as âncoras */
+    section[id] {
+      scroll-margin-top: 5rem;
+    }
     .template-container { display: none; }
     .template-container.active { display: block; }
   </style>
@@ -777,8 +813,9 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     ${htmlD}
   </div>
 
-  <!-- SCRIPT DE ATIVAÇÃO DO TEMPLATE ESCOLHIDO -->
+  <!-- SCRIPT DE NAVEGAÇÃO SUAVE E TROCA DE TEMPLATE -->
   <script>
+    // 1. Inicializa o template ativo
     (function() {
       const urlParams = new URLSearchParams(window.location.search);
       const urlTemplate = urlParams.get('t') || urlParams.get('template');
@@ -790,6 +827,63 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
         targetEl.classList.add('active');
       }
     })();
+
+    // 2. Manipulador do menu mobile
+    function toggleMobileNav(btn) {
+      const header = btn.closest('header');
+      if (!header) return;
+      const menu = header.querySelector('.mobile-nav-menu');
+      const hamburger = btn.querySelector('.hamburger-icon');
+      const close = btn.querySelector('.close-icon');
+      if (menu) {
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+          menu.classList.remove('hidden');
+          if (hamburger) hamburger.classList.add('hidden');
+          if (close) close.classList.remove('hidden');
+        } else {
+          menu.classList.add('hidden');
+          if (hamburger) hamburger.classList.remove('hidden');
+          if (close) close.classList.add('hidden');
+        }
+      }
+    }
+
+    function closeMobileNav(link) {
+      const menu = link.closest('.mobile-nav-menu');
+      if (menu) {
+        menu.classList.add('hidden');
+        const header = menu.closest('header');
+        if (header) {
+          const hamburger = header.querySelector('.hamburger-icon');
+          const close = header.querySelector('.close-icon');
+          if (hamburger) hamburger.classList.remove('hidden');
+          if (close) close.classList.add('hidden');
+        }
+      }
+    }
+
+    // 3. Suporte robusto a clique nos links de navegação dentro de qualquer container
+    document.addEventListener('click', function(e) {
+      const anchor = e.target.closest('a[href^="#"]');
+      if (!anchor) return;
+      const targetId = anchor.getAttribute('href');
+      if (!targetId || targetId === '#') return;
+
+      const activeContainer = document.querySelector('.template-container.active') || document;
+      const targetSection = activeContainer.querySelector(targetId);
+      if (targetSection) {
+        e.preventDefault();
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Atualiza a URL hash sem saltar
+        if (history.pushState) {
+          history.pushState(null, null, targetId);
+        } else {
+          window.location.hash = targetId;
+        }
+      }
+    });
   </script>
 
 </body>
