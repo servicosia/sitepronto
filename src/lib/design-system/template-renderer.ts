@@ -5,58 +5,149 @@ import type { DesignSpec } from './specs';
  * Mapeador de Imagens Contextuais de Alta Qualidade (Unsplash Editorial)
  * de acordo com a profissão / especialidade informada.
  */
+/**
+ * Mapeador de Imagens Contextuais Inteligente e Amplo (Unsplash Editorial)
+ * de acordo com a profissão / nicho / especialidade informada.
+ */
 function getContextualImages(profession: string, specialty: string) {
-  const p = (profession + ' ' + specialty).toLowerCase();
+  const text = (profession + ' ' + specialty).toLowerCase();
 
-  if (p.includes('advoc') || p.includes('jurid') || p.includes('direito') || p.includes('tribut') || p.includes('penal') || p.includes('trabalh')) {
+  // 1. Gastronomia, Churrasco, Carnes, Culinária, Chef, Restaurante
+  if (text.includes('churrasc') || text.includes('carne') || text.includes('bbq') || text.includes('gastro') || text.includes('chef') || text.includes('cozinha') || text.includes('restaurante') || text.includes('buffet')) {
     return {
-      hero: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80', // Balança / Direito
-      about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80', // Prédio Corporativo / Escritório
-      practicePattern: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80', // Tribunal / Documentos
+      hero: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80', // Churrasco / Grelhados artesanais
+      about: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1000&q=80', // Chef de cozinha / Mestre churrasqueiro
+      practicePattern: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80', // Cortes nobres de carne
     };
   }
 
-  if (p.includes('medic') || p.includes('saude') || p.includes('clinica') || p.includes('doutor') || p.includes('cirurg')) {
+  // 2. Advocacia, Direito, Jurídico
+  if (text.includes('advoc') || text.includes('jurid') || text.includes('direito') || text.includes('tribut') || text.includes('penal') || text.includes('trabalh') || text.includes('civil') || text.includes('inventari') || text.includes('divorc')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80', // Balança / Direito
+      about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80', // Escritório Corporativo
+      practicePattern: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80', // Documentos e análise
+    };
+  }
+
+  // 3. Medicina, Saúde, Consultório, Clínica Médica, Cirurgião
+  if (text.includes('medic') || text.includes('saude') || text.includes('clinica') || text.includes('doutor') || text.includes('cirurg') || text.includes('cardiolog') || text.includes('dermatolog') || text.includes('pediatr')) {
     return {
       hero: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80', // Consultório Moderno
-      about: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80', // Clínica / Hospital
+      about: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80', // Clínica / Ambiente Médico
       practicePattern: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-  if (p.includes('psicol') || p.includes('terap') || p.includes('mente')) {
+  // 4. Odontologia, Dentista, Ortodontia
+  if (text.includes('odont') || text.includes('dentist') || text.includes('implant') || text.includes('sorriso') || text.includes('ortodont')) {
     return {
-      hero: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=1200&q=80', // Ambiente acolhedor
-      about: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1000&q=80', // Atendimento
+      hero: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1200&q=80', // Consultório Odontológico
+      about: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1000&q=80', // Cuidado dental
+      practicePattern: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // 5. Psicologia, Psicoterapia, Terapia, Psiquiatria
+  if (text.includes('psicol') || text.includes('terap') || text.includes('mente') || text.includes('emocion') || text.includes('psiquiatr')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=1200&q=80', // Ambiente acolhedor e escuta
+      about: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1000&q=80', // Atendimento humanizado
       practicePattern: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-  if (p.includes('fisioter') || p.includes('reabilit')) {
+  // 6. Fisioterapia, Reabilitação, Pilates, Ortopedia
+  if (text.includes('fisioter') || text.includes('reabilit') || text.includes('pilates') || text.includes('postur')) {
     return {
-      hero: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80', // Fisioterapia
-      about: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1000&q=80', // Reabilitação
+      hero: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80', // Sessão de Fisioterapia
+      about: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1000&q=80', // Reabilitação e movimento
       practicePattern: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-  if (p.includes('contab') || p.includes('financ') || p.includes('invest')) {
+  // 7. Nutrição, Dietética, Emagrecimento
+  if (text.includes('nutri') || text.includes('dieta') || text.includes('aliment') || text.includes('emagrec')) {
     return {
-      hero: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80', // Finanças / Dados
-      about: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80', // Gráficos
+      hero: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80', // Alimentação Saudável
+      about: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&w=1000&q=80', // Consultório Nutricional
+      practicePattern: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // 8. Educação Física, Personal Trainer, Academia, Fitness
+  if (text.includes('personal') || text.includes('treinador') || text.includes('fitness') || text.includes('academi') || text.includes('musculac')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80', // Treinamento / Fitness
+      about: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1000&q=80', // Personal Trainer
+      practicePattern: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // 9. Contabilidade, Finanças, Consultoria Financeira, Tributos
+  if (text.includes('contab') || text.includes('financ') || text.includes('invest') || text.includes('auditor') || text.includes('fiscal') || text.includes('perito')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80', // Análise Financeira
+      about: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80', // Dados e Gestão
       practicePattern: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-  if (p.includes('engenh') || p.includes('arquitet') || p.includes('obra')) {
+  // 10. Engenharia, Construção, Obras
+  if (text.includes('engenh') || text.includes('obra') || text.includes('construc') || text.includes('eletric') || text.includes('mecanic') || text.includes('civil')) {
     return {
-      hero: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80', // Arquitetura
-      about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80', // Edifício
+      hero: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80', // Engenharia / Projetos
+      about: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80', // Planejamento e Obras
+      practicePattern: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // 11. Arquitetura, Design de Interiores, Urbanismo
+  if (text.includes('arquitet') || text.includes('interiores') || text.includes('decorac') || text.includes('urbanis')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80', // Arquitetura Contemporânea
+      about: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80', // Projeto Arquitetônico
       practicePattern: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-  // Padrão Executivo / Corporativo
+  // 12. Estética, Beleza, Barbeiro, Cabelo, Spa, Maquiagem
+  if (text.includes('estet') || text.includes('belez') || text.includes('barbear') || text.includes('barbeir') || text.includes('cabel') || text.includes('spa') || text.includes('maquiag')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80', // Salão / Barbearia Premium
+      about: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80', // Cuidados de Beleza
+      practicePattern: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // 13. Veterinária, Pet, Cuidados Animais
+  if (text.includes('veterin') || text.includes('pet') || text.includes('animal') || text.includes('cao') || text.includes('gato')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=80', // Clínica Veterinária
+      about: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1000&q=80', // Médico Veterinário
+      practicePattern: 'https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // 14. Fotografia, Vídeo, Produção Audiovisual
+  if (text.includes('fotog') || text.includes('video') || text.includes('filmmak') || text.includes('audiovisual')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=1200&q=80', // Câmera / Ensaio
+      about: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=1000&q=80', // Estúdio Fotográfico
+      practicePattern: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // 15. Tecnologia, Programação, Software, TI
+  if (text.includes('program') || text.includes('softwar') || text.includes('ti') || text.includes('tecnolog') || text.includes('desenvolv') || text.includes('sistem')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80', // Código / Tecnologia
+      about: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1000&q=80', // Workspace Tech
+      practicePattern: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // Padrão Geral Executivo / Serviços Especializados
   return {
     hero: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80', // Escritório Moderno
     about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80',

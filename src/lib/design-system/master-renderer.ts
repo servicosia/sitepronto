@@ -97,6 +97,12 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           <button id="btn-tab-profile" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition" onclick="switchTab('tab-profile')">
             👤 Perfil & Sobre
           </button>
+          <button id="btn-tab-media" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition" onclick="switchTab('tab-media')">
+            🖼️ Imagens & Fotos
+          </button>
+          <button id="btn-tab-template" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition" onclick="switchTab('tab-template')">
+            🎨 Trocar Modelo / Template
+          </button>
           <button id="btn-tab-services" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition" onclick="switchTab('tab-services')">
             ⚖️ Áreas de Atuação
           </button>
@@ -104,7 +110,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
             📰 Artigos & Notícias
           </button>
           <button id="btn-tab-settings" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition" onclick="switchTab('tab-settings')">
-            ⚙️ E-mails & Notificações
+            ⚙️ E-mails & Configurações
           </button>
         </div>
         <span id="saveBadge" class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
@@ -137,7 +143,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
                 <td class="py-3.5 px-4 font-bold text-slate-900">Mariana Souza</td>
                 <td class="py-3.5 px-4 font-mono text-xs text-indigo-600">(11) 97766-5544</td>
                 <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 font-semibold text-slate-700">Consulta Inicial</span></td>
-                <td class="py-3.5 px-4 text-xs text-slate-600 max-w-xs truncate">Preciso de orientação jurídica com urgência.</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600 max-w-xs truncate">Preciso de orientação com urgência.</td>
                 <td class="py-3.5 px-4">
                   <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
                     Novo
@@ -163,7 +169,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
             <input type="text" id="profName" value="${name}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Registro (OAB / Conselho)</label>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Registro (Conselho / OAB / Outro)</label>
             <input type="text" id="profOab" value="${oab}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none">
           </div>
           <div>
@@ -182,6 +188,139 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         <div class="flex justify-end pt-4 border-t border-slate-100">
           <button onclick="triggerSave('Perfil atualizado com sucesso!')" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
             Salvar Perfil
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA NOVA: GERENCIAMENTO DE IMAGENS & FOTOS -->
+      <div id="tab-media" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Gerenciador de Imagens do Site</h3>
+          <p class="text-xs text-slate-500 mt-1">Altere a imagem de capa (Hero) e a foto de perfil/sobre através de link direto ou upload do seu dispositivo.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Imagem de Capa (Hero) -->
+          <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-slate-900">1. Imagem Principal / Capa (Hero)</span>
+              <span class="text-[11px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-semibold">Cabeçalho</span>
+            </div>
+            
+            <div class="aspect-video w-full rounded-xl overflow-hidden border border-slate-300 bg-slate-200 relative group">
+              <img id="previewHero" src="${data.coverPhotoUrl || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80'}" alt="Capa" class="w-full h-full object-cover">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">URL da Imagem de Capa</label>
+              <input 
+                type="url" 
+                id="inputHeroUrl" 
+                placeholder="https://images.unsplash.com/..." 
+                value="${data.coverPhotoUrl || ''}"
+                oninput="document.getElementById('previewHero').src = this.value"
+                class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none font-mono"
+              >
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Ou selecione um arquivo do computador</label>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onchange="handleFileUpload(event, 'previewHero', 'inputHeroUrl')"
+                class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-900 file:text-white hover:file:bg-slate-800"
+              >
+            </div>
+          </div>
+
+          <!-- Foto do Profissional / Consultório (Sobre) -->
+          <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-slate-900">2. Foto de Perfil / Sobre</span>
+              <span class="text-[11px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-semibold">Apresentação</span>
+            </div>
+            
+            <div class="aspect-video w-full rounded-xl overflow-hidden border border-slate-300 bg-slate-200 relative group">
+              <img id="previewAbout" src="${data.profilePhotoUrl || 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1000&q=80'}" alt="Perfil" class="w-full h-full object-cover">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">URL da Foto de Perfil</label>
+              <input 
+                type="url" 
+                id="inputAboutUrl" 
+                placeholder="https://images.unsplash.com/..." 
+                value="${data.profilePhotoUrl || ''}"
+                oninput="document.getElementById('previewAbout').src = this.value"
+                class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none font-mono"
+              >
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Ou selecione um arquivo do computador</label>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onchange="handleFileUpload(event, 'previewAbout', 'inputAboutUrl')"
+                class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-900 file:text-white hover:file:bg-slate-800"
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="triggerSave('Imagens atualizadas e publicadas no site!')" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Salvar Novas Imagens
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA NOVA: TROCA DE TEMPLATE / MODELO VISUAL -->
+      <div id="tab-template" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">Troca de Modelo Visual (Design Template)</h3>
+          <p class="text-xs text-slate-500 mt-1">Alterne a qualquer momento o layout e a estética do seu site sem perder suas informações cadastradas.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Modelo A -->
+          <div id="opt-model-a" onclick="selectTemplateOption('MODEL_A')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-900 bg-slate-50 shadow-md transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase text-slate-500">Modelo A</span>
+              <span id="badge-model-a" class="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
+            </div>
+            <h4 class="font-bold text-slate-900 mb-1">Institucional Confiável</h4>
+            <p class="text-xs text-slate-600 mb-4">Estrutura clássica em fundo claro, layout split e alta legibilidade corporativa.</p>
+            <div class="p-2 bg-white rounded border text-[11px] text-slate-700 font-medium">Ideal para solidez e autoridade tradicional</div>
+          </div>
+
+          <!-- Modelo B -->
+          <div id="opt-model-b" onclick="selectTemplateOption('MODEL_B')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase text-slate-500">Modelo B</span>
+              <span id="badge-model-b" class="w-5 h-5 rounded-full bg-slate-900 text-white hidden items-center justify-center text-xs">✓</span>
+            </div>
+            <h4 class="font-bold text-slate-900 mb-1">Moderno Premium</h4>
+            <p class="text-xs text-slate-600 mb-4">Atmosfera dark contemporânea, efeitos visuais refinados e destaque dinâmico.</p>
+            <div class="p-2 bg-slate-900 rounded text-[11px] text-white font-medium">Ideal para alto impacto e diferenciação</div>
+          </div>
+
+          <!-- Modelo C -->
+          <div id="opt-model-c" onclick="selectTemplateOption('MODEL_C')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase text-slate-500">Modelo C</span>
+              <span id="badge-model-c" class="w-5 h-5 rounded-full bg-slate-900 text-white hidden items-center justify-center text-xs">✓</span>
+            </div>
+            <h4 class="font-bold text-slate-900 mb-1">Minimalista Editorial</h4>
+            <p class="text-xs text-slate-600 mb-4">Tipografia serifada nobre, fundo off-white e elegância executiva sóbria.</p>
+            <div class="p-2 bg-stone-100 rounded border border-stone-300 text-[11px] text-stone-800 font-serif">Ideal para abordagem editorial refinada</div>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="triggerSave('Template alterado com sucesso no site!')" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Aplicar Novo Template
           </button>
         </div>
       </div>
@@ -221,7 +360,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           <div class="p-4 rounded-xl border border-slate-200 bg-white flex items-center justify-between">
             <div>
               <span class="text-xs font-bold text-emerald-700 uppercase">Guia Prático</span>
-              <h4 class="font-bold text-sm text-slate-900">Direitos Fundamentais e Medidas Iniciais em Demandas Urgentes</h4>
+              <h4 class="font-bold text-sm text-slate-900">Direitos Fundamentais e Orientações Iniciais em Demandas Urgentes</h4>
               <p class="text-xs text-slate-400">Publicado • Leitura: 4 min</p>
             </div>
             <button onclick="triggerSave('Artigo editado!')" class="text-xs font-bold text-slate-900 border px-3 py-1.5 rounded-lg hover:bg-slate-50">Editar</button>
@@ -229,8 +368,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
 
           <div class="p-4 rounded-xl border border-slate-200 bg-white flex items-center justify-between">
             <div>
-              <span class="text-xs font-bold text-emerald-700 uppercase">Artigo Jurídico</span>
-              <h4 class="font-bold text-sm text-slate-900">A Importância do Acompanhamento Jurídico Especializado</h4>
+              <span class="text-xs font-bold text-emerald-700 uppercase">Informativo</span>
+              <h4 class="font-bold text-sm text-slate-900">A Importância do Acompanhamento Especializado e Prevenção</h4>
               <p class="text-xs text-slate-400">Publicado • Leitura: 3 min</p>
             </div>
             <button onclick="triggerSave('Artigo editado!')" class="text-xs font-bold text-slate-900 border px-3 py-1.5 rounded-lg hover:bg-slate-50">Editar</button>
@@ -244,7 +383,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail de Destino dos Formulários</label>
-            <input type="email" value="${data.publicEmail || 'contato@advocacia.com.br'}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none">
+            <input type="email" value="${data.publicEmail || 'contato@seusite.com.br'}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">WhatsApp de Contato Principal</label>
@@ -287,6 +426,43 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         activeBtn.classList.add('active', 'border-slate-900', 'text-slate-900', 'font-bold');
         activeBtn.classList.remove('text-slate-500', 'border-transparent');
       }
+    }
+
+    function selectTemplateOption(model) {
+      const opts = ['a', 'b', 'c'];
+      opts.forEach(o => {
+        const el = document.getElementById('opt-model-' + o);
+        const badge = document.getElementById('badge-model-' + o);
+        if (el && badge) {
+          el.classList.remove('border-slate-900', 'bg-slate-50', 'shadow-md');
+          el.classList.add('border-slate-200', 'bg-white');
+          badge.classList.add('hidden');
+          badge.classList.remove('flex');
+        }
+      });
+
+      const target = model === 'MODEL_A' ? 'a' : model === 'MODEL_B' ? 'b' : 'c';
+      const activeEl = document.getElementById('opt-model-' + target);
+      const activeBadge = document.getElementById('badge-model-' + target);
+      if (activeEl && activeBadge) {
+        activeEl.classList.add('border-slate-900', 'bg-slate-50', 'shadow-md');
+        activeEl.classList.remove('border-slate-200', 'bg-white');
+        activeBadge.classList.remove('hidden');
+        activeBadge.classList.add('flex');
+      }
+    }
+
+    function handleFileUpload(event, previewImgId, inputUrlId) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        document.getElementById(previewImgId).src = dataUrl;
+        document.getElementById(inputUrlId).value = dataUrl;
+      };
+      reader.readAsDataURL(file);
     }
 
     function triggerSave(msg) {
