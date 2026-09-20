@@ -180,10 +180,10 @@ function OnboardingContent() {
   }
 
   useEffect(() => {
-    if (currentStep === 6 && Object.keys(previewsData).length === 0) {
+    if (currentStep === 6) {
       generatePreviews();
     }
-  }, [currentStep]);
+  }, [currentStep, formData.primaryColor, formData.secondaryColor, formData.accentColor]);
 
   function handleInputChange(field: keyof OnboardingData, value: any) {
     setFormData((prev) => ({ ...prev, [field]: value }));
