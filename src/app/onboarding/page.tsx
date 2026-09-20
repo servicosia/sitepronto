@@ -605,6 +605,40 @@ function OnboardingContent() {
                     className="mt-1 block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900"
                   />
                 </div>
+
+                {/* Domínio Próprio .BR */}
+                <div className="sm:col-span-2 p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 mt-2">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="hasCustomDomain"
+                      checked={formData.hasCustomDomain || false}
+                      onChange={(e) => handleInputChange('hasCustomDomain', e.target.checked)}
+                      className="w-4 h-4 text-slate-900 rounded border-slate-300 focus:ring-slate-900"
+                    />
+                    <label htmlFor="hasCustomDomain" className="text-sm font-semibold text-slate-800 cursor-pointer">
+                      Já possuo ou pretendo utilizar meu próprio domínio .BR (ex: Registro.br)
+                    </label>
+                  </div>
+
+                  {formData.hasCustomDomain && (
+                    <div className="pt-2 pl-7 space-y-2">
+                      <label className="block text-xs font-semibold text-slate-700">
+                        Qual é o seu domínio .BR?
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.customDomainName || ''}
+                        onChange={(e) => handleInputChange('customDomainName', e.target.value)}
+                        placeholder="Ex: seunome.com.br, consultoriadra.adv.br, clinica.med.br"
+                        className="block w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 bg-white font-mono"
+                      />
+                      <p className="text-xs text-slate-500">
+                        Ao final da publicação, nós configuramos a Vercel e o Cloudflare automaticamente e forneceremos exatamente os servidores DNS para você alterar no Registro.br com 1 clique.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

@@ -3,6 +3,7 @@ import { generateSafeSlug } from '../security/crypto';
 import { GitHubProvider } from '../providers/git/github';
 import { VercelProvider } from '../providers/deployment/vercel';
 import { NeonProvider } from '../providers/database/neon';
+import { CloudflareProvider } from '../providers/domains/cloudflare';
 import { validateNeonProvisioning, validateVercelProject, validateSiteSecurity } from './validator';
 import { OnboardingData } from '../validation/onboarding';
 import { DesignSpec } from '../design-system/specs';
@@ -28,6 +29,10 @@ export async function startProvisioningPipeline(params: ProvisionSiteParams) {
     where: { onboardingSessionId: params.onboardingSessionId },
   });
 
+  const customDomain = (params.data.hasCustomDomain && params.data.customDomainName)
+    ? params.data.customDomainName.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+    : null;
+
   if (!site) {
     site = await prisma.site.create({
       data: {
@@ -40,6 +45,8 @@ export async function startProvisioningPipeline(params: ProvisionSiteParams) {
         designVariant: params.designSpec.variant,
         designSpec: params.designSpec as any,
         profileData: params.data as any,
+        customDomain: customDomain,
+        domainStatus: customDomain ? 'PENDING_DNS' : 'NOT_CONFIGURED',
         status: 'VALIDATING',
         adminActivationToken: crypto.randomBytes(24).toString('hex'),
       },
@@ -53,6 +60,8 @@ export async function startProvisioningPipeline(params: ProvisionSiteParams) {
         designVariant: params.designSpec.variant,
         designSpec: params.designSpec as any,
         profileData: params.data as any,
+        customDomain: customDomain,
+        domainStatus: customDomain ? 'PENDING_DNS' : 'NOT_CONFIGURED',
       },
     });
   }
@@ -90,6 +99,7 @@ async function recordStep(siteId: string, step: any, status: string, details?: a
 
 async function runPipelineSteps(siteId: string, jobId: string, params: ProvisionSiteParams, slug: string) {
   const vercel = new VercelProvider();
+  const cloudflare = new CloudflareProvider();
 
   try {
     // ETAPA 1: VALIDATING
@@ -153,7 +163,43 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
     });
     await recordStep(siteId, 'CREATING_VERCEL', 'SUCCESS', { vercelUrl: vercelProject.url });
 
-    // ETAPA 6: TESTING & COMPLETED (Validação rigorosa de ponta a ponta)
+    // ETAPA 6: CONFIGURAÇÃO DE DOMÍNIO .BR (Vercel + Cloudflare DNS)
+    if (params.data.hasCustomDomain && params.data.customDomainName) {
+      await prisma.site.update({ where: { id: siteId }, data: { status: 'DOMAIN_CONFIGURATION' } });
+      const rawDomain = params.data.customDomainName.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+      const { rootDomain } = CloudflareProvider.normalizeDomain(rawDomain);
+
+      // 1. Vincula o domínio na Vercel (raiz e www)
+      const vercelDomainApex = await vercel.addDomainToProject(vercelProject.name, rootDomain);
+      const vercelDomainWww = await vercel.addDomainToProject(vercelProject.name, `www.${rootDomain}`);
+
+      // 2. Cria/Obtém a Zona no Cloudflare
+      const cfZone = await cloudflare.getOrCreateZone(rootDomain);
+
+      // 3. Aplica os apontamentos A e CNAME apontando para a Vercel
+      await cloudflare.configureVercelDnsRecords(cfZone.zoneId, rootDomain);
+
+      // 4. Salva detalhes da configuração e nameservers no site
+      await prisma.site.update({
+        where: { id: siteId },
+        data: {
+          customDomain: rootDomain,
+          domainStatus: 'PENDING_DNS',
+        },
+      });
+
+      await recordStep(siteId, 'DOMAIN_CONFIGURATION', 'SUCCESS', {
+        domain: rootDomain,
+        nameServers: cfZone.nameServers,
+        message: `Domínio ${rootDomain} configurado na Vercel e Cloudflare. Altere os servidores DNS no Registro.br.`,
+        dnsRecords: [
+          { type: 'A', name: '@', value: '76.76.21.21' },
+          { type: 'CNAME', name: 'www', value: 'cname.vercel-dns.com' },
+        ],
+      });
+    }
+
+    // ETAPA 7: TESTING & COMPLETED (Validação rigorosa de ponta a ponta)
     await prisma.site.update({ where: { id: siteId }, data: { status: 'TESTING' } });
 
     // 1. Validação do Neon

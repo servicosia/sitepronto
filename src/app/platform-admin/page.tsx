@@ -37,6 +37,8 @@ export default function PlatformAdminPage() {
   const [quickSpecialty, setQuickSpecialty] = useState('Churrasco Corporativo, Parrilla e Eventos');
   const [quickProfessionalName, setQuickProfessionalName] = useState('Mestre Alessandro Carnes');
   const [quickTemplate, setQuickTemplate] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
+  const [quickHasDomain, setQuickHasDomain] = useState(false);
+  const [quickDomainName, setQuickDomainName] = useState('alessandrocarnes.com.br');
   const [generatingQuickSite, setGeneratingQuickSite] = useState(false);
   const [provisioningLiveSite, setProvisioningLiveSite] = useState(false);
 
@@ -141,6 +143,8 @@ export default function PlatformAdminPage() {
         specialty: quickSpecialty || 'Atendimento de Alta Performance',
         professionalName: quickProfessionalName || 'Alessandro Especialista',
         selectedTemplate: quickTemplate,
+        hasCustomDomain: quickHasDomain,
+        customDomainName: quickHasDomain ? quickDomainName : undefined,
         clientEmail: `teste.${Date.now()}@sitepronto.com.br`,
         clientPassword: 'SenhaTeste123!@#'
       };
@@ -658,6 +662,38 @@ export default function PlatformAdminPage() {
                       <span className="text-[10px] text-emerald-600 font-normal">Stitch Pulse</span>
                     </button>
                   </div>
+                </div>
+
+                {/* Seção de Domínio Próprio .BR */}
+                <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-3">
+                  <div className="flex items-center space-x-2.5">
+                    <input
+                      type="checkbox"
+                      id="quickHasDomain"
+                      checked={quickHasDomain}
+                      onChange={(e) => setQuickHasDomain(e.target.checked)}
+                      className="w-4 h-4 rounded text-slate-900 focus:ring-slate-900 border-slate-300"
+                    />
+                    <label htmlFor="quickHasDomain" className="text-xs font-bold text-slate-800 cursor-pointer">
+                      Configurar Domínio Próprio .BR (Vercel + Cloudflare DNS)
+                    </label>
+                  </div>
+
+                  {quickHasDomain && (
+                    <div className="space-y-1.5 pt-1">
+                      <label className="block text-[11px] font-bold text-slate-600 uppercase">Nome do Domínio .BR</label>
+                      <input
+                        type="text"
+                        value={quickDomainName}
+                        onChange={(e) => setQuickDomainName(e.target.value)}
+                        placeholder="Ex: seunome.com.br ou meuconsultorio.adv.br"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-slate-900 focus:outline-none bg-white font-mono"
+                      />
+                      <p className="text-[11px] text-slate-500">
+                        O sistema vinculará o domínio na Vercel e criará os registros no Cloudflare, gerando as instruções para troca de DNS no Registro.br.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -13,6 +13,8 @@ export async function POST(req: NextRequest) {
       specialty = 'Churrasco Corporativo, Parrilla e Eventos', 
       professionalName = 'Mestre Alessandro Carnes', 
       selectedTemplate = 'MODEL_A',
+      hasCustomDomain = false,
+      customDomainName = '',
       clientEmail = 'admin-teste@sitepronto.com.br',
       clientPassword = 'SenhaForteTeste123!'
     } = body;
@@ -38,7 +40,9 @@ export async function POST(req: NextRequest) {
       hasProfessionalCouncil: false,
       primaryColor: '#0f172a',
       secondaryColor: '#3b82f6',
-      selectedDesignVariant: selectedTemplate
+      selectedDesignVariant: selectedTemplate,
+      hasCustomDomain: Boolean(hasCustomDomain && customDomainName),
+      customDomainName: customDomainName || undefined,
     };
 
     const parseResult = OnboardingDataSchema.safeParse(onboardingData);

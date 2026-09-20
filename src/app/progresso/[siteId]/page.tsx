@@ -60,8 +60,12 @@ export default function ProgressoPage() {
     { key: 'CREATING_NEON', label: 'Provisionamento do Banco Neon PostgreSQL' },
     { key: 'GENERATING_CODE', label: 'Geração da Estrutura e Painel /master' },
     { key: 'CREATING_VERCEL', label: 'Publicação e Deploy na Vercel' },
+    { key: 'DOMAIN_CONFIGURATION', label: 'Configuração de Domínio .BR & Cloudflare DNS' },
     { key: 'TESTING', label: 'Health Checks e Testes de Integridade' },
   ];
+
+  const domainStep = siteData?.steps?.find((s: StepInfo) => s.step === 'DOMAIN_CONFIGURATION');
+  const hasDomainConfig = Boolean(domainStep && domainStep.status === 'SUCCESS');
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -89,7 +93,7 @@ export default function ProgressoPage() {
             <p className="text-slate-600 text-sm mt-2">
               {siteData?.completed 
                 ? 'Toda a infraestrutura isolada foi provisionada com sucesso.' 
-                : 'Estamos configurando GitHub, Neon e Vercel automaticamente.'}
+                : 'Estamos configurando GitHub, Neon, Vercel e Cloudflare automaticamente.'}
             </p>
           </div>
 
@@ -99,6 +103,11 @@ export default function ProgressoPage() {
               const recordedStep = siteData?.steps?.find((s: StepInfo) => s.step === stepItem.key);
               const isFinished = recordedStep?.status === 'SUCCESS' || siteData?.completed;
               const isCurrent = siteData?.status === stepItem.key;
+
+              // Não exibe etapa de domínio se o cliente não solicitou
+              if (stepItem.key === 'DOMAIN_CONFIGURATION' && !recordedStep && !isCurrent) {
+                return null;
+              }
 
               return (
                 <div
@@ -133,6 +142,42 @@ export default function ProgressoPage() {
               );
             })}
           </div>
+
+          {/* Card Especial de Instrução para Domínio .BR (Registro.br) */}
+          {hasDomainConfig && (
+            <div className="mt-6 p-6 bg-amber-50/80 rounded-2xl border border-amber-200 text-slate-900 space-y-4 animate-fade-in">
+              <div className="flex items-start space-x-3">
+                <Globe className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-bold text-base text-amber-950">
+                    Instruções de Apontamento DNS no Registro.br
+                  </h3>
+                  <p className="text-xs text-amber-900 mt-1">
+                    Seu domínio <strong>{domainStep.details?.domain}</strong> foi vinculado com sucesso na Vercel e configurado na Cloudflare.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 bg-white rounded-xl border border-amber-200 space-y-3">
+                <div className="text-xs font-semibold text-slate-700">
+                  Acesse sua conta no <a href="https://registro.br" target="_blank" rel="noreferrer" className="text-indigo-600 font-bold underline">Registro.br</a>, clique no seu domínio e substitua os Servidores DNS existentes por:
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono text-xs">
+                  <div className="p-2.5 bg-slate-900 text-amber-300 rounded-lg flex items-center justify-between">
+                    <span>Master: <strong>{domainStep.details?.nameServers?.[0] || 'dina.ns.cloudflare.com'}</strong></span>
+                  </div>
+                  <div className="p-2.5 bg-slate-900 text-amber-300 rounded-lg flex items-center justify-between">
+                    <span>Slave 1: <strong>{domainStep.details?.nameServers?.[1] || 'walt.ns.cloudflare.com'}</strong></span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-500">
+                  Após salvar no Registro.br, o certificado SSL e os apontamentos para o seu novo site serão ativados em poucos minutos.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Tratamento de Erro e Botão de Reiniciar */}
           {siteData?.hasError && (

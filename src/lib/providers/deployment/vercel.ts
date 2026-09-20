@@ -143,6 +143,49 @@ export class VercelProvider implements DeploymentProvider {
     }
   }
 
+  async addDomainToProject(projectIdOrName: string, domain: string) {
+    const rawDomain = domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+    if (!this.token) {
+      return {
+        name: rawDomain,
+        verified: true,
+        aRecords: ['76.76.21.21'],
+        cnames: ['cname.vercel-dns.com'],
+      };
+    }
+
+    try {
+      const teamQuery = this.teamId ? `?teamId=${this.teamId}` : '';
+      const res = await fetch(`https://api.vercel.com/v10/projects/${encodeURIComponent(projectIdOrName)}/domains${teamQuery}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: rawDomain,
+        }),
+      });
+
+      const data = await res.json();
+      return {
+        name: rawDomain,
+        verified: data.verified || false,
+        verification: data.verification || [],
+        aRecords: ['76.76.21.21'],
+        cnames: ['cname.vercel-dns.com'],
+      };
+    } catch (err: any) {
+      console.error('[VercelProvider] Erro ao adicionar domínio na Vercel:', err.message);
+      return {
+        name: rawDomain,
+        verified: false,
+        aRecords: ['76.76.21.21'],
+        cnames: ['cname.vercel-dns.com'],
+      };
+    }
+  }
+
   async deleteProject(projectIdOrName: string): Promise<boolean> {
     if (!this.token) return false;
     try {
