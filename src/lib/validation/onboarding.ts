@@ -1,0 +1,160 @@
+import { z } from 'zod';
+
+// Profissões Suportadas com adaptação de regras
+export const ProfessionTypes = [
+  'advocacia',
+  'medicina',
+  'psicologia',
+  'contabilidade',
+  'engenharia',
+  'odontologia',
+  'fisioterapia',
+  'arquitetura',
+  'nutricao',
+  'veterinaria',
+  'consultoria',
+  'fotografia',
+  'outra'
+] as const;
+
+export const ActivityTypes = [
+  'autonomo',
+  'liberal',
+  'empresa',
+  'escritorio',
+  'clinica',
+  'consultorio',
+  'organizacao',
+  'outro'
+] as const;
+
+export const AttendanceTypes = [
+  'presencial',
+  'online',
+  'hibrido'
+] as const;
+
+export const VisualStyles = [
+  'classico',
+  'tradicional',
+  'moderno',
+  'elegante',
+  'premium',
+  'minimalista',
+  'corporativo',
+  'acolhedor',
+  'criativo',
+  'tecnologico',
+  'editorial',
+  'sem_preferencia'
+] as const;
+
+export const ThemeTypes = [
+  'claro',
+  'escuro',
+  'ambos',
+  'sem_preferencia'
+] as const;
+
+export const DesignVariantTypes = [
+  'MODEL_A', // Institucional Confiável
+  'MODEL_B', // Moderno Premium
+  'MODEL_C'  // Minimalista Editorial
+] as const;
+
+// Schema de Serviço
+export const ServiceItemSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(2, 'Título do serviço é obrigatório'),
+  shortDescription: z.string().min(5, 'Descrição curta é obrigatória'),
+  fullDescription: z.string().optional(),
+  badge: z.string().optional(),
+  icon: z.string().default('Briefcase'),
+  targetAudience: z.string().optional(),
+  ctaText: z.string().default('Solicitar Atendimento'),
+  whatsappMessage: z.string().optional(),
+  active: z.boolean().default(true),
+  order: z.number().default(0),
+});
+
+// Schema de Dados de Onboarding
+export const OnboardingDataSchema = z.object({
+  // Identificação Pessoal/Profissional
+  fullName: z.string().min(3, 'Nome completo é obrigatório'),
+  professionalName: z.string().min(2, 'Nome profissional é obrigatório'),
+  companyName: z.string().optional(),
+  profession: z.string().min(2, 'Profissão é obrigatória'),
+  professionType: z.enum(ProfessionTypes).default('outra'),
+  activityType: z.enum(ActivityTypes).default('autonomo'),
+  
+  // Registro Profissional
+  hasProfessionalCouncil: z.boolean().default(false),
+  councilType: z.string().optional(), // ex: "OAB/SP", "CRM/RJ", "CRP"
+  councilNumber: z.string().optional(),
+  
+  // Especialidades & Descrição
+  mainSpecialty: z.string().min(2, 'Especialidade principal é obrigatória'),
+  otherSpecialties: z.array(z.string()).default([]),
+  professionalSummary: z.string().min(20, 'Resumo profissional deve ter no mínimo 20 caracteres'),
+  bio: z.string().optional(),
+  
+  // Localização & Atendimento
+  city: z.string().min(2, 'Cidade é obrigatória'),
+  state: z.string().min(2, 'Estado (UF) é obrigatório').max(2),
+  geographicArea: z.string().optional(),
+  attendanceType: z.enum(AttendanceTypes).default('hibrido'),
+  
+  // Contato
+  phone: z.string().optional(),
+  whatsapp: z.string().min(10, 'WhatsApp válido é obrigatório'),
+  publicEmail: z.string().email('E-mail público inválido'),
+  adminEmail: z.string().email('E-mail administrativo inválido').optional(),
+  
+  // Endereço
+  showFullAddress: z.boolean().default(false),
+  street: z.string().optional(),
+  number: z.string().optional(),
+  complement: z.string().optional(),
+  neighborhood: z.string().optional(),
+  zipCode: z.string().optional(),
+  businessHours: z.string().default('Segunda a Sexta, das 09h às 18h'),
+  
+  // Redes Sociais
+  instagram: z.string().url('URL inválida').or(z.string().length(0)).optional(),
+  facebook: z.string().url('URL inválida').or(z.string().length(0)).optional(),
+  linkedin: z.string().url('URL inválida').or(z.string().length(0)).optional(),
+  youtube: z.string().url('URL inválida').or(z.string().length(0)).optional(),
+  tiktok: z.string().url('URL inválida').or(z.string().length(0)).optional(),
+  twitter: z.string().url('URL inválida').or(z.string().length(0)).optional(),
+  
+  // Serviços
+  services: z.array(ServiceItemSchema).min(1, 'Cadastre pelo menos 1 serviço ou área de atuação'),
+  
+  // Histórico e Formação (Regra de Veracidade)
+  education: z.array(z.string()).default([]),
+  certifications: z.array(z.string()).default([]),
+  differentials: z.array(z.string()).default([]),
+  workPhilosophy: z.string().optional(),
+  
+  // Identidade Visual
+  hasBrandIdentity: z.boolean().default(false),
+  logoUrl: z.string().optional(),
+  primaryColor: z.string().default('#0f172a'),
+  secondaryColor: z.string().default('#3b82f6'),
+  accentColor: z.string().default('#10b981'),
+  
+  // Imagens
+  profilePhotoUrl: z.string().optional(),
+  coverPhotoUrl: z.string().optional(),
+  officePhotos: z.array(z.string()).default([]),
+  
+  // Preferências Visuais
+  visualStyle: z.enum(VisualStyles).default('moderno'),
+  themePreference: z.enum(ThemeTypes).default('claro'),
+  
+  // Domínio
+  hasCustomDomain: z.boolean().default(false),
+  customDomainName: z.string().optional(),
+});
+
+export type OnboardingData = z.infer<typeof OnboardingDataSchema>;

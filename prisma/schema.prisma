@@ -1,0 +1,236 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  CLIENT
+}
+
+enum VoucherStatus {
+  ISSUED
+  REDEEMED
+  EXPIRED
+  REVOKED
+  COMPLETED
+}
+
+enum ProvisioningStatus {
+  IDLE
+  VALIDATING
+  GENERATING_CONTENT
+  CREATING_GITHUB
+  CREATING_NEON
+  GENERATING_CODE
+  RUNNING_CODE_CHECKS
+  COMMITTING_CODE
+  CREATING_VERCEL
+  CONFIGURING_ENV
+  DEPLOYING
+  TESTING
+  DOMAIN_CONFIGURATION
+  COMPLETED
+  ERROR
+}
+
+enum DomainStatus {
+  NOT_CONFIGURED
+  PENDING_DNS
+  VERIFYING
+  ACTIVE
+  ERROR
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  name          String
+  role          Role           @default(CLIENT)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  vouchersUsed  Voucher[]      @relation("VoucherUser")
+  sites         Site[]
+  sessions      AuthSession[]
+  auditEvents   AuditEvent[]
+
+  @@map("users")
+}
+
+model AuthSession {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  ipHash     String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+
+  @@index([tokenHash])
+  @@index([userId])
+  @@map("auth_sessions")
+}
+
+model Voucher {
+  id              String        @id @default(cuid())
+  code            String        @unique
+  codeHash        String        @unique
+  description     String?
+  clientName      String?
+  clientEmail     String?
+  plan            String        @default("STANDARD_PRO")
+  allowedSites    Int           @default(1)
+  status          VoucherStatus @default(ISSUED)
+  expiresAt       DateTime?
+  redeemedAt      DateTime?
+  redeemedById    String?
+  redeemedBy      User?         @relation("VoucherUser", fields: [redeemedById], references: [id])
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  sites           Site[]
+  onboardingSessions OnboardingSession[]
+
+  @@index([code])
+  @@index([codeHash])
+  @@index([status])
+  @@map("vouchers")
+}
+
+model OnboardingSession {
+  id              String        @id @default(cuid())
+  voucherId       String
+  voucher         Voucher       @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  userId          String?
+  step            Int           @default(1)
+  data            Json          @default("{}")
+  isComplete      Boolean       @default(false)
+  selectedDesign  String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  site            Site?
+
+  @@index([voucherId])
+  @@map("onboarding_sessions")
+}
+
+model Site {
+  id                  String             @id @default(cuid())
+  userId              String
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voucherId           String
+  voucher             Voucher            @relation(fields: [voucherId], references: [id])
+  onboardingSessionId String?            @unique
+  onboardingSession   OnboardingSession? @relation(fields: [onboardingSessionId], references: [id])
+
+  name                String
+  slug                String             @unique
+  profession          String
+  designVariant       String             // "MODEL_A", "MODEL_B", "MODEL_C"
+  designSpec          Json               @default("{}")
+  profileData         Json               @default("{}")
+
+  // Isolated Infrastructure Details
+  githubRepoId        String?
+  githubRepoName      String?
+  githubRepoUrl       String?
+  
+  neonProjectId       String?
+  neonDatabaseId      String?
+  neonDatabaseUrl     String?            // Armazenado criptografado / gerado
+  
+  vercelProjectId     String?
+  vercelDeploymentId  String?
+  vercelUrl           String?
+  
+  customDomain        String?
+  domainStatus        DomainStatus       @default(NOT_CONFIGURED)
+  
+  adminActivationToken String?           @unique
+  adminActivatedAt    DateTime?
+
+  status              ProvisioningStatus @default(IDLE)
+  lastError           String?
+
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  jobs                ProvisioningJob[]
+  steps               ProvisioningStep[]
+
+  @@index([slug])
+  @@index([userId])
+  @@index([status])
+  @@map("sites")
+}
+
+model ProvisioningJob {
+  id            String             @id @default(cuid())
+  siteId        String
+  site          Site               @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  currentStep   ProvisioningStatus @default(VALIDATING)
+  status        String             @default("RUNNING") // RUNNING, COMPLETED, FAILED
+  attempts      Int                @default(1)
+  correlationId String             @unique
+  startedAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  completedAt   DateTime?
+  lastError     String?
+  retryAfter    DateTime?
+
+  @@index([siteId])
+  @@index([status])
+  @@map("provisioning_jobs")
+}
+
+model ProvisioningStep {
+  id          String             @id @default(cuid())
+  siteId      String
+  site        Site               @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  step        ProvisioningStatus
+  status      String             // PENDING, SUCCESS, ERROR, SKIPPED
+  details     Json?
+  error       String?
+  startedAt   DateTime           @default(now())
+  completedAt DateTime?
+
+  @@index([siteId])
+  @@map("provisioning_steps")
+}
+
+model AuditEvent {
+  id         String    @id @default(cuid())
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventType  String    // VOUCHER_CREATED, PROVISION_STARTED, GITHUB_CREATED, etc.
+  ipHash     String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime  @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("audit_events")
+}
+
+model RateLimit {
+  id        String   @id @default(cuid())
+  key       String   @unique // ex: "login:hash_ip", "form:hash_ip"
+  points    Int      @default(1)
+  expireAt  DateTime
+
+  @@index([key])
+  @@index([expireAt])
+  @@map("rate_limits")
+}
