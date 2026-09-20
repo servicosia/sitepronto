@@ -2,6 +2,7 @@ import { prisma } from '../db/client';
 import { generateSafeSlug } from '../security/crypto';
 import { GitHubProvider } from '../providers/git/github';
 import { VercelProvider } from '../providers/deployment/vercel';
+import { NeonProvider } from '../providers/database/neon';
 import { OnboardingData } from '../validation/onboarding';
 import { DesignSpec } from '../design-system/specs';
 import crypto from 'crypto';
@@ -99,16 +100,18 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
 
     // ETAPA 3: CREATING_NEON (Banco de dados dedicado para o site do cliente)
     await prisma.site.update({ where: { id: siteId }, data: { status: 'CREATING_NEON' } });
-    const clientDbUrl = process.env.DATABASE_URL;
+    const neon = new NeonProvider();
+    const neonDb = await neon.createDatabase({ projectName: slug });
+    
     await prisma.site.update({
       where: { id: siteId },
       data: {
-        neonProjectId: `neon_${slug}`,
-        neonDatabaseId: `db_${slug}`,
-        neonDatabaseUrl: clientDbUrl,
+        neonProjectId: neonDb.id,
+        neonDatabaseId: neonDb.name,
+        neonDatabaseUrl: neonDb.connectionUri,
       },
     });
-    await recordStep(siteId, 'CREATING_NEON', 'SUCCESS', { message: 'Banco PostgreSQL Neon dedicado configurado' });
+    await recordStep(siteId, 'CREATING_NEON', 'SUCCESS', { message: `Banco Neon '${neonDb.name}' criado com sucesso no Brasil (sa-east-1)` });
 
     // ETAPA 4: GENERATING_CODE
     await prisma.site.update({ where: { id: siteId }, data: { status: 'GENERATING_CODE' } });
