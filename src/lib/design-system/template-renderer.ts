@@ -2,8 +2,71 @@ import type { OnboardingData } from '../validation/onboarding';
 import type { DesignSpec } from './specs';
 
 /**
+ * Mapeador de Imagens Contextuais de Alta Qualidade (Unsplash Editorial)
+ * de acordo com a profissão / especialidade informada.
+ */
+function getContextualImages(profession: string, specialty: string) {
+  const p = (profession + ' ' + specialty).toLowerCase();
+
+  if (p.includes('advoc') || p.includes('jurid') || p.includes('direito') || p.includes('tribut') || p.includes('penal') || p.includes('trabalh')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80', // Balança / Direito
+      about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80', // Prédio Corporativo / Escritório
+      practicePattern: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80', // Tribunal / Documentos
+    };
+  }
+
+  if (p.includes('medic') || p.includes('saude') || p.includes('clinica') || p.includes('doutor') || p.includes('cirurg')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80', // Consultório Moderno
+      about: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80', // Clínica / Hospital
+      practicePattern: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  if (p.includes('psicol') || p.includes('terap') || p.includes('mente')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=1200&q=80', // Ambiente acolhedor
+      about: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1000&q=80', // Atendimento
+      practicePattern: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  if (p.includes('fisioter') || p.includes('reabilit')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80', // Fisioterapia
+      about: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1000&q=80', // Reabilitação
+      practicePattern: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  if (p.includes('contab') || p.includes('financ') || p.includes('invest')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80', // Finanças / Dados
+      about: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80', // Gráficos
+      practicePattern: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  if (p.includes('engenh') || p.includes('arquitet') || p.includes('obra')) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80', // Arquitetura
+      about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80', // Edifício
+      practicePattern: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // Padrão Executivo / Corporativo
+  return {
+    hero: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80', // Escritório Moderno
+    about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80',
+    practicePattern: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80',
+  };
+}
+
+/**
  * Gera o template completo, profissional e fiel ao Prompt Mestre com distinção visual real
- * entre os modelos (MODEL_A, MODEL_B, MODEL_C) e aplicação rigorosa das cores escolhidas pelo usuário.
+ * entre os modelos (MODEL_A, MODEL_B, MODEL_C) e aplicação rigorosa das cores e imagens contextuais.
  */
 export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, adminToken?: string): string {
   const name = data.professionalName || data.fullName || 'Escritório Profissional';
@@ -13,6 +76,11 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   const oabBadge = data.councilNumber ? `${data.councilType || 'OAB'} ${data.councilNumber}` : 'Registro Ativo';
   const variant = spec?.variant || 'MODEL_A';
   
+  // Imagens temáticas contextuais
+  const images = getContextualImages(profession, specialty);
+  const heroImage = data.coverPhotoUrl || images.hero;
+  const aboutImage = data.profilePhotoUrl || images.about;
+
   // Cores personalizadas escolhidas pelo usuário
   const primary = data.primaryColor || '#0f172a';
   const secondary = data.secondaryColor || '#2563eb';
@@ -102,83 +170,121 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
 
   <!-- HERO SECTION VARIANTES -->
   ${isModern ? `
-  <!-- HERO MODELO B (MODERNO PREMIUM / DARK) -->
-  <section id="inicio" class="relative pt-24 pb-28 md:pt-32 md:pb-36 overflow-hidden border-b border-slate-800 bg-slate-950">
-    <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-8 border shadow-sm" style="background-color: ${primary}1a; border-color: ${primary}55; color: ${primary}">
-        <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${accent}"></span>
-        Atendimento Online & Presencial • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
-      </div>
-      
-      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] mb-8 max-w-4xl mx-auto">
-        ${data.companyName || specialty || 'Soluções Jurídicas Estratégicas e Alta Performance'}
-      </h1>
-      
-      <p class="text-lg sm:text-xl text-slate-300 leading-relaxed mb-12 max-w-2xl mx-auto">
-        ${data.professionalSummary || 'Defesa técnica, ética e estratégica dos seus direitos com rigor e acompanhamento exclusivo.'}
-      </p>
+  <!-- HERO MODELO B (MODERNO PREMIUM / DARK COM IMAGEM) -->
+  <section id="inicio" class="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden border-b border-slate-800 bg-slate-950">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7 text-left">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6 border shadow-sm" style="background-color: ${primary}25; border-color: ${primary}66; color: #ffffff">
+            <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${accent}"></span>
+            Atendimento Online & Presencial • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
+          </div>
+          
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6">
+            ${data.companyName || specialty || 'Soluções Jurídicas Estratégicas e Alta Performance'}
+          </h1>
+          
+          <p class="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
+            ${data.professionalSummary || 'Defesa técnica, ética e estratégica dos seus direitos com rigor e acompanhamento exclusivo.'}
+          </p>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="w-full sm:w-auto px-9 py-4 text-white font-bold rounded-xl shadow-xl transition-all hover:scale-105" style="background-color: ${accent}">
-          Falar Diretamente no WhatsApp
-        </a>
-        <a href="#contato" class="w-full sm:w-auto px-9 py-4 bg-slate-900 border border-slate-700 text-white font-bold rounded-xl hover:bg-slate-800 transition">
-          Formulário de Análise
-        </a>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold rounded-xl shadow-xl transition-all hover:scale-105 text-center" style="background-color: ${accent}">
+              Falar Diretamente no WhatsApp
+            </a>
+            <a href="#contato" class="px-8 py-4 bg-slate-900 border border-slate-700 text-white font-bold rounded-xl hover:bg-slate-800 transition text-center">
+              Formulário de Análise
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 relative">
+          <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-800 aspect-[4/3] lg:aspect-[4/5] group">
+            <img src="${heroImage}" alt="${specialty}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+            <div class="absolute bottom-6 left-6 right-6 p-4 rounded-xl backdrop-blur-md bg-slate-900/80 border border-slate-700/60">
+              <span class="text-xs font-bold text-amber-400 block">${profession} • ${oabBadge}</span>
+              <span class="text-sm font-semibold text-white block mt-0.5">${name}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
   ` : isEditorial ? `
-  <!-- HERO MODELO C (MINIMALISTA EDITORIAL / CLÁSSICO) -->
-  <section id="inicio" class="py-24 md:py-36 border-b border-stone-300 bg-[#faf9f6]">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="border-l-4 pl-6 sm:pl-10 mb-8" style="border-color: ${primary}">
-        <span class="text-xs uppercase tracking-widest font-semibold text-stone-500 block mb-2">${profession} • ${data.city || 'São Paulo'}/${data.state || 'SP'}</span>
-        <h1 class="text-4xl sm:text-6xl font-serif text-stone-900 leading-tight">
-          ${data.companyName || specialty || 'Defesa Ética e Excelência Jurídica'}
-        </h1>
-      </div>
-      
-      <p class="text-lg sm:text-xl text-stone-700 leading-relaxed max-w-3xl mb-12 font-serif">
-        ${data.professionalSummary || 'Atuação dedicada com rigor técnico, discrição e transparência em todas as fases do processo.'}
-      </p>
+  <!-- HERO MODELO C (MINIMALISTA EDITORIAL / CLÁSSICO COM IMAGEM) -->
+  <section id="inicio" class="py-20 md:py-28 border-b border-stone-300 bg-[#faf9f6]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7">
+          <div class="border-l-4 pl-6 sm:pl-8 mb-6" style="border-color: ${primary}">
+            <span class="text-xs uppercase tracking-widest font-semibold text-stone-500 block mb-2">${profession} • ${data.city || 'São Paulo'}/${data.state || 'SP'}</span>
+            <h1 class="text-4xl sm:text-5xl font-serif text-stone-900 leading-tight">
+              ${data.companyName || specialty || 'Defesa Ética e Excelência Jurídica'}
+            </h1>
+          </div>
+          
+          <p class="text-base sm:text-lg text-stone-700 leading-relaxed mb-8 font-serif">
+            ${data.professionalSummary || 'Atuação dedicada com rigor técnico, discrição e transparência em todas as fases do processo.'}
+          </p>
 
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold text-center tracking-wider text-sm shadow-sm transition hover:opacity-90" style="background-color: ${primary}">
-          CONSULTAR VIA WHATSAPP
-        </a>
-        <a href="#contato" class="px-8 py-4 border border-stone-400 text-stone-900 font-bold text-center tracking-wider text-sm hover:bg-stone-200 transition">
-          ENVIAR MENSAGEM FORMAL
-        </a>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold text-center tracking-wider text-xs shadow-sm transition hover:opacity-90" style="background-color: ${primary}">
+              CONSULTAR VIA WHATSAPP
+            </a>
+            <a href="#contato" class="px-8 py-4 border border-stone-400 text-stone-900 font-bold text-center tracking-wider text-xs hover:bg-stone-200 transition">
+              ENVIAR MENSAGEM FORMAL
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5">
+          <div class="p-3 bg-white border border-stone-300 shadow-md">
+            <img src="${heroImage}" alt="${specialty}" class="w-full h-80 lg:h-96 object-cover grayscale contrast-125">
+            <p class="text-[11px] font-serif text-stone-500 mt-2 text-center uppercase tracking-widest">${specialty} • ${data.city || 'Atuação Especializada'}</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
   ` : `
-  <!-- HERO MODELO A (INSTITUCIONAL CONFIÁVEL / LIGHT) -->
-  <section id="inicio" class="relative pt-16 pb-20 md:pt-24 md:pb-32 bg-white overflow-hidden border-b border-slate-200">
+  <!-- HERO MODELO A (INSTITUCIONAL CONFIÁVEL COM IMAGEM SPLIT) -->
+  <section id="inicio" class="relative pt-16 pb-20 md:pt-20 md:pb-28 bg-white overflow-hidden border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="max-w-3xl">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-6 border" style="background-color: ${secondary}15; border-color: ${secondary}40; color: ${primary}">
-          <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${accent}"></span>
-          Atendimento Online e Presencial • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
-        </div>
-        
-        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-950 leading-[1.1] mb-6">
-          ${data.companyName || specialty || 'Atuação Jurídica Especializada e Atendimento Individualizado'}
-        </h1>
-        
-        <p class="text-lg sm:text-xl text-slate-600 leading-relaxed mb-10">
-          ${data.professionalSummary || 'Defesa técnica, ética e estratégica dos seus direitos com acompanhamento próximo e transparente em cada etapa.'}
-        </p>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-6 border" style="background-color: ${secondary}15; border-color: ${secondary}40; color: ${primary}">
+            <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${accent}"></span>
+            Atendimento Online e Presencial • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
+          </div>
+          
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950 leading-[1.15] mb-6">
+            ${data.companyName || specialty || 'Atuação Jurídica Especializada e Atendimento Individualizado'}
+          </h1>
+          
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-8">
+            ${data.professionalSummary || 'Defesa técnica, ética e estratégica dos seus direitos com acompanhamento próximo e transparente em cada etapa.'}
+          </p>
 
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-          <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold rounded-xl shadow-lg text-center transition hover:opacity-90" style="background-color: ${primary}">
-            Falar pelo WhatsApp
-          </a>
-          <a href="#contato" class="px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center transition">
-            Enviar Formulário de Análise
-          </a>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold rounded-xl shadow-lg text-center transition hover:opacity-90" style="background-color: ${primary}">
+              Falar pelo WhatsApp
+            </a>
+            <a href="#contato" class="px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center transition">
+              Enviar Formulário de Análise
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5">
+          <div class="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 aspect-[4/3] lg:aspect-[4/4]">
+            <img src="${heroImage}" alt="${specialty}" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-white/95 backdrop-blur-sm shadow-md border border-slate-100">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">${profession}</span>
+              <span class="text-sm font-bold text-slate-900 block">${name}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -239,22 +345,32 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     </div>
   </section>
 
-  <!-- SOBRE O PROFISSIONAL -->
+  <!-- SOBRE O PROFISSIONAL COM FOTO/IMAGEM -->
   <section id="sobre" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : 'bg-slate-50 border-b border-slate-200'}">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="${isModern ? 'bg-slate-950 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} p-8 sm:p-12 border shadow-sm">
-        <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Perfil Profissional</h2>
-        <h3 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} mb-4">${name}</h3>
-        <p class="text-sm font-semibold ${isModern ? 'text-slate-400' : 'text-slate-500'} mb-6">${profession} • ${oabBadge} • Atendimento em ${data.city || 'São Paulo'}/${data.state || 'SP'}</p>
-        
-        <p class="${isModern ? 'text-slate-300' : 'text-slate-700'} leading-relaxed mb-6">
-          ${data.bio || data.professionalSummary || 'Atuação dedicada à excelência jurídica e atendimento personalizado, pautado pela ética, sigilo profissional e rigor técnico.'}
-        </p>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div class="lg:col-span-4">
+            <div class="rounded-2xl overflow-hidden border border-slate-200/80 shadow-md aspect-[3/4]">
+              <img src="${aboutImage}" alt="${name}" class="w-full h-full object-cover">
+            </div>
+          </div>
 
-        <div class="pt-6 border-t ${isModern ? 'border-slate-800' : 'border-slate-100'} flex flex-wrap gap-4 text-xs font-semibold ${isModern ? 'text-slate-300' : 'text-slate-600'}">
-          <span class="px-3 py-1.5 ${isModern ? 'bg-slate-900' : 'bg-slate-100'} rounded-lg">🕒 Horário: ${data.businessHours || 'Segunda a Sexta, das 09h às 18h'}</span>
-          <span class="px-3 py-1.5 ${isModern ? 'bg-slate-900' : 'bg-slate-100'} rounded-lg">📍 Atendimento: ${data.attendanceType === 'online' ? '100% Online' : data.attendanceType === 'presencial' ? 'Presencial' : 'Híbrido (Online e Presencial)'}</span>
-          <span class="px-3 py-1.5 ${isModern ? 'bg-slate-900' : 'bg-slate-100'} rounded-lg">✉️ ${data.publicEmail || 'Atendimento Direto'}</span>
+          <div class="lg:col-span-8">
+            <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Perfil Profissional</h2>
+            <h3 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} mb-3">${name}</h3>
+            <p class="text-sm font-semibold ${isModern ? 'text-slate-400' : 'text-slate-500'} mb-6">${profession} • ${oabBadge} • Atendimento em ${data.city || 'São Paulo'}/${data.state || 'SP'}</p>
+            
+            <p class="${isModern ? 'text-slate-300' : 'text-slate-700'} leading-relaxed mb-6">
+              ${data.bio || data.professionalSummary || 'Atuação dedicada à excelência profissional e atendimento personalizado, pautado pela ética, sigilo e rigor técnico.'}
+            </p>
+
+            <div class="pt-6 border-t ${isModern ? 'border-slate-800' : 'border-slate-100'} flex flex-wrap gap-4 text-xs font-semibold ${isModern ? 'text-slate-300' : 'text-slate-600'}">
+              <span class="px-3 py-1.5 ${isModern ? 'bg-slate-900' : 'bg-slate-100'} rounded-lg">🕒 Horário: ${data.businessHours || 'Segunda a Sexta, das 09h às 18h'}</span>
+              <span class="px-3 py-1.5 ${isModern ? 'bg-slate-900' : 'bg-slate-100'} rounded-lg">📍 Atendimento: ${data.attendanceType === 'online' ? '100% Online' : data.attendanceType === 'presencial' ? 'Presencial' : 'Híbrido (Online e Presencial)'}</span>
+              <span class="px-3 py-1.5 ${isModern ? 'bg-slate-900' : 'bg-slate-100'} rounded-lg">✉️ ${data.publicEmail || 'Atendimento Direto'}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
