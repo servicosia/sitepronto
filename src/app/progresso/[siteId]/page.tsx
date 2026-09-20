@@ -136,6 +136,49 @@ export default function ProgressoPage() {
             })}
           </div>
 
+          {/* Tratamento de Erro e Botão de Reiniciar */}
+          {siteData?.hasError && (
+            <div className="mt-8 p-6 bg-red-50 rounded-2xl border border-red-200 text-red-950 space-y-4 animate-fade-in">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-bold text-base text-red-900">Ocorreu uma falha no provisionamento</h3>
+                  <p className="text-xs text-red-700 mt-1">
+                    {siteData.lastError || 'Não foi possível concluir uma das etapas da infraestrutura.'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-red-200/60 flex justify-end">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      const res = await fetch('/api/provisioning/retry', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ siteId }),
+                      });
+                      if (res.ok) {
+                        window.location.reload();
+                      } else {
+                        alert('Erro ao reiniciar.');
+                        setLoading(false);
+                      }
+                    } catch {
+                      alert('Erro ao conectar.');
+                      setLoading(false);
+                    }
+                  }}
+                  className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-md cursor-pointer transition-colors"
+                >
+                  Reiniciar e Tentar Novamente
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Conclusão com Links e Ações */}
           {siteData?.completed && (
             <div className="mt-8 p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-950 space-y-4 animate-fade-in">
