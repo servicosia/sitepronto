@@ -24,6 +24,10 @@ export default function PlatformAdminPage() {
   const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authenticating, setAuthenticating] = useState(false);
   const [creatingVoucher, setCreatingVoucher] = useState(false);
   
   // Novo voucher
@@ -46,13 +50,52 @@ export default function PlatformAdminPage() {
     setLoading(true);
     try {
       const res = await fetch('/api/platform-admin');
+      if (res.status === 401) {
+        setAuthenticated(false);
+        setData(null);
+        return;
+      }
       const json = await res.json();
-      setData(json);
+      if (json.authenticated) {
+        setAuthenticated(true);
+        setData(json);
+      }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setAuthenticating(true);
+    setAuthError('');
+    try {
+      const res = await fetch('/api/platform-admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPasswordInput }),
+      });
+      const resJson = await res.json();
+      if (res.ok && resJson.success) {
+        setAuthenticated(true);
+        setAdminPasswordInput('');
+        loadData();
+      } else {
+        setAuthError(resJson.error || 'Senha incorreta.');
+      }
+    } catch (err: any) {
+      setAuthError('Erro de conexão: ' + err.message);
+    } finally {
+      setAuthenticating(false);
+    }
+  }
+
+  async function handleLogout() {
+    await fetch('/api/platform-admin/auth', { method: 'DELETE' });
+    setAuthenticated(false);
+    setData(null);
   }
 
   useEffect(() => {
@@ -169,6 +212,69 @@ export default function PlatformAdminPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin" />
+          <p className="text-sm font-semibold text-slate-300">Carregando painel administrativo...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4">
+        <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+          <div className="text-center space-y-2">
+            <div className="w-12 h-12 bg-emerald-500 rounded-xl mx-auto flex items-center justify-center font-black text-slate-950 text-xl shadow-lg">
+              SP
+            </div>
+            <h1 className="text-xl font-black text-white tracking-tight">Platform Admin</h1>
+            <p className="text-xs text-slate-400">Área restrita de controle e gerenciamento da fábrica</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                Senha Mestra de Acesso
+              </label>
+              <input
+                type="password"
+                required
+                value={adminPasswordInput}
+                onChange={(e) => setAdminPasswordInput(e.target.value)}
+                placeholder="Digite a senha mestra..."
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+            </div>
+
+            {authError && (
+              <div className="p-3 bg-red-950/60 border border-red-800/80 rounded-xl text-red-300 text-xs text-center font-semibold">
+                {authError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={authenticating}
+              className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-emerald-950 transition disabled:opacity-50 flex items-center justify-center"
+            >
+              {authenticating ? 'Verificando...' : 'Acessar Painel Admin'}
+            </button>
+          </form>
+
+          <div className="text-center pt-2">
+            <Link href="/" className="text-xs text-slate-500 hover:text-slate-300">
+              ← Voltar ao site principal
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top Header */}
@@ -197,6 +303,12 @@ export default function PlatformAdminPage() {
               title="Atualizar dados"
             >
               <RefreshCw className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-red-950/60 hover:text-red-400 text-slate-300 rounded-lg text-xs font-semibold transition border border-slate-700"
+            >
+              Sair
             </button>
           </div>
         </div>

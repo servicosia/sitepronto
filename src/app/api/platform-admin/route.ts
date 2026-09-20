@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { createVoucher } from '@/lib/vouchers/service';
+import { sha256 } from '@/lib/security/crypto';
+
+function isAuthorized(req: NextRequest): boolean {
+  const secret = process.env.SESSION_SECRET || 'sitepronto-session-secret-salt';
+  const correctPassword = process.env.PLATFORM_ADMIN_PASSWORD || 'Ale281911S@@';
+  const expectedToken = sha256(`platform_admin_auth_${secret}_${correctPassword}`);
+
+  const cookie = req.cookies.get('platform_admin_session')?.value;
+  return cookie === expectedToken;
+}
 
 export async function GET(req: NextRequest) {
   try {
+    if (!isAuthorized(req)) {
+      return NextResponse.json({ authenticated: false, error: 'Não autorizado.' }, { status: 401 });
+    }
+
     const vouchers = await prisma.voucher.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
@@ -24,6 +38,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({
+      authenticated: true,
       metrics: {
         totalVouchers: vouchers.length,
         vouchersIssued: vouchers.filter((v) => v.status === 'ISSUED').length,
@@ -49,6 +64,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isAuthorized(req)) {
+      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
+    }
+
     const body = await req.json();
     const voucher = await createVoucher(body);
     return NextResponse.json({ success: true, voucher });
