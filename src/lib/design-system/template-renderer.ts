@@ -14,7 +14,26 @@ export function getContextualImages(profession?: string, specialty?: string, com
   // Remove acentuação para garantir correspondência exata (ex: 'churrasqueiro', 'culinária' -> 'culinaria')
   const text = rawText.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  // 1. Gastronomia, Churrasco, Churrasqueiro, Carnes, Culinária, Chef, Restaurante, Hamburgueria, Buffet
+  // 1. Educação Física, Personal Trainer, Academia, Treinador, Fitness, Musculação, Consultoria Esportiva
+  if (
+    text.includes('personal') || 
+    text.includes('trainer') || 
+    text.includes('treinad') || 
+    text.includes('fitness') || 
+    text.includes('academi') || 
+    text.includes('musculac') ||
+    text.includes('esport') ||
+    text.includes('emagrec') ||
+    text.includes('cref')
+  ) {
+    return {
+      hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80', // Treinamento / Fitness
+      about: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1000&q=80', // Personal Trainer
+      practicePattern: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
+    };
+  }
+
+  // 2. Gastronomia, Churrasco, Churrasqueiro, Carnes, Culinária, Chef, Restaurante, Hamburgueria, Buffet
   if (
     text.includes('churrasc') || 
     text.includes('carne') || 
@@ -30,10 +49,7 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('assar') || 
     text.includes('assado') ||
     text.includes('parrilla') ||
-    text.includes('picanha') ||
-    text.includes('comida') ||
-    text.includes('alimento') ||
-    text.includes('evento')
+    text.includes('picanha')
   ) {
     return {
       hero: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80', // Churrasco / Grelhados artesanais
@@ -42,7 +58,7 @@ export function getContextualImages(profession?: string, specialty?: string, com
     };
   }
 
-  // 2. Advocacia, Direito, Jurídico
+  // 3. Advocacia, Direito, Jurídico
   if (
     text.includes('advoc') || 
     text.includes('jurid') || 
@@ -54,8 +70,9 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('inventari') || 
     text.includes('divorc') || 
     text.includes('oab') ||
-    text.includes('lei') ||
-    text.includes('process')
+    text.includes('lei ') ||
+    text.includes('leis') ||
+    text.includes('jurista')
   ) {
     return {
       hero: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80', // Balança / Direito
@@ -64,17 +81,17 @@ export function getContextualImages(profession?: string, specialty?: string, com
     };
   }
 
-  // 3. Medicina, Saúde, Consultório, Clínica Médica, Cirurgião
+  // 4. Medicina, Médico, Cirurgião, Consultório Médico
   if (
     text.includes('medic') || 
-    text.includes('saude') || 
-    text.includes('clinica') || 
+    text.includes('clinica medica') || 
     text.includes('doutor') || 
     text.includes('cirurg') || 
     text.includes('cardiolog') || 
     text.includes('dermatolog') || 
     text.includes('pediatr') ||
-    text.includes('crm')
+    text.includes('crm/') ||
+    text.includes('crm-')
   ) {
     return {
       hero: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80', // Consultório Moderno
@@ -83,14 +100,15 @@ export function getContextualImages(profession?: string, specialty?: string, com
     };
   }
 
-  // 4. Odontologia, Dentista, Ortodontia
+  // 5. Odontologia, Dentista, Ortodontia, Implante
   if (
     text.includes('odont') || 
     text.includes('dentist') || 
-    text.includes('implant') || 
+    text.includes('implantodont') || 
     text.includes('sorriso') || 
     text.includes('ortodont') ||
-    text.includes('cro')
+    text.includes('cro/') ||
+    text.includes('cro-')
   ) {
     return {
       hero: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1200&q=80', // Consultório Odontológico
@@ -145,21 +163,6 @@ export function getContextualImages(profession?: string, specialty?: string, com
     };
   }
 
-  // 8. Educação Física, Personal Trainer, Academia, Fitness
-  if (
-    text.includes('personal') || 
-    text.includes('treinador') || 
-    text.includes('fitness') || 
-    text.includes('academi') || 
-    text.includes('musculac') ||
-    text.includes('cref')
-  ) {
-    return {
-      hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80', // Treinamento / Fitness
-      about: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1000&q=80', // Personal Trainer
-      practicePattern: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
-    };
-  }
 
   // 9. Contabilidade, Finanças, Consultoria Financeira, Tributos
   if (
