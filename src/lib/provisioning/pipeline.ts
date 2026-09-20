@@ -22,21 +22,38 @@ export async function startProvisioningPipeline(params: ProvisionSiteParams) {
   const slug = generateSafeSlug(params.data.professionalName || params.data.fullName);
 
   // 1. Cria ou recupera registro de Site
-  let site = await prisma.site.create({
-    data: {
-      userId: params.userId,
-      voucherId: params.voucherId,
-      onboardingSessionId: params.onboardingSessionId,
-      name: params.data.companyName || params.data.professionalName || params.data.fullName,
-      slug,
-      profession: params.data.profession,
-      designVariant: params.designSpec.variant,
-      designSpec: params.designSpec as any,
-      profileData: params.data as any,
-      status: 'VALIDATING',
-      adminActivationToken: crypto.randomBytes(24).toString('hex'),
-    },
+  let site = await prisma.site.findUnique({
+    where: { onboardingSessionId: params.onboardingSessionId },
   });
+
+  if (!site) {
+    site = await prisma.site.create({
+      data: {
+        userId: params.userId,
+        voucherId: params.voucherId,
+        onboardingSessionId: params.onboardingSessionId,
+        name: params.data.companyName || params.data.professionalName || params.data.fullName,
+        slug,
+        profession: params.data.profession,
+        designVariant: params.designSpec.variant,
+        designSpec: params.designSpec as any,
+        profileData: params.data as any,
+        status: 'VALIDATING',
+        adminActivationToken: crypto.randomBytes(24).toString('hex'),
+      },
+    });
+  } else {
+    site = await prisma.site.update({
+      where: { id: site.id },
+      data: {
+        status: 'VALIDATING',
+        lastError: null,
+        designVariant: params.designSpec.variant,
+        designSpec: params.designSpec as any,
+        profileData: params.data as any,
+      },
+    });
+  }
 
   // 2. Cria o Job de Provisionamento persistente
   const job = await prisma.provisioningJob.create({
