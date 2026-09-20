@@ -68,4 +68,22 @@ export class NeonProvider implements DatabaseProvider {
       };
     }
   }
+
+  async deleteDatabase(projectId: string): Promise<boolean> {
+    if (!this.apiKey || !projectId || projectId.startsWith('neon_')) return false;
+    try {
+      const res = await fetch(`https://console.neon.tech/api/v2/projects/${projectId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: 'application/json',
+        },
+      });
+      return res.status === 200 || res.status === 204;
+    } catch (err: any) {
+      console.warn(`[NeonProvider] Falha ao deletar projeto Neon ${projectId}:`, err.message);
+      return false;
+    }
+  }
 }
+

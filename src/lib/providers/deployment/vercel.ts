@@ -142,4 +142,23 @@ export class VercelProvider implements DeploymentProvider {
       return { url: `https://${options.projectName}.vercel.app`, ready: false };
     }
   }
+
+  async deleteProject(projectIdOrName: string): Promise<boolean> {
+    if (!this.token) return false;
+    try {
+      const teamQuery = this.teamId ? `?teamId=${this.teamId}` : '';
+      const res = await fetch(`https://api.vercel.com/v9/projects/${encodeURIComponent(projectIdOrName)}${teamQuery}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+      return res.status === 200 || res.status === 204;
+    } catch (err: any) {
+      console.warn(`[VercelProvider] Falha ao deletar projeto ${projectIdOrName}:`, err.message);
+      return false;
+    }
+  }
 }
+
+

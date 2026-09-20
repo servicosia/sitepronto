@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
+import { VercelProvider } from '@/lib/providers/deployment/vercel';
+import { NeonProvider } from '@/lib/providers/database/neon';
 
 // Excluir Projeto/Site da Plataforma, Vercel e Neon
 export async function DELETE(req: NextRequest) {
@@ -19,33 +21,19 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Site não encontrado' }, { status: 404 });
     }
 
-    // 1. Exclusão na Vercel (caso exista VERCEL_TOKEN configurado)
-    if (process.env.VERCEL_TOKEN && site.vercelProjectId) {
-      try {
-        await fetch(`https://api.vercel.com/v9/projects/${site.vercelProjectId}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${process.env.VERCEL_TOKEN}`,
-          },
-        });
-      } catch (vercelErr) {
-        console.warn('Falha ao remover projeto na Vercel:', vercelErr);
-      }
+    // 1. Exclusão na Vercel
+    const vercel = new VercelProvider();
+    if (site.vercelProjectId) {
+      await vercel.deleteProject(site.vercelProjectId);
+    }
+    if (site.subdomain && site.subdomain !== site.vercelProjectId) {
+      await vercel.deleteProject(site.subdomain);
     }
 
-    // 2. Exclusão no Neon (caso exista NEON_API_KEY configurada)
-    if (process.env.NEON_API_KEY && site.neonProjectId) {
-      try {
-        await fetch(`https://console.neon.tech/api/v2/projects/${site.neonProjectId}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${process.env.NEON_API_KEY}`,
-            Accept: 'application/json',
-          },
-        });
-      } catch (neonErr) {
-        console.warn('Falha ao remover banco no Neon:', neonErr);
-      }
+    // 2. Exclusão no Neon
+    const neon = new NeonProvider();
+    if (site.neonProjectId) {
+      await neon.deleteDatabase(site.neonProjectId);
     }
 
     // 3. Exclui steps, jobs e o registro do Site no Banco Central
