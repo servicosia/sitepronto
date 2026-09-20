@@ -50,15 +50,18 @@ export default function PlatformAdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientName, clientEmail, description }),
       });
+      const resJson = await res.json();
       if (res.ok) {
         setClientName('');
         setClientEmail('');
         setDescription('');
         setCreatingVoucher(false);
         loadData();
+      } else {
+        alert(resJson.error || 'Erro ao criar voucher.');
       }
-    } catch (err) {
-      alert('Erro ao criar voucher');
+    } catch (err: any) {
+      alert('Erro de conexão ao criar voucher: ' + err.message);
     }
   }
 
