@@ -294,7 +294,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           <p class="text-xs text-slate-500 mt-1">Alterne a qualquer momento o layout e a estética do seu site sem perder suas informações cadastradas.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Modelo A -->
           <div id="opt-model-a" onclick="selectTemplateOption('MODEL_A')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-900 bg-slate-50 shadow-md transition-all">
             <div class="flex items-center justify-between mb-2">
@@ -312,7 +312,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
               <span class="text-xs font-bold uppercase text-slate-500">Modelo B</span>
               <span id="badge-model-b" class="w-5 h-5 rounded-full bg-slate-900 text-white hidden items-center justify-center text-xs">✓</span>
             </div>
-            <h4 class="font-bold text-slate-900 mb-1">Moderno Premium</h4>
+            <h4 class="font-bold text-slate-900 mb-1">Moderno Dark</h4>
             <p class="text-xs text-slate-600 mb-4">Atmosfera dark contemporânea, efeitos visuais refinados e destaque dinâmico.</p>
             <div class="p-2 bg-slate-900 rounded text-[11px] text-white font-medium">Ideal para alto impacto e diferenciação</div>
           </div>
@@ -324,8 +324,19 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
               <span id="badge-model-c" class="w-5 h-5 rounded-full bg-slate-900 text-white hidden items-center justify-center text-xs">✓</span>
             </div>
             <h4 class="font-bold text-slate-900 mb-1">Minimalista Editorial</h4>
-            <p class="text-xs text-slate-600 mb-4">Tipografia serifada nobre, fundo off-white e elegância executiva sóbria.</p>
+            <p class="text-xs text-slate-600 mb-4">Tipografia nobre clássica, fundo off-white e elegância executiva sóbria.</p>
             <div class="p-2 bg-stone-100 rounded border border-stone-300 text-[11px] text-stone-800 font-serif">Ideal para abordagem editorial refinada</div>
+          </div>
+
+          <!-- Modelo D -->
+          <div id="opt-model-d" onclick="selectTemplateOption('MODEL_D')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase text-emerald-600">Modelo D • Stitch</span>
+              <span id="badge-model-d" class="w-5 h-5 rounded-full bg-slate-900 text-white hidden items-center justify-center text-xs">✓</span>
+            </div>
+            <h4 class="font-bold text-slate-900 mb-1">Alta Conversão</h4>
+            <p class="text-xs text-slate-600 mb-4">Layout dinâmico Bento Grid, badge de disponibilidade e foco em agendamento ágil.</p>
+            <div class="p-2 bg-emerald-950 rounded text-[11px] text-emerald-300 font-medium">Ideal para consultorias e conversão</div>
           </div>
         </div>
 
@@ -380,7 +391,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           <div class="p-4 rounded-xl border border-slate-200 bg-white flex items-center justify-between">
             <div>
               <span class="text-xs font-bold text-emerald-700 uppercase">Artigo Técnico</span>
-              <h4 class="font-bold text-sm text-slate-900">A Importância do Acompanhamento Especializado e Prevenção</h4>
+              <h4 class="font-bold text-sm text-slate-900">A Importância do Acompanhamento Especializado</h4>
               <p class="text-xs text-slate-400">Publicado • Leitura: 3 min</p>
             </div>
             <button onclick="triggerSave('Artigo editado!')" class="text-xs font-bold text-slate-900 border px-3 py-1.5 rounded-lg hover:bg-slate-50">Editar</button>
@@ -451,7 +462,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
 
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Modelo Visual (Template)</label>
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-900 bg-slate-50" id="label-quick-model-a">
               <input type="radio" name="quickTemplate" value="MODEL_A" checked onchange="updateQuickTemplateHighlight('MODEL_A')" class="hidden">
               <span class="font-bold text-xs text-slate-900">Modelo A</span>
@@ -460,12 +471,17 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
             <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-200 bg-white" id="label-quick-model-b">
               <input type="radio" name="quickTemplate" value="MODEL_B" onchange="updateQuickTemplateHighlight('MODEL_B')" class="hidden">
               <span class="font-bold text-xs text-slate-900">Modelo B</span>
-              <span class="text-[10px] text-slate-500">Moderno Dark</span>
+              <span class="text-[10px] text-slate-500">Dark</span>
             </label>
             <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-200 bg-white" id="label-quick-model-c">
               <input type="radio" name="quickTemplate" value="MODEL_C" onchange="updateQuickTemplateHighlight('MODEL_C')" class="hidden">
               <span class="font-bold text-xs text-slate-900">Modelo C</span>
               <span class="text-[10px] text-slate-500">Editorial</span>
+            </label>
+            <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center transition flex flex-col items-center border-slate-200 bg-white" id="label-quick-model-d">
+              <input type="radio" name="quickTemplate" value="MODEL_D" onchange="updateQuickTemplateHighlight('MODEL_D')" class="hidden">
+              <span class="font-bold text-xs text-emerald-600">Modelo D</span>
+              <span class="text-[10px] text-slate-500">Stitch Pulse</span>
             </label>
           </div>
         </div>
@@ -504,7 +520,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     }
 
     function selectTemplateOption(model) {
-      const opts = ['a', 'b', 'c'];
+      const opts = ['a', 'b', 'c', 'd'];
       opts.forEach(o => {
         const el = document.getElementById('opt-model-' + o);
         const badge = document.getElementById('badge-model-' + o);
@@ -516,7 +532,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         }
       });
 
-      const target = model === 'MODEL_A' ? 'a' : model === 'MODEL_B' ? 'b' : 'c';
+      const target = model === 'MODEL_A' ? 'a' : model === 'MODEL_B' ? 'b' : model === 'MODEL_C' ? 'c' : 'd';
       const activeEl = document.getElementById('opt-model-' + target);
       const activeBadge = document.getElementById('badge-model-' + target);
       if (activeEl && activeBadge) {
@@ -549,7 +565,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     }
 
     function updateQuickTemplateHighlight(model) {
-      ['MODEL_A', 'MODEL_B', 'MODEL_C'].forEach(m => {
+      ['MODEL_A', 'MODEL_B', 'MODEL_C', 'MODEL_D'].forEach(m => {
         const key = m.toLowerCase().replace('_', '-');
         const lbl = document.getElementById('label-quick-' + key);
         if (lbl) {

@@ -58,8 +58,9 @@ export const ThemeTypes = [
 
 export const DesignVariantTypes = [
   'MODEL_A', // Institucional Confiável
-  'MODEL_B', // Moderno Premium
-  'MODEL_C'  // Minimalista Editorial
+  'MODEL_B', // Moderno Dark Premium
+  'MODEL_C', // Minimalista Editorial Nobre
+  'MODEL_D'  // Alta Conversão & Consultoria Ágil (Google Stitch Dynamic)
 ] as const;
 
 // Schema de Serviço

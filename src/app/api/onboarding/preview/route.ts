@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const data = parseResult.data;
     const { providerUsed, specs } = await getDesignSpecsWithProvider(data);
 
-    // Renderiza o HTML completo para cada variante
+    // Renderiza o HTML completo para cada uma das 4 variantes
     const previews = {
       MODEL_A: {
         title: 'Modelo A — Institucional Confiável',
@@ -30,16 +30,22 @@ export async function POST(req: NextRequest) {
         html: renderCompleteSiteHtml(data, specs.MODEL_A),
       },
       MODEL_B: {
-        title: 'Modelo B — Moderno Premium',
-        description: 'Forte impacto visual, tipografia contemporânea e cartões de serviços dinâmicos.',
+        title: 'Modelo B — Moderno Dark Premium',
+        description: 'Forte impacto visual, tipografia contemporânea, atmosfera noturna e cartões dinâmicos.',
         spec: specs.MODEL_B,
         html: renderCompleteSiteHtml(data, specs.MODEL_B),
       },
       MODEL_C: {
         title: 'Modelo C — Minimalista Editorial',
-        description: 'Design editorial e sóbrio com tipografia serifada, espaçamento generoso e elegância executiva.',
+        description: 'Design editorial e nobre com tipografia clássica, espaçamento generoso e elegância executiva.',
         spec: specs.MODEL_C,
         html: renderCompleteSiteHtml(data, specs.MODEL_C),
+      },
+      MODEL_D: {
+        title: 'Modelo D — Consultoria & Alta Conversão (Stitch Pulse)',
+        description: 'Estrutura moderna estilo Bento Grid, hero dinâmico focado em conversão e agendamento ágil.',
+        spec: specs.MODEL_D,
+        html: renderCompleteSiteHtml(data, specs.MODEL_D),
       },
     };
 

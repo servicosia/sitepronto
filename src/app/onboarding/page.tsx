@@ -51,7 +51,7 @@ function OnboardingContent() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string>('Alterações salvas');
-  const [selectedModel, setSelectedModel] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C'>('MODEL_A');
+  const [selectedModel, setSelectedModel] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
   const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop');
 
   // Conta do cliente para provisionamento
@@ -717,27 +717,27 @@ function OnboardingContent() {
               ) : (
                 <>
                   {/* Seletor de Modelo */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Modelo A */}
                     <div 
                       onClick={() => setSelectedModel('MODEL_A')}
-                      className={`cursor-pointer p-6 rounded-2xl border-2 transition-all ${
+                      className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
                         selectedModel === 'MODEL_A'
                           ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Modelo A</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Modelo A</span>
                         {selectedModel === 'MODEL_A' && (
                           <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
                         )}
                       </div>
-                      <h3 className="text-lg font-bold text-slate-900 mb-1">Institucional Confiável</h3>
-                      <p className="text-xs text-slate-600 mb-4">
-                        Estrutura clássica, hero com contato rápido, cartões simétricos e alta legibilidade.
+                      <h3 className="text-base font-bold text-slate-900 mb-1">Institucional Confiável</h3>
+                      <p className="text-xs text-slate-600 mb-3">
+                        Estrutura clássica, hero split e autoridade corporativa.
                       </p>
-                      <div className="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-700">
+                      <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs text-slate-700">
                         <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
                         <div className="text-[11px] text-slate-500">{formData.profession || 'Sua Profissão'}</div>
                       </div>
@@ -746,23 +746,23 @@ function OnboardingContent() {
                     {/* Modelo B */}
                     <div 
                       onClick={() => setSelectedModel('MODEL_B')}
-                      className={`cursor-pointer p-6 rounded-2xl border-2 transition-all ${
+                      className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
                         selectedModel === 'MODEL_B'
                           ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Modelo B</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Modelo B</span>
                         {selectedModel === 'MODEL_B' && (
                           <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
                         )}
                       </div>
-                      <h3 className="text-lg font-bold text-slate-900 mb-1">Moderno Premium</h3>
-                      <p className="text-xs text-slate-600 mb-4">
-                        Forte impacto visual, tipografia contemporânea, cartões dinâmicos e sofisticação.
+                      <h3 className="text-base font-bold text-slate-900 mb-1">Moderno Dark</h3>
+                      <p className="text-xs text-slate-600 mb-3">
+                        Forte impacto visual, atmosfera dark e sofisticação.
                       </p>
-                      <div className="p-3 bg-slate-900 rounded-lg text-xs text-white">
+                      <div className="p-2.5 bg-slate-900 rounded-lg text-xs text-white">
                         <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
                         <div className="text-[11px] text-slate-300">{formData.mainSpecialty || 'Especialidade'}</div>
                       </div>
@@ -771,25 +771,50 @@ function OnboardingContent() {
                     {/* Modelo C */}
                     <div 
                       onClick={() => setSelectedModel('MODEL_C')}
-                      className={`cursor-pointer p-6 rounded-2xl border-2 transition-all ${
+                      className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
                         selectedModel === 'MODEL_C'
                           ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Modelo C</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Modelo C</span>
                         {selectedModel === 'MODEL_C' && (
                           <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
                         )}
                       </div>
-                      <h3 className="text-lg font-bold text-slate-900 mb-1">Minimalista Editorial</h3>
-                      <p className="text-xs text-slate-600 mb-4">
-                        Espaçamento generoso, foco total na escrita, tipografia serifada e elegância sem ruídos.
+                      <h3 className="text-base font-bold text-slate-900 mb-1">Minimalista Editorial</h3>
+                      <p className="text-xs text-slate-600 mb-3">
+                        Tipografia clássica serifada, off-white e sobriedade.
                       </p>
-                      <div className="p-3 bg-stone-100 rounded-lg border-l-2 border-stone-800 text-xs text-stone-800 font-serif">
+                      <div className="p-2.5 bg-stone-100 rounded-lg border-l-2 border-stone-800 text-xs text-stone-800 font-serif">
                         <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
                         <div className="text-[11px] text-stone-600">{formData.city || 'Cidade'} - {formData.state || 'UF'}</div>
+                      </div>
+                    </div>
+
+                    {/* Modelo D */}
+                    <div 
+                      onClick={() => setSelectedModel('MODEL_D')}
+                      className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
+                        selectedModel === 'MODEL_D'
+                          ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Modelo D • Stitch Pulse</span>
+                        {selectedModel === 'MODEL_D' && (
+                          <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
+                        )}
+                      </div>
+                      <h3 className="text-base font-bold text-slate-900 mb-1">Alta Conversão</h3>
+                      <p className="text-xs text-slate-600 mb-3">
+                        Layout dinâmico Bento Grid, foco em agendamento e SaaS.
+                      </p>
+                      <div className="p-2.5 bg-emerald-950 rounded-lg text-xs text-emerald-300">
+                        <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
+                        <div className="text-[11px] text-emerald-400">Agendamento & Consultoria</div>
                       </div>
                     </div>
                   </div>
@@ -802,7 +827,7 @@ function OnboardingContent() {
                         <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" />
                         <span className="w-3 h-3 rounded-full bg-emerald-400 inline-block" />
                         <span className="text-xs font-mono text-slate-500 ml-2">
-                          Pré-visualização Interativa • {selectedModel === 'MODEL_A' ? 'Modelo A (Institucional)' : selectedModel === 'MODEL_B' ? 'Modelo B (Moderno)' : 'Modelo C (Editorial)'}
+                          Pré-visualização Interativa • {selectedModel === 'MODEL_A' ? 'Modelo A (Institucional)' : selectedModel === 'MODEL_B' ? 'Modelo B (Moderno Dark)' : selectedModel === 'MODEL_C' ? 'Modelo C (Editorial)' : 'Modelo D (Alta Conversão)'}
                         </span>
                       </div>
 

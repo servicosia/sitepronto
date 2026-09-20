@@ -2,7 +2,7 @@ import type { OnboardingData } from '../validation/onboarding';
 
 export interface DesignSpec {
   id: string;
-  variant: 'MODEL_A' | 'MODEL_B' | 'MODEL_C';
+  variant: 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D';
   name: string;
   description: string;
   colors: {
@@ -31,17 +31,17 @@ export interface DesignSpec {
     badge: string;
   };
   hero: {
-    layout: 'centered' | 'split-right-image' | 'editorial-minimal' | 'badge-overlay';
+    layout: 'centered' | 'split-right-image' | 'editorial-minimal' | 'badge-overlay' | 'lead-capture-focused';
     hasSearchOrQuickContact: boolean;
     hasOnlineBadge: boolean;
   };
   servicesSection: {
-    layout: 'grid-3' | 'horizontal-cards' | 'editorial-list';
+    layout: 'grid-3' | 'horizontal-cards' | 'editorial-list' | 'interactive-bento';
     hasIcons: boolean;
     hasBadges: boolean;
   };
   aboutSection: {
-    layout: 'two-column-story' | 'timeline' | 'quote-centered';
+    layout: 'two-column-story' | 'timeline' | 'quote-centered' | 'stat-highlight-story';
     hasCredentialsBadge: boolean;
   };
   footer: {
@@ -50,9 +50,10 @@ export interface DesignSpec {
 }
 
 /**
- * Síntese do DesignSpec a partir das escolhas e dados do cliente
+ * Síntese de 4 DesignSpecs sob medida a partir dos dados do Profissional Liberal
+ * Integrando os princípios e diretrizes do Google Stitch Design DNA.
  */
-export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'MODEL_B' | 'MODEL_C', DesignSpec> {
+export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D', DesignSpec> {
   const primary = data.primaryColor || '#0f172a';
   const secondary = data.secondaryColor || '#3b82f6';
   const accent = data.accentColor || '#10b981';
@@ -110,16 +111,16 @@ export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'M
     MODEL_B: {
       id: 'spec_model_b',
       variant: 'MODEL_B',
-      name: 'Moderno Premium',
-      description: 'Forte impacto visual, contrastes elegantes, microinterações, glassmorphism sutil e sofisticação.',
+      name: 'Moderno Dark Premium',
+      description: 'Forte impacto visual, contrastes elegantes, atmosfera noturna, glassmorphism sutil e sofisticação.',
       colors: {
         primary: primary,
         secondary: secondary,
         accent: accent,
-        background: '#f8fafc',
-        foreground: '#0f172a',
-        muted: '#f1f5f9',
-        card: '#ffffff',
+        background: '#090d16',
+        foreground: '#f8fafc',
+        muted: '#131c2e',
+        card: '#0f172a',
       },
       typography: {
         headingFont: 'Plus Jakarta Sans, sans-serif',
@@ -133,7 +134,7 @@ export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'M
         cardPadding: 'p-10',
       },
       borderRadius: {
-        card: 'rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300',
+        card: 'rounded-2xl border border-slate-800 shadow-xl shadow-slate-950/50 hover:-translate-y-1 transition-all duration-300',
         button: 'rounded-xl',
         badge: 'rounded-md',
       },
@@ -160,29 +161,29 @@ export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'M
       id: 'spec_model_c',
       variant: 'MODEL_C',
       name: 'Minimalista Editorial',
-      description: 'Espaço generoso, foco total no conteúdo, tipografia marcante e elegância refinada sem ruídos.',
+      description: 'Espaço generoso, foco total no conteúdo, tipografia clássica nobre e elegância executiva sóbria.',
       colors: {
-        primary: '#111827',
+        primary: '#1c1917',
         secondary: primary,
         accent: accent,
-        background: '#fcfcfc',
+        background: '#faf9f6',
         foreground: '#1c1917',
-        muted: '#f5f5f4',
+        muted: '#f4f2eb',
         card: '#ffffff',
       },
       typography: {
-        headingFont: 'Cinzel, Georgia, serif',
-        bodyFont: 'Inter, sans-serif',
-        baseSize: '17px',
-        heroHeadingSize: 'text-4xl md:text-5xl font-normal leading-tight',
+        headingFont: 'Playfair Display, Cinzel, Georgia, serif',
+        bodyFont: 'Plus Jakarta Sans, Inter, sans-serif',
+        baseSize: '16px',
+        heroHeadingSize: 'text-4xl md:text-5xl font-serif font-normal leading-tight',
       },
       spacing: {
-        containerMaxWidth: 'max-w-5xl',
+        containerMaxWidth: 'max-w-6xl',
         sectionPaddingY: 'py-24',
         cardPadding: 'p-8',
       },
       borderRadius: {
-        card: 'rounded-none border-l-2 border-slate-900 bg-white p-8',
+        card: 'rounded-none border border-stone-300 bg-white p-8 shadow-sm',
         button: 'rounded-none uppercase tracking-wider text-xs',
         badge: 'rounded-none',
       },
@@ -202,6 +203,55 @@ export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'M
       },
       footer: {
         layout: 'stacked-centered',
+      },
+    },
+
+    MODEL_D: {
+      id: 'spec_model_d',
+      variant: 'MODEL_D',
+      name: 'Consultoria & Alta Conversão (Stitch Pulse)',
+      description: 'Estrutura contemporânea estilo SaaS/Consultoria com cartões Bento Grid, badge flutuante e foco em agendamento.',
+      colors: {
+        primary: primary,
+        secondary: '#0ea5e9',
+        accent: '#10b981',
+        background: '#f8fafc',
+        foreground: '#0f172a',
+        muted: '#e2e8f0',
+        card: '#ffffff',
+      },
+      typography: {
+        headingFont: 'Plus Jakarta Sans, sans-serif',
+        bodyFont: 'Inter, sans-serif',
+        baseSize: '16px',
+        heroHeadingSize: 'text-4xl md:text-6xl font-black tracking-tight',
+      },
+      spacing: {
+        containerMaxWidth: 'max-w-7xl',
+        sectionPaddingY: 'py-20',
+        cardPadding: 'p-8',
+      },
+      borderRadius: {
+        card: 'rounded-3xl border border-slate-200/80 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:border-slate-300 transition-all',
+        button: 'rounded-2xl shadow-md hover:shadow-lg',
+        badge: 'rounded-full',
+      },
+      hero: {
+        layout: 'lead-capture-focused',
+        hasSearchOrQuickContact: true,
+        hasOnlineBadge: true,
+      },
+      servicesSection: {
+        layout: 'interactive-bento',
+        hasIcons: true,
+        hasBadges: true,
+      },
+      aboutSection: {
+        layout: 'stat-highlight-story',
+        hasCredentialsBadge: true,
+      },
+      footer: {
+        layout: 'multi-column-rich',
       },
     },
   };

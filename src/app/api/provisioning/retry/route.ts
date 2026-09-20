@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     }
 
     const allSpecs = generateDesignSpecs(parsedData.data);
-    const designSpec = allSpecs[site.designVariant as 'MODEL_A' | 'MODEL_B' | 'MODEL_C'] || allSpecs.MODEL_A;
+    const designSpec = allSpecs[site.designVariant as 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'] || allSpecs.MODEL_A;
 
     // 3. Reinicia o Pipeline Idempotente
     const { job } = await startProvisioningPipeline({

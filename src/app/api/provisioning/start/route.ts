@@ -50,9 +50,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Obtém DesignSpec correspondente à escolha do cliente
-    const variant = (selectedVariant || session.selectedDesign || 'MODEL_A') as 'MODEL_A' | 'MODEL_B' | 'MODEL_C';
+    const variant = (selectedVariant || session.selectedDesign || 'MODEL_A') as 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D';
     const allSpecs = generateDesignSpecs(parseResult.data);
-    const designSpec = allSpecs[variant];
+    const designSpec = allSpecs[variant] || allSpecs.MODEL_A;
 
     // Inicia Pipeline Automatizado
     const { site, job } = await startProvisioningPipeline({

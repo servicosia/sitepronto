@@ -314,12 +314,13 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   const accent = data.accentColor || '#10b981';
 
   // Configurações visuais por variante
+  const isConversion = variant === 'MODEL_D';
   const isEditorial = variant === 'MODEL_C';
   const isModern = variant === 'MODEL_B';
   const isInstitutional = variant === 'MODEL_A';
 
-  const fontBody = isEditorial ? "'Cinzel', Georgia, serif" : isModern ? "'Plus Jakarta Sans', sans-serif" : "'Inter', sans-serif";
-  const fontHeading = isEditorial ? "'Cinzel', Georgia, serif" : isModern ? "'Plus Jakarta Sans', sans-serif" : "'Outfit', sans-serif";
+  const fontBody = isEditorial ? "'Playfair Display', Georgia, serif" : (isModern || isConversion) ? "'Plus Jakarta Sans', sans-serif" : "'Inter', sans-serif";
+  const fontHeading = isEditorial ? "'Playfair Display', Georgia, serif" : (isModern || isConversion) ? "'Plus Jakarta Sans', sans-serif" : "'Outfit', sans-serif";
 
   const servicesList = data.services && data.services.length > 0 ? data.services : [
     {
@@ -354,7 +355,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&family=Cinzel:wght@500;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Cinzel:wght@500;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -375,13 +376,13 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     .border-custom-accent { border-color: ${accent}; }
   </style>
 </head>
-<body class="${isModern ? 'bg-slate-950 text-slate-100' : isEditorial ? 'bg-[#faf9f6] text-stone-900' : 'bg-slate-50 text-slate-900'} antialiased">
+<body class="${isModern ? 'bg-slate-950 text-slate-100' : isEditorial ? 'bg-[#faf9f6] text-stone-900' : isConversion ? 'bg-slate-50 text-slate-900' : 'bg-slate-50 text-slate-900'} antialiased">
 
   <!-- HEADER -->
-  <header class="sticky top-0 z-50 ${isModern ? 'bg-slate-900/90 border-slate-800' : isEditorial ? 'bg-[#faf9f6]/95 border-stone-300' : 'bg-white/95 border-slate-200'} backdrop-blur border-b">
+  <header class="sticky top-0 z-50 ${isModern ? 'bg-slate-900/90 border-slate-800' : isEditorial ? 'bg-[#faf9f6]/95 border-stone-300' : isConversion ? 'bg-white/95 border-slate-200/80 shadow-sm' : 'bg-white/95 border-slate-200'} backdrop-blur border-b">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-11 h-11 ${isEditorial ? 'rounded-none' : 'rounded-xl'} text-white flex items-center justify-center font-bold text-lg shadow-md" style="background-color: ${primary}">
+        <div class="w-11 h-11 ${isEditorial ? 'rounded-none' : isConversion ? 'rounded-2xl' : 'rounded-xl'} text-white flex items-center justify-center font-bold text-lg shadow-md" style="background-color: ${primary}">
           ${name.slice(0, 2).toUpperCase()}
         </div>
         <div>
@@ -400,7 +401,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
       </nav>
 
       <div class="flex items-center space-x-3">
-        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-5 py-2.5 text-white text-sm font-bold ${isEditorial ? 'rounded-none uppercase tracking-wider' : 'rounded-xl'} shadow-md transition-all flex items-center hover:opacity-90" style="background-color: ${primary}">
+        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-5 py-2.5 text-white text-sm font-bold ${isEditorial ? 'rounded-none uppercase tracking-wider' : isConversion ? 'rounded-2xl' : 'rounded-xl'} shadow-md transition-all flex items-center hover:opacity-90" style="background-color: ${isConversion ? accent : primary}">
           Agendar Atendimento
         </a>
       </div>
@@ -408,7 +409,56 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   </header>
 
   <!-- HERO SECTION VARIANTES -->
-  ${isModern ? `
+  ${isConversion ? `
+  <!-- HERO MODELO D (GOOGLE STITCH PULSE / ALTA CONVERSÃO & BENTO) -->
+  <section id="inicio" class="relative pt-16 pb-20 md:pt-24 md:pb-28 bg-gradient-to-b from-slate-100 via-white to-slate-50 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7 text-left">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Disponível para Atendimento • ${data.city || 'São Paulo'} (${data.attendanceType === 'online' ? '100% Online' : data.attendanceType === 'presencial' ? 'Presencial' : 'Híbrido'})
+          </div>
+          
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.08] mb-6">
+            ${data.companyName || specialty || 'Consultoria e Soluções Estratégicas de Alto Nível'}
+          </h1>
+          
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-8 max-w-2xl font-normal">
+            ${data.professionalSummary || 'Atendimento ágil, foco em resultados concretos e segurança técnica em cada detalhe.'}
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold rounded-2xl shadow-xl shadow-emerald-500/20 transition-all hover:scale-105 text-center flex items-center justify-center gap-2" style="background-color: ${accent}">
+              <span>⚡</span> Falar no WhatsApp Agora
+            </a>
+            <a href="#contato" class="px-8 py-4 bg-white border-2 border-slate-300 text-slate-800 font-bold rounded-2xl hover:border-slate-900 transition text-center">
+              Agendar Reunião / Proposta
+            </a>
+          </div>
+
+          <div class="mt-8 flex items-center gap-6 text-xs text-slate-500 font-semibold">
+            <span class="flex items-center gap-1.5">✓ Resposta Rápida</span>
+            <span class="flex items-center gap-1.5">✓ Confidencialidade Total</span>
+            <span class="flex items-center gap-1.5">✓ Atendimento Personalizado</span>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 relative">
+          <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-[4/3] lg:aspect-[4/5] group bg-slate-100">
+            <img src="${heroImage}" alt="${specialty}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+            <div class="absolute bottom-6 left-6 right-6 p-5 rounded-2xl backdrop-blur-md bg-white/95 border border-white/40 shadow-xl">
+              <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block">${profession}</span>
+              <span class="text-base font-extrabold text-slate-900 block mt-0.5">${name}</span>
+              <span class="text-[11px] text-slate-500 block">${specialty}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  ` : isModern ? `
   <!-- HERO MODELO B (MODERNO PREMIUM / DARK COM IMAGEM) -->
   <section id="inicio" class="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden border-b border-slate-800 bg-slate-950">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -531,7 +581,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   `}
 
   <!-- SERVIÇOS / ÁREAS DE ATUAÇÃO -->
-  <section id="servicos" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : 'bg-slate-50 border-b border-slate-200'}">
+  <section id="servicos" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : isConversion ? 'bg-white border-b border-slate-200' : 'bg-slate-50 border-b border-slate-200'}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16">
         <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Serviços & Soluções</h2>
@@ -541,8 +591,8 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         ${servicesList.map((s, index) => `
-          <div class="${isModern ? 'bg-slate-950 border-slate-800 hover:border-slate-700' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-2xl'} p-8 border shadow-sm hover:shadow-md transition-all">
-            <div class="w-12 h-12 ${isEditorial ? 'rounded-none' : 'rounded-xl'} text-white flex items-center justify-center font-bold mb-6 text-xl shadow-md" style="background-color: ${primary}">
+          <div class="${isModern ? 'bg-slate-950 border-slate-800 hover:border-slate-700' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-slate-50 border-slate-200/80 rounded-3xl hover:bg-slate-100/80 hover:border-slate-300' : 'bg-white border-slate-200 rounded-2xl'} p-8 border shadow-sm hover:shadow-md transition-all">
+            <div class="w-12 h-12 ${isEditorial ? 'rounded-none' : isConversion ? 'rounded-2xl' : 'rounded-xl'} text-white flex items-center justify-center font-bold mb-6 text-xl shadow-md" style="background-color: ${primary}">
               ${index === 0 ? '✨' : index === 1 ? '🎯' : '⭐'}
             </div>
             <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mb-3">${s.title}</h3>
@@ -557,7 +607,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   </section>
 
   <!-- COMO FUNCIONA -->
-  <section id="como-funciona" class="py-20 ${isModern ? 'bg-slate-950 border-b border-slate-800' : isEditorial ? 'bg-[#faf9f6] border-b border-stone-300' : 'bg-white border-b border-slate-200'}">
+  <section id="como-funciona" class="py-20 ${isModern ? 'bg-slate-950 border-b border-slate-800' : isEditorial ? 'bg-[#faf9f6] border-b border-stone-300' : isConversion ? 'bg-slate-50 border-b border-slate-200' : 'bg-white border-b border-slate-200'}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16">
         <h2 class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Processo</h2>
@@ -565,18 +615,18 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
-          <div class="w-12 h-12 mx-auto rounded-full text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">1</div>
+        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-white border-slate-200 rounded-3xl shadow-sm' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
+          <div class="w-12 h-12 mx-auto ${isConversion ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">1</div>
           <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Primeiro Contato</h3>
           <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Você entra em contato via WhatsApp ou formulário apresentando sua necessidade.</p>
         </div>
-        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
-          <div class="w-12 h-12 mx-auto rounded-full text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">2</div>
+        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-white border-slate-200 rounded-3xl shadow-sm' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
+          <div class="w-12 h-12 mx-auto ${isConversion ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">2</div>
           <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Diagnóstico Personalizado</h3>
           <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Avaliamos seu caso detalhadamente para estruturar a abordagem mais eficiente e sob medida.</p>
         </div>
-        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
-          <div class="w-12 h-12 mx-auto rounded-full text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">3</div>
+        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-white border-slate-200 rounded-3xl shadow-sm' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
+          <div class="w-12 h-12 mx-auto ${isConversion ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">3</div>
           <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Execução & Resultados</h3>
           <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Iniciamos os trabalhos com suporte contínuo, transparência e foco nos melhores resultados.</p>
         </div>
@@ -585,12 +635,12 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   </section>
 
   <!-- SOBRE O PROFISSIONAL / EMPRESA COM FOTO -->
-  <section id="sobre" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : 'bg-slate-50 border-b border-slate-200'}">
+  <section id="sobre" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : isConversion ? 'bg-white border-b border-slate-200' : 'bg-slate-50 border-b border-slate-200'}">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="${isModern ? 'bg-slate-950 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} p-8 sm:p-12 border shadow-sm">
+      <div class="${isModern ? 'bg-slate-950 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-slate-50 border-slate-200/80 rounded-3xl shadow-sm' : 'bg-white border-slate-200 rounded-3xl'} p-8 sm:p-12 border shadow-sm">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div class="lg:col-span-4">
-            <div class="rounded-2xl overflow-hidden border border-slate-200/80 shadow-md aspect-[3/4]">
+            <div class="${isConversion ? 'rounded-3xl' : 'rounded-2xl'} overflow-hidden border border-slate-200/80 shadow-md aspect-[3/4]">
               <img src="${aboutImage}" alt="${name}" class="w-full h-full object-cover">
             </div>
           </div>
