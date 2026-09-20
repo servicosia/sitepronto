@@ -9,11 +9,32 @@ import type { DesignSpec } from './specs';
  * Mapeador de Imagens Contextuais Inteligente e Amplo (Unsplash Editorial)
  * de acordo com a profissão / nicho / especialidade informada.
  */
-function getContextualImages(profession: string, specialty: string) {
-  const text = (profession + ' ' + specialty).toLowerCase();
+function getContextualImages(profession?: string, specialty?: string, companyName?: string) {
+  const rawText = `${profession || ''} ${specialty || ''} ${companyName || ''}`.toLowerCase();
+  // Remove acentuação para garantir correspondência exata (ex: 'churrasqueiro', 'culinária' -> 'culinaria')
+  const text = rawText.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  // 1. Gastronomia, Churrasco, Carnes, Culinária, Chef, Restaurante
-  if (text.includes('churrasc') || text.includes('carne') || text.includes('bbq') || text.includes('gastro') || text.includes('chef') || text.includes('cozinha') || text.includes('restaurante') || text.includes('buffet')) {
+  // 1. Gastronomia, Churrasco, Churrasqueiro, Carnes, Culinária, Chef, Restaurante, Hamburgueria, Buffet
+  if (
+    text.includes('churrasc') || 
+    text.includes('carne') || 
+    text.includes('bbq') || 
+    text.includes('barbecue') || 
+    text.includes('gastro') || 
+    text.includes('chef') || 
+    text.includes('cozinh') || 
+    text.includes('restauran') || 
+    text.includes('buffet') || 
+    text.includes('culinar') || 
+    text.includes('hamburg') || 
+    text.includes('assar') || 
+    text.includes('assado') ||
+    text.includes('parrilla') ||
+    text.includes('picanha') ||
+    text.includes('comida') ||
+    text.includes('alimento') ||
+    text.includes('evento')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80', // Churrasco / Grelhados artesanais
       about: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1000&q=80', // Chef de cozinha / Mestre churrasqueiro
@@ -22,7 +43,20 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 2. Advocacia, Direito, Jurídico
-  if (text.includes('advoc') || text.includes('jurid') || text.includes('direito') || text.includes('tribut') || text.includes('penal') || text.includes('trabalh') || text.includes('civil') || text.includes('inventari') || text.includes('divorc')) {
+  if (
+    text.includes('advoc') || 
+    text.includes('jurid') || 
+    text.includes('direito') || 
+    text.includes('tribut') || 
+    text.includes('penal') || 
+    text.includes('trabalh') || 
+    text.includes('civil') || 
+    text.includes('inventari') || 
+    text.includes('divorc') || 
+    text.includes('oab') ||
+    text.includes('lei') ||
+    text.includes('process')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80', // Balança / Direito
       about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80', // Escritório Corporativo
@@ -31,7 +65,17 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 3. Medicina, Saúde, Consultório, Clínica Médica, Cirurgião
-  if (text.includes('medic') || text.includes('saude') || text.includes('clinica') || text.includes('doutor') || text.includes('cirurg') || text.includes('cardiolog') || text.includes('dermatolog') || text.includes('pediatr')) {
+  if (
+    text.includes('medic') || 
+    text.includes('saude') || 
+    text.includes('clinica') || 
+    text.includes('doutor') || 
+    text.includes('cirurg') || 
+    text.includes('cardiolog') || 
+    text.includes('dermatolog') || 
+    text.includes('pediatr') ||
+    text.includes('crm')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80', // Consultório Moderno
       about: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80', // Clínica / Ambiente Médico
@@ -40,7 +84,14 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 4. Odontologia, Dentista, Ortodontia
-  if (text.includes('odont') || text.includes('dentist') || text.includes('implant') || text.includes('sorriso') || text.includes('ortodont')) {
+  if (
+    text.includes('odont') || 
+    text.includes('dentist') || 
+    text.includes('implant') || 
+    text.includes('sorriso') || 
+    text.includes('ortodont') ||
+    text.includes('cro')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1200&q=80', // Consultório Odontológico
       about: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1000&q=80', // Cuidado dental
@@ -49,7 +100,14 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 5. Psicologia, Psicoterapia, Terapia, Psiquiatria
-  if (text.includes('psicol') || text.includes('terap') || text.includes('mente') || text.includes('emocion') || text.includes('psiquiatr')) {
+  if (
+    text.includes('psicol') || 
+    text.includes('terap') || 
+    text.includes('mente') || 
+    text.includes('emocion') || 
+    text.includes('psiquiatr') ||
+    text.includes('crp')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=1200&q=80', // Ambiente acolhedor e escuta
       about: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1000&q=80', // Atendimento humanizado
@@ -58,7 +116,13 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 6. Fisioterapia, Reabilitação, Pilates, Ortopedia
-  if (text.includes('fisioter') || text.includes('reabilit') || text.includes('pilates') || text.includes('postur')) {
+  if (
+    text.includes('fisioter') || 
+    text.includes('reabilit') || 
+    text.includes('pilates') || 
+    text.includes('postur') ||
+    text.includes('crefito')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80', // Sessão de Fisioterapia
       about: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1000&q=80', // Reabilitação e movimento
@@ -67,7 +131,13 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 7. Nutrição, Dietética, Emagrecimento
-  if (text.includes('nutri') || text.includes('dieta') || text.includes('aliment') || text.includes('emagrec')) {
+  if (
+    text.includes('nutri') || 
+    text.includes('dieta') || 
+    text.includes('aliment') || 
+    text.includes('emagrec') ||
+    text.includes('crn')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80', // Alimentação Saudável
       about: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&w=1000&q=80', // Consultório Nutricional
@@ -76,7 +146,14 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 8. Educação Física, Personal Trainer, Academia, Fitness
-  if (text.includes('personal') || text.includes('treinador') || text.includes('fitness') || text.includes('academi') || text.includes('musculac')) {
+  if (
+    text.includes('personal') || 
+    text.includes('treinador') || 
+    text.includes('fitness') || 
+    text.includes('academi') || 
+    text.includes('musculac') ||
+    text.includes('cref')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80', // Treinamento / Fitness
       about: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1000&q=80', // Personal Trainer
@@ -85,7 +162,15 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 9. Contabilidade, Finanças, Consultoria Financeira, Tributos
-  if (text.includes('contab') || text.includes('financ') || text.includes('invest') || text.includes('auditor') || text.includes('fiscal') || text.includes('perito')) {
+  if (
+    text.includes('contab') || 
+    text.includes('financ') || 
+    text.includes('invest') || 
+    text.includes('auditor') || 
+    text.includes('fiscal') || 
+    text.includes('perito') ||
+    text.includes('crc')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80', // Análise Financeira
       about: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80', // Dados e Gestão
@@ -93,8 +178,17 @@ function getContextualImages(profession: string, specialty: string) {
     };
   }
 
-  // 10. Engenharia, Construção, Obras
-  if (text.includes('engenh') || text.includes('obra') || text.includes('construc') || text.includes('eletric') || text.includes('mecanic') || text.includes('civil')) {
+  // 10. Engenharia, Construção, Obras, Reforma, Eletricista, Encanador
+  if (
+    text.includes('engenh') || 
+    text.includes('obra') || 
+    text.includes('construc') || 
+    text.includes('eletric') || 
+    text.includes('mecanic') || 
+    text.includes('civil') || 
+    text.includes('reform') ||
+    text.includes('crea')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80', // Engenharia / Projetos
       about: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80', // Planejamento e Obras
@@ -103,7 +197,13 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 11. Arquitetura, Design de Interiores, Urbanismo
-  if (text.includes('arquitet') || text.includes('interiores') || text.includes('decorac') || text.includes('urbanis')) {
+  if (
+    text.includes('arquitet') || 
+    text.includes('interiores') || 
+    text.includes('decorac') || 
+    text.includes('urbanis') ||
+    text.includes('cau')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80', // Arquitetura Contemporânea
       about: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80', // Projeto Arquitetônico
@@ -112,7 +212,17 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 12. Estética, Beleza, Barbeiro, Cabelo, Spa, Maquiagem
-  if (text.includes('estet') || text.includes('belez') || text.includes('barbear') || text.includes('barbeir') || text.includes('cabel') || text.includes('spa') || text.includes('maquiag')) {
+  if (
+    text.includes('estet') || 
+    text.includes('belez') || 
+    text.includes('barbear') || 
+    text.includes('barbeir') || 
+    text.includes('cabel') || 
+    text.includes('spa') || 
+    text.includes('maquiag') ||
+    text.includes('manicur') ||
+    text.includes('salao')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80', // Salão / Barbearia Premium
       about: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80', // Cuidados de Beleza
@@ -121,7 +231,16 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 13. Veterinária, Pet, Cuidados Animais
-  if (text.includes('veterin') || text.includes('pet') || text.includes('animal') || text.includes('cao') || text.includes('gato')) {
+  if (
+    text.includes('veterin') || 
+    text.includes('pet') || 
+    text.includes('animal') || 
+    text.includes('cao') || 
+    text.includes('cachorro') || 
+    text.includes('gato') || 
+    text.includes('banho e tosa') ||
+    text.includes('crmv')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=80', // Clínica Veterinária
       about: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1000&q=80', // Médico Veterinário
@@ -130,7 +249,14 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 14. Fotografia, Vídeo, Produção Audiovisual
-  if (text.includes('fotog') || text.includes('video') || text.includes('filmmak') || text.includes('audiovisual')) {
+  if (
+    text.includes('fotog') || 
+    text.includes('video') || 
+    text.includes('filmmak') || 
+    text.includes('audiovisual') ||
+    text.includes('ensaio') ||
+    text.includes('camera')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=1200&q=80', // Câmera / Ensaio
       about: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=1000&q=80', // Estúdio Fotográfico
@@ -139,7 +265,15 @@ function getContextualImages(profession: string, specialty: string) {
   }
 
   // 15. Tecnologia, Programação, Software, TI
-  if (text.includes('program') || text.includes('softwar') || text.includes('ti') || text.includes('tecnolog') || text.includes('desenvolv') || text.includes('sistem')) {
+  if (
+    text.includes('program') || 
+    text.includes('softwar') || 
+    text.includes('ti') || 
+    text.includes('tecnolog') || 
+    text.includes('desenvolv') || 
+    text.includes('sistem') ||
+    text.includes('dev')
+  ) {
     return {
       hero: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80', // Código / Tecnologia
       about: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1000&q=80', // Workspace Tech
@@ -170,7 +304,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   const variant = spec?.variant || 'MODEL_A';
   
   // Imagens temáticas contextuais de acordo com a profissão digitada
-  const images = getContextualImages(profession, specialty);
+  const images = getContextualImages(profession, specialty, data.companyName);
   const heroImage = data.coverPhotoUrl || images.hero;
   const aboutImage = data.profilePhotoUrl || images.about;
 

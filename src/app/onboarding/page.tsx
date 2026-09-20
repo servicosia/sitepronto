@@ -183,7 +183,16 @@ function OnboardingContent() {
     if (currentStep === 6) {
       generatePreviews();
     }
-  }, [currentStep, formData.primaryColor, formData.secondaryColor, formData.accentColor]);
+  }, [
+    currentStep, 
+    formData.profession, 
+    formData.mainSpecialty, 
+    formData.professionalName, 
+    formData.fullName,
+    formData.primaryColor, 
+    formData.secondaryColor, 
+    formData.accentColor
+  ]);
 
   function handleInputChange(field: keyof OnboardingData, value: any) {
     setFormData((prev) => ({ ...prev, [field]: value }));
