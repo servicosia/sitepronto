@@ -337,8 +337,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         </div>
 
         <div class="flex justify-end pt-4 border-t border-slate-100">
-          <button onclick="triggerSave('Template alterado com sucesso no site!')" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
-            Aplicar Novo Template
+          <button onclick="applyTemplateChoice()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition flex items-center gap-2">
+            <span>🎨</span> Aplicar Novo Template
           </button>
         </div>
       </div>
@@ -428,6 +428,12 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
   </footer>
 
   <script>
+    let selectedTemplate = localStorage.getItem('site_selected_template') || 'MODEL_A';
+
+    function initTemplateSelection() {
+      selectTemplateOption(selectedTemplate, false);
+    }
+
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -446,7 +452,10 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       }
     }
 
-    function selectTemplateOption(model) {
+    function selectTemplateOption(model, updateVar = true) {
+      if (updateVar) {
+        selectedTemplate = model;
+      }
       const opts = ['a', 'b', 'c', 'd'];
       opts.forEach(o => {
         const el = document.getElementById('opt-model-' + o);
@@ -470,6 +479,16 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       }
     }
 
+    function applyTemplateChoice() {
+      localStorage.setItem('site_selected_template', selectedTemplate);
+      const b = document.getElementById('saveBadge');
+      b.innerText = 'Salvando template...';
+      setTimeout(() => {
+        b.innerText = '✓ Sincronizado';
+        alert('Template alterado com sucesso para o ' + selectedTemplate + '! Ao abrir ou atualizar o site principal (/), o novo design já estará ativo.');
+      }, 300);
+    }
+
     function handleFileUpload(event, previewImgId, inputUrlId) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
@@ -491,6 +510,9 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         alert(msg || 'Dados salvos com sucesso no Neon PostgreSQL!');
       }, 400);
     }
+
+    // Inicializa seleção do template atual
+    initTemplateSelection();
   </script>
 
 </body>

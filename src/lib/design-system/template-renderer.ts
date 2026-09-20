@@ -2,16 +2,12 @@ import type { OnboardingData } from '../validation/onboarding';
 import type { DesignSpec } from './specs';
 
 /**
- * Mapeador de Imagens Contextuais de Alta Qualidade (Unsplash Editorial)
- * de acordo com a profissão / especialidade informada.
- */
-/**
  * Mapeador de Imagens Contextuais Inteligente e Amplo (Unsplash Editorial)
  * de acordo com a profissão / nicho / especialidade informada.
  */
 export function getContextualImages(profession?: string, specialty?: string, companyName?: string) {
   const rawText = `${profession || ''} ${specialty || ''} ${companyName || ''}`.toLowerCase();
-  // Remove acentuação para garantir correspondência exata (ex: 'churrasqueiro', 'culinária' -> 'culinaria')
+  // Remove acentuação para garantir correspondência exata
   const text = rawText.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   // 1. Educação Física, Personal Trainer, Academia, Treinador, Fitness, Musculação, Consultoria Esportiva
@@ -52,9 +48,9 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('picanha')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80', // Churrasco / Grelhados artesanais
-      about: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1000&q=80', // Chef de cozinha / Mestre churrasqueiro
-      practicePattern: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80', // Cortes nobres de carne
+      hero: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
     };
   }
 
@@ -75,9 +71,9 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('jurista')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80', // Balança / Direito
-      about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80', // Escritório Corporativo
-      practicePattern: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80', // Documentos e análise
+      hero: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80',
     };
   }
 
@@ -94,8 +90,8 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('crm-')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80', // Consultório Moderno
-      about: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80', // Clínica / Ambiente Médico
+      hero: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1000&q=80',
       practicePattern: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80',
     };
   }
@@ -111,90 +107,84 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('cro-')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1200&q=80', // Consultório Odontológico
-      about: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1000&q=80', // Cuidado dental
+      hero: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1000&q=80',
       practicePattern: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-  // 5. Psicologia, Psicoterapia, Terapia, Psiquiatria
+  // 6. Psicologia, Psicoterapia, Terapia, Psiquiatria
   if (
-    text.includes('psicol') || 
-    text.includes('terap') || 
-    text.includes('mente') || 
-    text.includes('emocion') || 
-    text.includes('psiquiatr') ||
-    text.includes('crp')
+    text.includes('psicolog') || 
+    text.includes('terapeut') || 
+    text.includes('psicoterap') || 
+    text.includes('saude mental') || 
+    text.includes('crp/') ||
+    text.includes('crp-')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=1200&q=80', // Ambiente acolhedor e escuta
-      about: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1000&q=80', // Atendimento humanizado
-      practicePattern: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=800&q=80',
+      hero: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-  // 6. Fisioterapia, Reabilitação, Pilates, Ortopedia
+  // 7. Fisioterapia, Pilates, Reabilitação
   if (
-    text.includes('fisioter') || 
-    text.includes('reabilit') || 
+    text.includes('fisio') || 
     text.includes('pilates') || 
-    text.includes('postur') ||
+    text.includes('reabilit') || 
     text.includes('crefito')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80', // Sessão de Fisioterapia
-      about: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1000&q=80', // Reabilitação e movimento
-      practicePattern: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
+      hero: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-  // 7. Nutrição, Dietética, Emagrecimento
+  // 8. Nutrição, Nutricionista, Dieta
   if (
     text.includes('nutri') || 
     text.includes('dieta') || 
-    text.includes('aliment') || 
-    text.includes('emagrec') ||
+    text.includes('alimentac') || 
     text.includes('crn')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80', // Alimentação Saudável
-      about: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&w=1000&q=80', // Consultório Nutricional
-      practicePattern: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80',
+      hero: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1543362906-acfc16c67564?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-
-  // 9. Contabilidade, Finanças, Consultoria Financeira, Tributos
+  // 9. Contabilidade, Contador, Finanças, Consultoria Financeira
   if (
     text.includes('contab') || 
-    text.includes('financ') || 
-    text.includes('invest') || 
-    text.includes('auditor') || 
+    text.includes('contador') || 
     text.includes('fiscal') || 
-    text.includes('perito') ||
-    text.includes('crc')
+    text.includes('auditor') || 
+    text.includes('crc') ||
+    text.includes('financ')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80', // Análise Financeira
-      about: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80', // Dados e Gestão
-      practicePattern: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=800&q=80',
+      hero: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
     };
   }
 
-  // 10. Engenharia, Construção, Obras, Reforma, Eletricista, Encanador
+  // 10. Engenharia, Construção, Obras, Perícias
   if (
-    text.includes('engenh') || 
-    text.includes('obra') || 
-    text.includes('construc') || 
-    text.includes('eletric') || 
+    text.includes('engenha') || 
+    text.includes('constru') || 
     text.includes('mecanic') || 
     text.includes('civil') || 
     text.includes('reform') ||
     text.includes('crea')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80', // Engenharia / Projetos
-      about: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80', // Planejamento e Obras
+      hero: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80',
       practicePattern: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80',
     };
   }
@@ -208,8 +198,8 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('cau')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80', // Arquitetura Contemporânea
-      about: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80', // Projeto Arquitetônico
+      hero: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80',
       practicePattern: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
     };
   }
@@ -227,8 +217,8 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('salao')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80', // Salão / Barbearia Premium
-      about: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80', // Cuidados de Beleza
+      hero: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80',
       practicePattern: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80',
     };
   }
@@ -245,8 +235,8 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('crmv')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=80', // Clínica Veterinária
-      about: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1000&q=80', // Médico Veterinário
+      hero: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1000&q=80',
       practicePattern: 'https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&w=800&q=80',
     };
   }
@@ -261,8 +251,8 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('camera')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=1200&q=80', // Câmera / Ensaio
-      about: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=1000&q=80', // Estúdio Fotográfico
+      hero: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=1000&q=80',
       practicePattern: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
     };
   }
@@ -278,25 +268,24 @@ export function getContextualImages(profession?: string, specialty?: string, com
     text.includes('dev')
   ) {
     return {
-      hero: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80', // Código / Tecnologia
-      about: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1000&q=80', // Workspace Tech
+      hero: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1000&q=80',
       practicePattern: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
     };
   }
 
   // Padrão Geral Executivo / Serviços Especializados
   return {
-    hero: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80', // Escritório Moderno
+    hero: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80',
     about: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80',
     practicePattern: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80',
   };
 }
 
 /**
- * Gera o template completo, profissional e fiel ao Prompt Mestre com distinção visual real
- * entre os modelos (MODEL_A, MODEL_B, MODEL_C) e aplicação rigorosa das cores e imagens contextuais.
+ * Renderiza o corpo do site para uma variante específica (MODEL_A, MODEL_B, MODEL_C, MODEL_D)
  */
-export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, adminToken?: string): string {
+export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D' = 'MODEL_A'): string {
   const name = data.professionalName || data.fullName || 'Nome do Profissional / Empresa';
   const profession = data.profession || 'Especialista / Consultoria';
   const specialty = data.mainSpecialty || 'Atendimento e Serviços Especializados';
@@ -304,23 +293,19 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   const councilBadge = data.councilNumber 
     ? `${data.councilType || 'Registro'} ${data.councilNumber}` 
     : (data.hasProfessionalCouncil ? 'Registro Ativo' : 'Atendimento Certificado');
-  const variant = spec?.variant || 'MODEL_A';
   
-  // Imagens temáticas contextuais de acordo com a profissão digitada
   const images = getContextualImages(profession, specialty, data.companyName);
   const heroImage = data.coverPhotoUrl || images.hero;
   const aboutImage = data.profilePhotoUrl || images.about;
 
-  // Cores personalizadas escolhidas pelo usuário
   const primary = data.primaryColor || '#0f172a';
   const secondary = data.secondaryColor || '#2563eb';
   const accent = data.accentColor || '#10b981';
 
-  // Configurações visuais por variante
-  const isConversion = variant === 'MODEL_D';
-  const isEditorial = variant === 'MODEL_C';
-  const isModern = variant === 'MODEL_B';
-  const isInstitutional = variant === 'MODEL_A';
+  const isConversion = variantName === 'MODEL_D';
+  const isEditorial = variantName === 'MODEL_C';
+  const isModern = variantName === 'MODEL_B';
+  const isInstitutional = variantName === 'MODEL_A';
 
   const fontBody = isEditorial ? "'Playfair Display', Georgia, serif" : (isModern || isConversion) ? "'Plus Jakarta Sans', sans-serif" : "'Inter', sans-serif";
   const fontHeading = isEditorial ? "'Playfair Display', Georgia, serif" : (isModern || isConversion) ? "'Plus Jakarta Sans', sans-serif" : "'Outfit', sans-serif";
@@ -346,40 +331,8 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     }
   ];
 
-  return `<!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${name} — ${profession} | ${specialty}</title>
-  <meta name="description" content="${data.professionalSummary || 'Atuação de alto padrão, atendimento individualizado e compromisso com os melhores resultados para você.'}">
-  
-  <!-- Tailwind CSS & Fontes Google Stitch -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Cinzel:wght@500;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <style>
-    :root {
-      --primary-color: ${primary};
-      --secondary-color: ${secondary};
-      --accent-color: ${accent};
-    }
-    body { font-family: ${fontBody}; }
-    h1, h2, h3, h4, h5, h6 { font-family: ${fontHeading}; }
-    .bg-custom-primary { background-color: ${primary}; }
-    .text-custom-primary { color: ${primary}; }
-    .border-custom-primary { border-color: ${primary}; }
-    .bg-custom-secondary { background-color: ${secondary}; }
-    .text-custom-secondary { color: ${secondary}; }
-    .border-custom-secondary { border-color: ${secondary}; }
-    .bg-custom-accent { background-color: ${accent}; }
-    .text-custom-accent { color: ${accent}; }
-    .border-custom-accent { border-color: ${accent}; }
-  </style>
-</head>
-<body class="${isModern ? 'bg-slate-950 text-slate-100' : isEditorial ? 'bg-[#faf9f6] text-stone-900' : isConversion ? 'bg-slate-50 text-slate-900' : 'bg-slate-50 text-slate-900'} antialiased">
+  return `
+<div class="template-wrapper ${isModern ? 'bg-slate-950 text-slate-100' : isEditorial ? 'bg-[#faf9f6] text-stone-900' : isConversion ? 'bg-slate-50 text-slate-900' : 'bg-slate-50 text-slate-900'} antialiased min-h-screen flex flex-col" style="font-family: ${fontBody};">
 
   <!-- HEADER -->
   <header class="sticky top-0 z-50 ${isModern ? 'bg-slate-900/90 border-slate-800' : isEditorial ? 'bg-[#faf9f6]/95 border-stone-300' : isConversion ? 'bg-white/95 border-slate-200/80 shadow-sm' : 'bg-white/95 border-slate-200'} backdrop-blur border-b">
@@ -423,7 +376,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
             Disponível para Atendimento • ${data.city || 'São Paulo'} (${data.attendanceType === 'online' ? '100% Online' : data.attendanceType === 'presencial' ? 'Presencial' : 'Híbrido'})
           </div>
           
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.08] mb-6">
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.08] mb-6" style="font-family: ${fontHeading}">
             ${data.companyName || specialty || 'Consultoria e Soluções Estratégicas de Alto Nível'}
           </h1>
           
@@ -472,7 +425,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
             ${data.attendanceType === 'online' ? 'Atendimento 100% Online' : data.attendanceType === 'presencial' ? 'Atendimento Presencial' : 'Atendimento Online & Presencial'} • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
           </div>
           
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6">
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6" style="font-family: ${fontHeading}">
             ${data.companyName || specialty || 'Soluções Estratégicas e Atendimento de Alta Performance'}
           </h1>
           
@@ -511,7 +464,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
         <div class="lg:col-span-7">
           <div class="border-l-4 pl-6 sm:pl-8 mb-6" style="border-color: ${primary}">
             <span class="text-xs uppercase tracking-widest font-semibold text-stone-500 block mb-2">${profession} • ${data.city || 'São Paulo'}/${data.state || 'SP'}</span>
-            <h1 class="text-4xl sm:text-5xl font-serif text-stone-900 leading-tight">
+            <h1 class="text-4xl sm:text-5xl font-serif text-stone-900 leading-tight" style="font-family: ${fontHeading}">
               ${data.companyName || specialty || 'Excelência Profissional e Atendimento Dedicado'}
             </h1>
           </div>
@@ -550,7 +503,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
             ${data.attendanceType === 'online' ? 'Atendimento 100% Online' : data.attendanceType === 'presencial' ? 'Atendimento Presencial' : 'Atendimento Online e Presencial'} • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
           </div>
           
-          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950 leading-[1.15] mb-6">
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950 leading-[1.15] mb-6" style="font-family: ${fontHeading}">
             ${data.companyName || specialty || 'Serviços Especializados com Atendimento Individualizado'}
           </h1>
           
@@ -588,7 +541,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16">
         <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Serviços & Soluções</h2>
-        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl">Áreas de Atuação e Especialidades</p>
+        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl" style="font-family: ${fontHeading}">Áreas de Atuação e Especialidades</p>
         <p class="mt-3 text-sm ${isModern ? 'text-slate-400' : 'text-slate-600'}">Soluções estruturadas para atender às necessidades específicas do seu perfil.</p>
       </div>
 
@@ -598,7 +551,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
             <div class="w-12 h-12 ${isEditorial ? 'rounded-none' : isConversion ? 'rounded-2xl' : 'rounded-xl'} text-white flex items-center justify-center font-bold mb-6 text-xl shadow-md" style="background-color: ${primary}">
               ${index === 0 ? '✨' : index === 1 ? '🎯' : '⭐'}
             </div>
-            <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mb-3">${s.title}</h3>
+            <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mb-3" style="font-family: ${fontHeading}">${s.title}</h3>
             <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-6">${s.shortDescription}</p>
             <a href="https://wa.me/${whatsappDigits}?text=${encodeURIComponent('Olá, gostaria de informações sobre ' + s.title)}" target="_blank" class="text-sm font-bold inline-flex items-center hover:underline" style="color: ${primary}">
               ${s.ctaText || 'Saber mais'} →
@@ -614,23 +567,23 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16">
         <h2 class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Processo</h2>
-        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl">Como Funciona o Atendimento</p>
+        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl" style="font-family: ${fontHeading}">Como Funciona o Atendimento</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-white border-slate-200 rounded-3xl shadow-sm' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
           <div class="w-12 h-12 mx-auto ${isConversion ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">1</div>
-          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Primeiro Contato</h3>
+          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}" style="font-family: ${fontHeading}">Primeiro Contato</h3>
           <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Você entra em contato via WhatsApp ou formulário apresentando sua necessidade.</p>
         </div>
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-white border-slate-200 rounded-3xl shadow-sm' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
           <div class="w-12 h-12 mx-auto ${isConversion ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">2</div>
-          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Diagnóstico Personalizado</h3>
+          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}" style="font-family: ${fontHeading}">Diagnóstico Personalizado</h3>
           <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Avaliamos seu caso detalhadamente para estruturar a abordagem mais eficiente e sob medida.</p>
         </div>
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-white border-slate-200 rounded-3xl shadow-sm' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
           <div class="w-12 h-12 mx-auto ${isConversion ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">3</div>
-          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}">Execução & Resultados</h3>
+          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}" style="font-family: ${fontHeading}">Execução & Resultados</h3>
           <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Iniciamos os trabalhos com suporte contínuo, transparência e foco nos melhores resultados.</p>
         </div>
       </div>
@@ -650,7 +603,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
 
           <div class="lg:col-span-8">
             <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Apresentação</h2>
-            <h3 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} mb-3">${name}</h3>
+            <h3 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} mb-3" style="font-family: ${fontHeading}">${name}</h3>
             <p class="text-sm font-semibold ${isModern ? 'text-slate-400' : 'text-slate-500'} mb-6">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''} • Atendimento em ${data.city || 'São Paulo'}/${data.state || 'SP'}</p>
             
             <p class="${isModern ? 'text-slate-300' : 'text-slate-700'} leading-relaxed mb-6">
@@ -673,20 +626,20 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-16">
         <h2 class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo</h2>
-        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl">Artigos & Orientações</p>
+        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl" style="font-family: ${fontHeading}">Artigos & Orientações</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border">
           <span class="text-xs font-bold uppercase" style="color: ${secondary}">Guia Informativo</span>
-          <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mt-2 mb-3">Principais Cuidados e Estratégias para Escolher o Serviço Ideal</h3>
+          <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mt-2 mb-3" style="font-family: ${fontHeading}">Principais Cuidados e Estratégias para Escolher o Serviço Ideal</h3>
           <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-4">Entenda os fatores determinantes na tomada de decisão e como um planejamento adequado pode economizar tempo e recursos.</p>
           <span class="text-xs text-slate-500 font-medium">Leitura: 4 min • Por ${name}</span>
         </div>
 
         <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border">
           <span class="text-xs font-bold uppercase" style="color: ${secondary}">Artigo Técnico</span>
-          <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mt-2 mb-3">A Importância do Acompanhamento Especializado</h3>
+          <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mt-2 mb-3" style="font-family: ${fontHeading}">A Importância do Acompanhamento Especializado</h3>
           <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-4">Como a assistência profissional qualificada previne problemas e assegura a máxima eficiência em cada projeto.</p>
           <span class="text-xs text-slate-500 font-medium">Leitura: 3 min • Por ${name}</span>
         </div>
@@ -699,7 +652,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="${isModern ? 'bg-slate-950 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} p-8 sm:p-12 border shadow-sm">
         <div class="text-center mb-8">
-          <h2 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'}">Formulário de Contato Direto</h2>
+          <h2 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'}" style="font-family: ${fontHeading}">Formulário de Contato Direto</h2>
           <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm mt-2">Envie sua mensagem. Seus dados são confidenciais e retornaremos o mais breve possível.</p>
         </div>
 
@@ -758,6 +711,86 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
       </p>
     </div>
   </footer>
+
+</div>`;
+}
+
+/**
+ * Gera o documento HTML completo com suporte a troca dinâmica de template
+ * (Instantânea via localStorage ou parâmetros de URL ?t=MODEL_X)
+ */
+export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, adminToken?: string): string {
+  const name = data.professionalName || data.fullName || 'Nome do Profissional / Empresa';
+  const profession = data.profession || 'Especialista / Consultoria';
+  const specialty = data.mainSpecialty || 'Atendimento e Serviços Especializados';
+  const defaultVariant = (spec?.variant as 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D') || 'MODEL_A';
+
+  const primary = data.primaryColor || '#0f172a';
+  const secondary = data.secondaryColor || '#2563eb';
+  const accent = data.accentColor || '#10b981';
+
+  const htmlA = renderSingleTemplateHtml(data, 'MODEL_A');
+  const htmlB = renderSingleTemplateHtml(data, 'MODEL_B');
+  const htmlC = renderSingleTemplateHtml(data, 'MODEL_C');
+  const htmlD = renderSingleTemplateHtml(data, 'MODEL_D');
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${name} — ${profession} | ${specialty}</title>
+  <meta name="description" content="${data.professionalSummary || 'Atuação de alto padrão, atendimento individualizado e compromisso com os melhores resultados para você.'}">
+  
+  <!-- Tailwind CSS & Fontes Google Stitch -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Cinzel:wght@500;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-color: ${primary};
+      --secondary-color: ${secondary};
+      --accent-color: ${accent};
+    }
+    .template-container { display: none; }
+    .template-container.active { display: block; }
+  </style>
+</head>
+<body class="bg-slate-50 antialiased min-h-screen">
+
+  <!-- CONTAINERS DOS MODELOS DE TEMPLATE -->
+  <div id="tpl-MODEL_A" class="template-container">
+    ${htmlA}
+  </div>
+
+  <div id="tpl-MODEL_B" class="template-container">
+    ${htmlB}
+  </div>
+
+  <div id="tpl-MODEL_C" class="template-container">
+    ${htmlC}
+  </div>
+
+  <div id="tpl-MODEL_D" class="template-container">
+    ${htmlD}
+  </div>
+
+  <!-- SCRIPT DE ATIVAÇÃO DO TEMPLATE ESCOLHIDO -->
+  <script>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTemplate = urlParams.get('t') || urlParams.get('template');
+      const storedTemplate = localStorage.getItem('site_selected_template');
+      const activeTemplate = urlTemplate || storedTemplate || '${defaultVariant}';
+      
+      const targetEl = document.getElementById('tpl-' + activeTemplate) || document.getElementById('tpl-MODEL_A');
+      if (targetEl) {
+        targetEl.classList.add('active');
+      }
+    })();
+  </script>
 
 </body>
 </html>`;
