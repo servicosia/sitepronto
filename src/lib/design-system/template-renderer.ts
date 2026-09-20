@@ -9,7 +9,7 @@ import type { DesignSpec } from './specs';
  * Mapeador de Imagens Contextuais Inteligente e Amplo (Unsplash Editorial)
  * de acordo com a profissão / nicho / especialidade informada.
  */
-function getContextualImages(profession?: string, specialty?: string, companyName?: string) {
+export function getContextualImages(profession?: string, specialty?: string, companyName?: string) {
   const rawText = `${profession || ''} ${specialty || ''} ${companyName || ''}`.toLowerCase();
   // Remove acentuação para garantir correspondência exata (ex: 'churrasqueiro', 'culinária' -> 'culinaria')
   const text = rawText.normalize('NFD').replace(/[\u0300-\u036f]/g, '');

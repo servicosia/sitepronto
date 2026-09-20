@@ -1,4 +1,5 @@
 import type { OnboardingData } from '../validation/onboarding';
+import { getContextualImages } from './template-renderer';
 
 export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string): string {
   const name = data.professionalName || data.fullName || 'Profissional / Empresa';
@@ -11,6 +12,10 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     { title: 'Diagnóstico e Estruturação', shortDescription: 'Planejamento e estruturação prática para alcance de metas.' },
     { title: 'Suporte Contínuo', shortDescription: 'Acompanhamento dedicado com foco em excelência e resultados.' }
   ];
+
+  const images = getContextualImages(profession, data.mainSpecialty, data.companyName);
+  const heroImage = data.coverPhotoUrl || images.hero;
+  const aboutImage = data.profilePhotoUrl || images.about;
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -210,7 +215,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
             </div>
             
             <div class="aspect-video w-full rounded-xl overflow-hidden border border-slate-300 bg-slate-200 relative group">
-              <img id="previewHero" src="${data.coverPhotoUrl || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80'}" alt="Capa" class="w-full h-full object-cover">
+              <img id="previewHero" src="${data.coverPhotoUrl || heroImage}" alt="Capa" class="w-full h-full object-cover">
             </div>
 
             <div>
@@ -244,7 +249,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
             </div>
             
             <div class="aspect-video w-full rounded-xl overflow-hidden border border-slate-300 bg-slate-200 relative group">
-              <img id="previewAbout" src="${data.profilePhotoUrl || 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1000&q=80'}" alt="Perfil" class="w-full h-full object-cover">
+              <img id="previewAbout" src="${data.profilePhotoUrl || aboutImage}" alt="Perfil" class="w-full h-full object-cover">
             </div>
 
             <div>
