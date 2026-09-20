@@ -148,7 +148,8 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
     }
 
     // 3. Validação de Segurança e Acesso /master
-    const securityCheck = await validateSiteSecurity(site.adminActivationToken || 'token_placeholder_secure');
+    const currentSite = await prisma.site.findUnique({ where: { id: siteId } });
+    const securityCheck = await validateSiteSecurity(currentSite?.adminActivationToken || 'token_placeholder_secure');
     if (securityCheck.status === 'FAILED') {
       throw new Error(`Validação de Segurança: ${securityCheck.message}`);
     }
