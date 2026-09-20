@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { OnboardingDataSchema } from '@/lib/validation/onboarding';
-import { generateDesignSpecs } from '@/lib/design-system/specs';
+import { getDesignSpecsWithProvider } from '@/lib/providers/design/stitch';
 import { validateVoucher } from '@/lib/vouchers/service';
 
 // Salvar / atualizar sessão de onboarding (Autosave com debounce no frontend)
@@ -78,7 +78,14 @@ export async function GET(req: NextRequest) {
     });
 
     const parsedData = session?.data ? OnboardingDataSchema.safeParse(session.data) : null;
-    const designs = parsedData?.success ? generateDesignSpecs(parsedData.data) : null;
+    let designs = null;
+    let providerUsed = 'InternalSynthesizer';
+
+    if (parsedData?.success) {
+      const designResult = await getDesignSpecsWithProvider(parsedData.data);
+      designs = designResult.specs;
+      providerUsed = designResult.providerUsed;
+    }
 
     return NextResponse.json({
       session: session ? {
@@ -89,6 +96,7 @@ export async function GET(req: NextRequest) {
         isComplete: session.isComplete,
       } : null,
       designs,
+      providerUsed,
       voucher: {
         code: validation.voucher.code,
         clientName: validation.voucher.clientName,
