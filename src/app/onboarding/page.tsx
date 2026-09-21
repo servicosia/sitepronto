@@ -19,6 +19,7 @@ import {
   Loader2 
 } from 'lucide-react';
 import { OnboardingData } from '@/lib/validation/onboarding';
+import { analyzeProfessionContext } from '@/lib/design-system/profession-intelligence';
 
 const steps = [
   { id: 1, name: 'Identificação', desc: 'Nome e Atividade' },
@@ -195,6 +196,18 @@ function OnboardingContent() {
   ]);
 
   function handleInputChange(field: keyof OnboardingData, value: any) {
+    if (field === 'profession') {
+      const analysis = analyzeProfessionContext(value, formData.mainSpecialty, formData.companyName);
+      if (analysis.suggestedCouncil.hasCouncil && !formData.hasProfessionalCouncil) {
+        setFormData((prev) => ({
+          ...prev,
+          profession: value,
+          hasProfessionalCouncil: true,
+          councilType: prev.councilType || `${analysis.suggestedCouncil.councilAcronym}/${prev.state || 'SP'}`,
+        }));
+        return;
+      }
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 

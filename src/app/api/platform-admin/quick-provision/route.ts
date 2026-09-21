@@ -19,7 +19,12 @@ export async function POST(req: NextRequest) {
       clientPassword = 'SenhaForteTeste123!'
     } = body;
 
-    // 1. Montar payload válido de OnboardingData
+    // 1. Analisar profissão para enriquecimento contextual e detecção de conselho
+    const { analyzeProfessionContext } = await import('@/lib/design-system/profession-intelligence');
+    const analysis = analyzeProfessionContext(profession, specialty, professionalName);
+    const hasCouncil = analysis.suggestedCouncil.hasCouncil;
+
+    // 2. Montar payload válido de OnboardingData
     const onboardingData = {
       fullName: professionalName,
       professionalName: professionalName,
@@ -37,7 +42,9 @@ export async function POST(req: NextRequest) {
         { title: `Soluções em ${specialty}`, shortDescription: 'Planejamento estratégico e execução prática focada em excelência.', ctaText: 'Agendar' },
         { title: 'Consultoria Especializada', shortDescription: 'Acompanhamento dedicado com suporte contínuo para os melhores resultados.', ctaText: 'Consultar' }
       ],
-      hasProfessionalCouncil: false,
+      hasProfessionalCouncil: hasCouncil,
+      councilType: hasCouncil ? `${analysis.suggestedCouncil.councilAcronym}/SP` : undefined,
+      councilNumber: hasCouncil ? '123456' : undefined,
       primaryColor: '#0f172a',
       secondaryColor: '#3b82f6',
       selectedDesignVariant: selectedTemplate,
