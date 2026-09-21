@@ -294,45 +294,45 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           <!-- Modelo A -->
           <div id="opt-model-a" onclick="selectTemplateOption('MODEL_A')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-900 bg-slate-50 shadow-md transition-all">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase text-slate-500">Modelo A</span>
+              <span class="text-xs font-bold uppercase text-emerald-800">Modelo A • Serene Haven</span>
               <span id="badge-model-a" class="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
             </div>
-            <h4 class="font-bold text-slate-900 mb-1">Institucional Confiável</h4>
-            <p class="text-xs text-slate-600 mb-4">Estrutura clássica em fundo claro, layout split e alta legibilidade corporativa.</p>
-            <div class="p-2 bg-white rounded border text-[11px] text-slate-700 font-medium">Ideal para solidez e autoridade tradicional</div>
+            <h4 class="font-bold text-slate-900 mb-1">Serene Haven</h4>
+            <p class="text-xs text-slate-600 mb-4">Design orgânico botânico (verde sábio/terracota), linho natural e Playfair Display.</p>
+            <div class="p-2 bg-[#f3efea] rounded-xl border border-[#e8e2d9] text-[11px] text-[#17382d] font-serif">Equilíbrio, Acolhimento & Tipografia Nobre</div>
           </div>
 
           <!-- Modelo B -->
           <div id="opt-model-b" onclick="selectTemplateOption('MODEL_B')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 transition-all">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase text-slate-500">Modelo B</span>
+              <span class="text-xs font-bold uppercase text-sky-500">Modelo B</span>
               <span id="badge-model-b" class="w-5 h-5 rounded-full bg-slate-900 text-white hidden items-center justify-center text-xs">✓</span>
             </div>
-            <h4 class="font-bold text-slate-900 mb-1">Moderno Dark</h4>
-            <p class="text-xs text-slate-600 mb-4">Atmosfera dark contemporânea, efeitos visuais refinados e destaque dinâmico.</p>
-            <div class="p-2 bg-slate-900 rounded text-[11px] text-white font-medium">Ideal para alto impacto e diferenciação</div>
+            <h4 class="font-bold text-slate-900 mb-1">Midnight Luminescence</h4>
+            <p class="text-xs text-slate-600 mb-4">Atmosfera noturna com vidro fosco e bioluminescência sutil.</p>
+            <div class="p-2 bg-slate-900 rounded-xl text-[11px] text-sky-300 font-medium">Nocturnal Chic & Sofisticação</div>
           </div>
 
           <!-- Modelo C -->
           <div id="opt-model-c" onclick="selectTemplateOption('MODEL_C')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 transition-all">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase text-slate-500">Modelo C</span>
+              <span class="text-xs font-bold uppercase text-stone-600">Modelo C</span>
               <span id="badge-model-c" class="w-5 h-5 rounded-full bg-slate-900 text-white hidden items-center justify-center text-xs">✓</span>
             </div>
-            <h4 class="font-bold text-slate-900 mb-1">Minimalista Editorial</h4>
-            <p class="text-xs text-slate-600 mb-4">Tipografia nobre clássica, fundo off-white e elegância executiva sóbria.</p>
-            <div class="p-2 bg-stone-100 rounded border border-stone-300 text-[11px] text-stone-800 font-serif">Ideal para abordagem editorial refinada</div>
+            <h4 class="font-bold text-slate-900 mb-1">Atelier Editorial</h4>
+            <p class="text-xs text-slate-600 mb-4">Tipografia clássica serifada nobre, fundo aquecido e alta autoridade.</p>
+            <div class="p-2 bg-stone-100 rounded-xl border border-stone-300 text-[11px] text-stone-800 font-serif">Minimalismo Literário & Curadoria</div>
           </div>
 
           <!-- Modelo D -->
           <div id="opt-model-d" onclick="selectTemplateOption('MODEL_D')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 transition-all">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase text-emerald-600">Modelo D • Stitch</span>
+              <span class="text-xs font-bold uppercase text-emerald-600">Modelo D • Bento Pulse</span>
               <span id="badge-model-d" class="w-5 h-5 rounded-full bg-slate-900 text-white hidden items-center justify-center text-xs">✓</span>
             </div>
-            <h4 class="font-bold text-slate-900 mb-1">Alta Conversão</h4>
-            <p class="text-xs text-slate-600 mb-4">Layout dinâmico Bento Grid, badge de disponibilidade e foco em agendamento ágil.</p>
-            <div class="p-2 bg-emerald-950 rounded text-[11px] text-emerald-300 font-medium">Ideal para consultorias e conversão</div>
+            <h4 class="font-bold text-slate-900 mb-1">Modern Bento Pulse</h4>
+            <p class="text-xs text-slate-600 mb-4">Layout modular Bento Grid, status ativo e foco em conversão e agendamento.</p>
+            <div class="p-2 bg-emerald-950 rounded-xl text-[11px] text-emerald-300 font-medium">Bento Grid Dinâmico & Alta Conversão</div>
           </div>
         </div>
 

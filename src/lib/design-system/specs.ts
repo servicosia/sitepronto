@@ -4,6 +4,7 @@ export interface DesignSpec {
   id: string;
   variant: 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D';
   name: string;
+  tagline: string;
   description: string;
   colors: {
     primary: string;
@@ -13,6 +14,7 @@ export interface DesignSpec {
     foreground: string;
     muted: string;
     card: string;
+    border: string;
   };
   typography: {
     headingFont: string;
@@ -31,7 +33,7 @@ export interface DesignSpec {
     badge: string;
   };
   hero: {
-    layout: 'centered' | 'split-right-image' | 'editorial-minimal' | 'badge-overlay' | 'lead-capture-focused';
+    layout: 'split-right-image' | 'centered' | 'editorial-minimal' | 'lead-capture-focused';
     hasSearchOrQuickContact: boolean;
     hasOnlineBadge: boolean;
   };
@@ -50,49 +52,52 @@ export interface DesignSpec {
 }
 
 /**
- * Síntese de 4 DesignSpecs sob medida a partir dos dados do Profissional Liberal
- * Integrando os princípios e diretrizes do Google Stitch Design DNA.
+ * Síntese de 4 DesignSpecs exclusivas e sob medida com DNA Google Stitch
+ * Inspiradas em projetos de alto padrão visual (como Serene Haven / psicologia.servicos.ia.br, Modern Bento, etc.)
  */
 export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D', DesignSpec> {
-  const primary = data.primaryColor || '#0f172a';
-  const secondary = data.secondaryColor || '#3b82f6';
-  const accent = data.accentColor || '#10b981';
+  const customPrimary = data.primaryColor && data.primaryColor !== '#0f172a' ? data.primaryColor : undefined;
+  const customSecondary = data.secondaryColor && data.secondaryColor !== '#3b82f6' ? data.secondaryColor : undefined;
+  const customAccent = data.accentColor && data.accentColor !== '#10b981' ? data.accentColor : undefined;
 
   return {
+    // MODELO A: Serene Haven / Equilíbrio Orgânico & Acolhimento (Estilo psicologia.servicos.ia.br do Stitch)
     MODEL_A: {
       id: 'spec_model_a',
       variant: 'MODEL_A',
-      name: 'Institucional Confiável',
-      description: 'Estrutura tradicional, altamente organizada, seções claras e foco em solidez e credibilidade.',
+      name: 'Serene Haven',
+      tagline: 'Equilíbrio, Acolhimento & Tipografia Nobre',
+      description: 'Design orgânico com paleta botânica e mineral (verde sábio/terracota), tons quentes de linho natural e tipografia Playfair Display.',
       colors: {
-        primary: primary,
-        secondary: secondary,
-        accent: accent,
-        background: '#ffffff',
-        foreground: '#1e293b',
-        muted: '#f8fafc',
+        primary: customPrimary || '#2e4f43',
+        secondary: customSecondary || '#c88770',
+        accent: customAccent || '#3b6154',
+        background: '#fbf9f6',
+        foreground: '#1e2824',
+        muted: '#f3efea',
         card: '#ffffff',
+        border: '#e8e2d9',
       },
       typography: {
-        headingFont: 'Outfit, Inter, sans-serif',
-        bodyFont: 'Inter, sans-serif',
+        headingFont: "'Playfair Display', Georgia, serif",
+        bodyFont: "'Plus Jakarta Sans', sans-serif",
         baseSize: '16px',
-        heroHeadingSize: 'text-4xl md:text-5xl font-bold tracking-tight',
+        heroHeadingSize: 'text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight font-serif',
       },
       spacing: {
-        containerMaxWidth: 'max-w-7xl',
-        sectionPaddingY: 'py-20',
-        cardPadding: 'p-8',
+        containerMaxWidth: 'max-w-6xl',
+        sectionPaddingY: 'py-20 md:py-28',
+        cardPadding: 'p-8 md:p-10',
       },
       borderRadius: {
-        card: 'rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow',
-        button: 'rounded-lg',
+        card: 'rounded-3xl border border-[#e8e2d9] shadow-sm bg-white',
+        button: 'rounded-full',
         badge: 'rounded-full',
       },
       hero: {
         layout: 'split-right-image',
         hasSearchOrQuickContact: true,
-        hasOnlineBadge: data.attendanceType !== 'presencial',
+        hasOnlineBadge: true,
       },
       servicesSection: {
         layout: 'grid-3',
@@ -101,45 +106,48 @@ export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'M
       },
       aboutSection: {
         layout: 'two-column-story',
-        hasCredentialsBadge: data.hasProfessionalCouncil,
+        hasCredentialsBadge: true,
       },
       footer: {
         layout: 'multi-column-rich',
       },
     },
 
+    // MODELO B: Midnight Luminescence / Dark Elegance Stitch
     MODEL_B: {
       id: 'spec_model_b',
       variant: 'MODEL_B',
-      name: 'Moderno Dark Premium',
-      description: 'Forte impacto visual, contrastes elegantes, atmosfera noturna, glassmorphism sutil e sofisticação.',
+      name: 'Midnight Luminescence',
+      tagline: 'Nocturnal Chic & Vidro Fosco',
+      description: 'Estética noturna refinada com superfícies em camadas obsidiana, bordas com bioluminescência sutil e contraste cristalino.',
       colors: {
-        primary: primary,
-        secondary: secondary,
-        accent: accent,
+        primary: customPrimary || '#0f172a',
+        secondary: customSecondary || '#38bdf8',
+        accent: customAccent || '#10b981',
         background: '#090d16',
         foreground: '#f8fafc',
         muted: '#131c2e',
         card: '#0f172a',
+        border: 'rgba(255, 255, 255, 0.08)',
       },
       typography: {
-        headingFont: 'Plus Jakarta Sans, sans-serif',
-        bodyFont: 'Inter, sans-serif',
+        headingFont: "'Plus Jakarta Sans', sans-serif",
+        bodyFont: "'Inter', sans-serif",
         baseSize: '16px',
-        heroHeadingSize: 'text-5xl md:text-6xl font-extrabold tracking-tight',
+        heroHeadingSize: 'text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight',
       },
       spacing: {
         containerMaxWidth: 'max-w-7xl',
-        sectionPaddingY: 'py-24',
-        cardPadding: 'p-10',
+        sectionPaddingY: 'py-24 md:py-32',
+        cardPadding: 'p-8 md:p-10',
       },
       borderRadius: {
-        card: 'rounded-2xl border border-slate-800 shadow-xl shadow-slate-950/50 hover:-translate-y-1 transition-all duration-300',
+        card: 'rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-md shadow-2xl',
         button: 'rounded-xl',
-        badge: 'rounded-md',
+        badge: 'rounded-full',
       },
       hero: {
-        layout: 'centered',
+        layout: 'split-right-image',
         hasSearchOrQuickContact: true,
         hasOnlineBadge: true,
       },
@@ -157,40 +165,43 @@ export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'M
       },
     },
 
+    // MODELO C: Atelier Editorial / Nobreza Clássica Stitch
     MODEL_C: {
       id: 'spec_model_c',
       variant: 'MODEL_C',
-      name: 'Minimalista Editorial',
-      description: 'Espaço generoso, foco total no conteúdo, tipografia clássica nobre e elegância executiva sóbria.',
+      name: 'Atelier Editorial',
+      tagline: 'Minimalismo Literário & Alta Autoridade',
+      description: 'Respiro generoso de páginas de alta curadoria, contrastes orgânicos quentes, selos finos e diagramação jornalística nobre.',
       colors: {
-        primary: '#1c1917',
-        secondary: primary,
-        accent: accent,
-        background: '#faf9f6',
+        primary: customPrimary || '#1c1917',
+        secondary: customSecondary || '#78716c',
+        accent: customAccent || '#b45309',
+        background: '#faf7f2',
         foreground: '#1c1917',
-        muted: '#f4f2eb',
+        muted: '#f0ece1',
         card: '#ffffff',
+        border: '#e4dec3',
       },
       typography: {
-        headingFont: 'Playfair Display, Cinzel, Georgia, serif',
-        bodyFont: 'Plus Jakarta Sans, Inter, sans-serif',
+        headingFont: "'Playfair Display', Georgia, serif",
+        bodyFont: "'Plus Jakarta Sans', Inter, sans-serif",
         baseSize: '16px',
-        heroHeadingSize: 'text-4xl md:text-5xl font-serif font-normal leading-tight',
+        heroHeadingSize: 'text-4xl sm:text-5xl lg:text-6xl font-serif font-normal leading-[1.12]',
       },
       spacing: {
-        containerMaxWidth: 'max-w-6xl',
-        sectionPaddingY: 'py-24',
-        cardPadding: 'p-8',
+        containerMaxWidth: 'max-w-5xl',
+        sectionPaddingY: 'py-24 md:py-32',
+        cardPadding: 'p-10',
       },
       borderRadius: {
-        card: 'rounded-none border border-stone-300 bg-white p-8 shadow-sm',
-        button: 'rounded-none uppercase tracking-wider text-xs',
+        card: 'rounded-none border border-stone-300 bg-white shadow-sm',
+        button: 'rounded-none tracking-widest text-xs uppercase',
         badge: 'rounded-none',
       },
       hero: {
         layout: 'editorial-minimal',
-        hasSearchOrQuickContact: false,
-        hasOnlineBadge: data.attendanceType !== 'presencial',
+        hasSearchOrQuickContact: true,
+        hasOnlineBadge: true,
       },
       servicesSection: {
         layout: 'editorial-list',
@@ -199,41 +210,44 @@ export function generateDesignSpecs(data: OnboardingData): Record<'MODEL_A' | 'M
       },
       aboutSection: {
         layout: 'quote-centered',
-        hasCredentialsBadge: data.hasProfessionalCouncil,
+        hasCredentialsBadge: true,
       },
       footer: {
         layout: 'stacked-centered',
       },
     },
 
+    // MODELO D: Modern Bento Pulse / Google Stitch Conversão
     MODEL_D: {
       id: 'spec_model_d',
       variant: 'MODEL_D',
-      name: 'Consultoria & Alta Conversão (Stitch Pulse)',
-      description: 'Estrutura contemporânea estilo SaaS/Consultoria com cartões Bento Grid, badge flutuante e foco em agendamento.',
+      name: 'Modern Bento Pulse',
+      tagline: 'Bento Grid Dinâmico & Alta Conversão',
+      description: 'Layout moderno com blocos modulares Bento, indicadores de status ativos em tempo real, badges pulsantes e micro-cards de impacto.',
       colors: {
-        primary: primary,
-        secondary: '#0ea5e9',
-        accent: '#10b981',
+        primary: customPrimary || '#0f172a',
+        secondary: customSecondary || '#2563eb',
+        accent: customAccent || '#10b981',
         background: '#f8fafc',
         foreground: '#0f172a',
-        muted: '#e2e8f0',
+        muted: '#f1f5f9',
         card: '#ffffff',
+        border: 'rgba(226, 232, 240, 0.8)',
       },
       typography: {
-        headingFont: 'Plus Jakarta Sans, sans-serif',
-        bodyFont: 'Inter, sans-serif',
+        headingFont: "'Plus Jakarta Sans', sans-serif",
+        bodyFont: "'Plus Jakarta Sans', sans-serif",
         baseSize: '16px',
-        heroHeadingSize: 'text-4xl md:text-6xl font-black tracking-tight',
+        heroHeadingSize: 'text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight',
       },
       spacing: {
         containerMaxWidth: 'max-w-7xl',
-        sectionPaddingY: 'py-20',
+        sectionPaddingY: 'py-20 md:py-28',
         cardPadding: 'p-8',
       },
       borderRadius: {
-        card: 'rounded-3xl border border-slate-200/80 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:border-slate-300 transition-all',
-        button: 'rounded-2xl shadow-md hover:shadow-lg',
+        card: 'rounded-3xl border border-slate-200/90 shadow-xl shadow-slate-200/50 bg-white',
+        button: 'rounded-2xl',
         badge: 'rounded-full',
       },
       hero: {

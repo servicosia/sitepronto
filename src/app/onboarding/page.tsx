@@ -770,23 +770,23 @@ function OnboardingContent() {
                       onClick={() => setSelectedModel('MODEL_A')}
                       className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
                         selectedModel === 'MODEL_A'
-                          ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
+                          ? 'border-[#2e4f43] bg-[#fbf9f6] shadow-md ring-2 ring-[#2e4f43]'
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Modelo A</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#2e4f43]">Modelo A • Stitch Haven</span>
                         {selectedModel === 'MODEL_A' && (
-                          <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
+                          <span className="w-5 h-5 rounded-full bg-[#2e4f43] text-white flex items-center justify-center text-xs">✓</span>
                         )}
                       </div>
-                      <h3 className="text-base font-bold text-slate-900 mb-1">Institucional Confiável</h3>
+                      <h3 className="text-base font-bold text-slate-900 mb-1">Serene Haven</h3>
                       <p className="text-xs text-slate-600 mb-3">
-                        Estrutura clássica, hero split e autoridade corporativa.
+                        Design orgânico botânico (verde sábio/terracota), linho e Playfair Display.
                       </p>
-                      <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs text-slate-700">
+                      <div className="p-2.5 bg-[#f3efea] rounded-xl border border-[#e8e2d9] text-xs text-[#17382d] font-serif">
                         <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
-                        <div className="text-[11px] text-slate-500">{formData.profession || 'Sua Profissão'}</div>
+                        <div className="text-[11px] text-[#5f6864] font-sans">{formData.profession || 'Sua Profissão'}</div>
                       </div>
                     </div>
 
@@ -795,23 +795,23 @@ function OnboardingContent() {
                       onClick={() => setSelectedModel('MODEL_B')}
                       className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
                         selectedModel === 'MODEL_B'
-                          ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
+                          ? 'border-sky-500 bg-slate-900 shadow-md ring-2 ring-sky-500 text-white'
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Modelo B</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-sky-400">Modelo B</span>
                         {selectedModel === 'MODEL_B' && (
-                          <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
+                          <span className="w-5 h-5 rounded-full bg-sky-500 text-slate-950 flex items-center justify-center text-xs font-bold">✓</span>
                         )}
                       </div>
-                      <h3 className="text-base font-bold text-slate-900 mb-1">Moderno Dark</h3>
-                      <p className="text-xs text-slate-600 mb-3">
-                        Forte impacto visual, atmosfera dark e sofisticação.
+                      <h3 className={`text-base font-bold mb-1 ${selectedModel === 'MODEL_B' ? 'text-white' : 'text-slate-900'}`}>Midnight Luminescence</h3>
+                      <p className={`text-xs mb-3 ${selectedModel === 'MODEL_B' ? 'text-slate-300' : 'text-slate-600'}`}>
+                        Atmosfera noturna com camadas de vidro fosco e contraste cristalino.
                       </p>
-                      <div className="p-2.5 bg-slate-900 rounded-lg text-xs text-white">
+                      <div className="p-2.5 bg-slate-950 rounded-xl text-xs text-white border border-slate-800">
                         <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
-                        <div className="text-[11px] text-slate-300">{formData.mainSpecialty || 'Especialidade'}</div>
+                        <div className="text-[11px] text-sky-400">{formData.mainSpecialty || 'Especialidade'}</div>
                       </div>
                     </div>
 
@@ -820,19 +820,19 @@ function OnboardingContent() {
                       onClick={() => setSelectedModel('MODEL_C')}
                       className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
                         selectedModel === 'MODEL_C'
-                          ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
+                          ? 'border-stone-800 bg-[#faf7f2] shadow-md ring-2 ring-stone-800'
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Modelo C</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-stone-600">Modelo C</span>
                         {selectedModel === 'MODEL_C' && (
-                          <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
+                          <span className="w-5 h-5 rounded-full bg-stone-900 text-white flex items-center justify-center text-xs">✓</span>
                         )}
                       </div>
-                      <h3 className="text-base font-bold text-slate-900 mb-1">Minimalista Editorial</h3>
+                      <h3 className="text-base font-bold text-slate-900 mb-1">Atelier Editorial</h3>
                       <p className="text-xs text-slate-600 mb-3">
-                        Tipografia clássica serifada, off-white e sobriedade.
+                        Tipografia clássica serifada nobre, alta autoridade e layout de curadoria.
                       </p>
                       <div className="p-2.5 bg-stone-100 rounded-lg border-l-2 border-stone-800 text-xs text-stone-800 font-serif">
                         <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
@@ -845,23 +845,23 @@ function OnboardingContent() {
                       onClick={() => setSelectedModel('MODEL_D')}
                       className={`cursor-pointer p-5 rounded-2xl border-2 transition-all ${
                         selectedModel === 'MODEL_D'
-                          ? 'border-slate-900 bg-slate-50/90 shadow-md ring-2 ring-slate-900'
+                          ? 'border-emerald-600 bg-emerald-50/50 shadow-md ring-2 ring-emerald-600'
                           : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Modelo D • Stitch Pulse</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Modelo D • Bento Pulse</span>
                         {selectedModel === 'MODEL_D' && (
-                          <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs">✓</span>
+                          <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs">✓</span>
                         )}
                       </div>
-                      <h3 className="text-base font-bold text-slate-900 mb-1">Alta Conversão</h3>
+                      <h3 className="text-base font-bold text-slate-900 mb-1">Modern Bento Pulse</h3>
                       <p className="text-xs text-slate-600 mb-3">
-                        Layout dinâmico Bento Grid, foco em agendamento e SaaS.
+                        Layout modular Bento Grid contemporâneo com foco em conversão e agendamento.
                       </p>
-                      <div className="p-2.5 bg-emerald-950 rounded-lg text-xs text-emerald-300">
+                      <div className="p-2.5 bg-emerald-950 rounded-xl text-xs text-emerald-300">
                         <strong>{formData.professionalName || formData.fullName || 'Seu Nome'}</strong>
-                        <div className="text-[11px] text-emerald-400">Agendamento & Consultoria</div>
+                        <div className="text-[11px] text-emerald-400">Agendamento & Conversão</div>
                       </div>
                     </div>
                   </div>

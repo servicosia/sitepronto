@@ -16,9 +16,9 @@ export function getContextualImages(profession?: string, specialty?: string, com
  * Renderiza o corpo do site para uma variante específica (MODEL_A, MODEL_B, MODEL_C, MODEL_D)
  */
 export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D' = 'MODEL_A'): string {
-  const name = data.professionalName || data.fullName || 'Nome do Profissional / Empresa';
-  const profession = data.profession || 'Especialista / Consultoria';
-  const specialty = data.mainSpecialty || 'Atendimento e Serviços Especializados';
+  const name = data.professionalName || data.fullName || 'Nome do Profissional';
+  const profession = data.profession || 'Especialista';
+  const specialty = data.mainSpecialty || 'Atendimento Especializado';
   const whatsappDigits = (data.whatsapp || '').replace(/[^0-9]/g, '');
   const councilBadge = data.councilNumber 
     ? `${data.councilType || 'Registro'} ${data.councilNumber}` 
@@ -28,73 +28,98 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   const heroImage = data.coverPhotoUrl || images.hero;
   const aboutImage = data.profilePhotoUrl || images.about;
 
-  const primary = data.primaryColor || '#0f172a';
-  const secondary = data.secondaryColor || '#2563eb';
-  const accent = data.accentColor || '#10b981';
+  const isModelA = variantName === 'MODEL_A'; // Serene Haven (Inspirado em psicologia.servicos.ia.br)
+  const isModelB = variantName === 'MODEL_B'; // Midnight Luminescence (Dark Stitch)
+  const isModelC = variantName === 'MODEL_C'; // Atelier Editorial (Nobility & Warmth)
+  const isModelD = variantName === 'MODEL_D'; // Modern Bento Pulse (SaaS / Conversão)
 
-  const isConversion = variantName === 'MODEL_D';
-  const isEditorial = variantName === 'MODEL_C';
-  const isModern = variantName === 'MODEL_B';
-  const isInstitutional = variantName === 'MODEL_A';
+  // Cores personalizadas ou da paleta do Stitch
+  const primary = data.primaryColor && data.primaryColor !== '#0f172a' 
+    ? data.primaryColor 
+    : (isModelA ? '#2e4f43' : isModelB ? '#0f172a' : isModelC ? '#1c1917' : '#0f172a');
 
-  const fontBody = isEditorial ? "'Playfair Display', Georgia, serif" : (isModern || isConversion) ? "'Plus Jakarta Sans', sans-serif" : "'Inter', sans-serif";
-  const fontHeading = isEditorial ? "'Playfair Display', Georgia, serif" : (isModern || isConversion) ? "'Plus Jakarta Sans', sans-serif" : "'Outfit', sans-serif";
+  const secondary = data.secondaryColor && data.secondaryColor !== '#3b82f6'
+    ? data.secondaryColor
+    : (isModelA ? '#c88770' : isModelB ? '#38bdf8' : isModelC ? '#78716c' : '#2563eb');
+
+  const accent = data.accentColor && data.accentColor !== '#10b981'
+    ? data.accentColor
+    : (isModelA ? '#3b6154' : isModelB ? '#10b981' : isModelC ? '#b45309' : '#10b981');
+
+  const fontBody = (isModelA || isModelC) ? "'Plus Jakarta Sans', sans-serif" : (isModelB || isModelD) ? "'Inter', sans-serif" : "'Inter', sans-serif";
+  const fontHeading = (isModelA || isModelC) ? "'Playfair Display', Georgia, serif" : "'Plus Jakarta Sans', sans-serif";
 
   const servicesList = data.services && data.services.length > 0 ? data.services : [
     {
-      title: 'Consultoria e Atendimento Especializado',
-      shortDescription: 'Atendimento e orientação personalizada com análise aprofundada das suas necessidades e soluções sob medida.',
+      title: 'Consultoria e Atendimento Individual',
+      shortDescription: 'Sessões personalizadas e diagnóstico aprofundado com suporte contínuo para alcançar seus objetivos com clareza.',
       icon: 'Briefcase',
-      ctaText: 'Solicitar Atendimento'
+      ctaText: 'Agendar Sessão'
     },
     {
-      title: 'Diagnóstico e Planejamento',
-      shortDescription: 'Avaliação técnica detalhada para estruturação das melhores etapas e estratégias práticas para o seu objetivo.',
+      title: 'Avaliação & Diagnóstico Técnico',
+      shortDescription: 'Estruturação estratégica, mapeamento de prioridades e plano de ação estruturado de alta eficácia.',
       icon: 'Target',
-      ctaText: 'Agendar Horário'
+      ctaText: 'Solicitar Avaliação'
     },
     {
-      title: 'Acompanhamento Contínuo',
-      shortDescription: 'Suporte dedicado e acompanhamento próximo para garantir excelência, segurança e resultados consistentes.',
+      title: 'Acompanhamento e Mentoria',
+      shortDescription: 'Suporte dedicado e orientação periódica para garantir segurança, evolução sustentável e excelência nos resultados.',
       icon: 'Shield',
       ctaText: 'Falar no WhatsApp'
     }
   ];
 
   return `
-<div class="template-wrapper ${isModern ? 'bg-slate-950 text-slate-100' : isEditorial ? 'bg-[#faf9f6] text-stone-900' : isConversion ? 'bg-slate-50 text-slate-900' : 'bg-slate-50 text-slate-900'} antialiased min-h-screen flex flex-col" style="font-family: ${fontBody};">
+<div class="template-wrapper ${
+    isModelA ? 'bg-[#fbf9f6] text-[#1e2824]' : 
+    isModelB ? 'bg-[#090d16] text-[#f8fafc]' : 
+    isModelC ? 'bg-[#faf7f2] text-[#1c1917]' : 
+    'bg-[#f8fafc] text-[#0f172a]'
+  } antialiased min-h-screen flex flex-col selection:bg-emerald-500/20 selection:text-emerald-900" style="font-family: ${fontBody};">
 
-  <!-- HEADER -->
-  <header class="sticky top-0 z-50 ${isModern ? 'bg-slate-900/95 border-slate-800' : isEditorial ? 'bg-[#faf9f6]/95 border-stone-300' : isConversion ? 'bg-white/95 border-slate-200/80 shadow-sm' : 'bg-white/95 border-slate-200'} backdrop-blur border-b">
+  <!-- ==================== HEADER / NAVEGAÇÃO ==================== -->
+  <header class="sticky top-0 z-50 ${
+    isModelA ? 'bg-[#fbf9f6]/90 border-[#e8e2d9]' : 
+    isModelB ? 'bg-[#090d16]/90 border-slate-800/80' : 
+    isModelC ? 'bg-[#faf7f2]/95 border-stone-300' : 
+    'bg-white/90 border-slate-200/80 shadow-sm'
+  } backdrop-blur-md border-b transition-all">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-11 h-11 ${isEditorial ? 'rounded-none' : isConversion ? 'rounded-2xl' : 'rounded-xl'} text-white flex items-center justify-center font-bold text-lg shadow-md shrink-0" style="background-color: ${primary}">
+      
+      <!-- Brand Logo / Badge -->
+      <a href="#inicio" class="flex items-center space-x-3 group">
+        <div class="w-11 h-11 ${isModelC ? 'rounded-none' : isModelD ? 'rounded-2xl' : 'rounded-2xl'} text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0 transition-transform group-hover:scale-105" style="background-color: ${primary}">
           ${name.slice(0, 2).toUpperCase()}
         </div>
         <div>
-          <span class="font-bold text-base sm:text-lg leading-tight block ${isModern ? 'text-white' : isEditorial ? 'text-stone-900 font-serif' : 'text-slate-900'}">${name}</span>
-          <span class="text-xs font-medium block ${isModern ? 'text-slate-400' : 'text-slate-500'}">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</span>
+          <span class="font-bold text-base sm:text-lg leading-tight block ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}">${name}</span>
+          <span class="text-xs font-medium block ${isModelB ? 'text-slate-400' : 'text-stone-500'}">
+            ${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}
+          </span>
         </div>
-      </div>
+      </a>
 
-      <!-- DESKTOP NAV -->
-      <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold ${isModern ? 'text-slate-300' : isEditorial ? 'text-stone-700' : 'text-slate-600'}">
-        <a href="#inicio" class="hover:text-emerald-500 transition py-1">Início</a>
-        <a href="#servicos" class="hover:text-emerald-500 transition py-1">Serviços</a>
-        <a href="#como-funciona" class="hover:text-emerald-500 transition py-1">Como Funciona</a>
-        <a href="#sobre" class="hover:text-emerald-500 transition py-1">Sobre</a>
-        <a href="#artigos" class="hover:text-emerald-500 transition py-1">Informativos</a>
-        <a href="#contato" class="hover:text-emerald-500 transition py-1">Contato</a>
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold ${isModelB ? 'text-slate-300' : isModelC ? 'text-stone-700 tracking-wider text-xs uppercase' : 'text-stone-600'}">
+        <a href="#inicio" class="hover:opacity-80 transition py-1">Início</a>
+        <a href="#servicos" class="hover:opacity-80 transition py-1">Atuação</a>
+        <a href="#como-funciona" class="hover:opacity-80 transition py-1">Como Funciona</a>
+        <a href="#sobre" class="hover:opacity-80 transition py-1">Sobre</a>
+        <a href="#artigos" class="hover:opacity-80 transition py-1">Orientações</a>
+        <a href="#contato" class="hover:opacity-80 transition py-1">Contato</a>
       </nav>
 
-      <!-- CTA & BOTÃO MENU MOBILE -->
+      <!-- CTA Action & Mobile Toggle -->
       <div class="flex items-center space-x-3">
-        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="hidden sm:inline-flex px-5 py-2.5 text-white text-sm font-bold ${isEditorial ? 'rounded-none uppercase tracking-wider' : isConversion ? 'rounded-2xl' : 'rounded-xl'} shadow-md transition-all items-center hover:opacity-90" style="background-color: ${isConversion ? accent : primary}">
-          Agendar Atendimento
+        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="hidden sm:inline-flex px-6 py-2.5 text-white text-sm font-bold ${
+          isModelC ? 'rounded-none uppercase tracking-widest text-xs' : isModelA ? 'rounded-full' : isModelD ? 'rounded-2xl' : 'rounded-xl'
+        } shadow-sm transition-all items-center hover:opacity-95 hover:shadow-md active:scale-95" style="background-color: ${primary}">
+          ${isModelA ? 'Agendar Consulta' : isModelC ? 'CONSULTAR AGORA' : 'Agendar Atendimento'}
         </a>
         
-        <!-- Mobile hamburger button -->
-        <button type="button" onclick="toggleMobileNav(this)" aria-label="Abrir Menu" class="md:hidden p-2 rounded-xl border ${isModern ? 'border-slate-800 text-slate-200 hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-slate-100'} transition flex items-center justify-center">
+        <!-- Mobile Menu Toggle -->
+        <button type="button" onclick="toggleMobileNav(this)" aria-label="Abrir Menu" class="md:hidden p-2 rounded-xl border ${isModelB ? 'border-slate-800 text-slate-200 hover:bg-slate-800' : 'border-stone-200 text-stone-700 hover:bg-stone-100'} transition flex items-center justify-center">
           <svg class="w-6 h-6 hamburger-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
@@ -105,41 +130,175 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
       </div>
     </div>
 
-    <!-- MOBILE MENU DROPDOWN -->
-    <div class="mobile-nav-menu hidden md:hidden border-t ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-[#faf9f6] border-stone-300' : 'bg-white border-slate-200'} px-4 pt-3 pb-6 space-y-3 shadow-xl">
-      <div class="flex flex-col space-y-2 text-sm font-semibold ${isModern ? 'text-slate-200' : 'text-slate-800'}">
-        <a href="#inicio" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Início</a>
-        <a href="#servicos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Serviços</a>
-        <a href="#como-funciona" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Como Funciona</a>
-        <a href="#sobre" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Sobre</a>
-        <a href="#artigos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Informativos</a>
-        <a href="#contato" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-slate-100/10 transition">Contato</a>
+    <!-- Mobile Menu Dropdown -->
+    <div class="mobile-nav-menu hidden md:hidden border-t ${isModelB ? 'bg-[#090d16] border-slate-800' : isModelC ? 'bg-[#faf7f2] border-stone-300' : 'bg-white border-stone-200'} px-4 pt-3 pb-6 space-y-3 shadow-xl">
+      <div class="flex flex-col space-y-2 text-sm font-semibold ${isModelB ? 'text-slate-200' : 'text-stone-800'}">
+        <a href="#inicio" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Início</a>
+        <a href="#servicos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Atuação</a>
+        <a href="#como-funciona" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Como Funciona</a>
+        <a href="#sobre" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Sobre</a>
+        <a href="#artigos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Orientações</a>
+        <a href="#contato" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Contato</a>
       </div>
       <div class="pt-2">
-        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="w-full text-center px-5 py-3 text-white text-sm font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2" style="background-color: ${isConversion ? accent : primary}">
-          <span>⚡</span> Agendar pelo WhatsApp
+        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="w-full text-center px-5 py-3 text-white text-sm font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2" style="background-color: ${primary}">
+          <span>⚡</span> Falar pelo WhatsApp
         </a>
       </div>
     </div>
   </header>
 
-  <!-- HERO SECTION VARIANTES -->
-  ${isConversion ? `
-  <!-- HERO MODELO D (GOOGLE STITCH PULSE / ALTA CONVERSÃO & BENTO) -->
+  <!-- ==================== HERO SECTION ==================== -->
+  ${isModelA ? `
+  <!-- HERO MODELO A (SERENE HAVEN / STITCH PSICOLOGIA) -->
+  <section id="inicio" class="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden border-b border-[#e8e2d9]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        
+        <!-- Left Column (Content) -->
+        <div class="lg:col-span-7 text-left space-y-6">
+          <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#f3efea] border border-[#e8e2d9] text-[#2e4f43]">
+            <span class="w-2 h-2 rounded-full bg-[#2e4f43] animate-pulse"></span>
+            ${data.attendanceType === 'online' ? 'Atendimento Online Nacional' : data.attendanceType === 'presencial' ? 'Atendimento Presencial' : 'Atendimento Online & Presencial'} • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
+          </div>
+          
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-[#17382d] leading-[1.14]" style="font-family: ${fontHeading}">
+            ${data.companyName || specialty || 'Cuidado, escuta atenta e transformação humana'}
+          </h1>
+          
+          <p class="text-base sm:text-lg text-[#414845] leading-relaxed max-w-xl font-normal">
+            ${data.professionalSummary || 'Um espaço seguro e acolhedor para o seu desenvolvimento, com rigor ético, método humanizado e total confidencialidade.'}
+          </p>
+
+          <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold rounded-full shadow-lg shadow-[#2e4f43]/15 transition-all hover:opacity-95 hover:scale-[1.02] active:scale-95 text-center flex items-center justify-center gap-2" style="background-color: ${primary}">
+              <span>💬</span> Agendar Primeira Sessão
+            </a>
+            <a href="#sobre" class="px-7 py-4 bg-transparent border border-[#2e4f43]/30 text-[#2e4f43] font-bold rounded-full hover:bg-[#f3efea] transition text-center">
+              Conhecer Abordagem
+            </a>
+          </div>
+
+          <!-- Micro Credenciais do Stitch -->
+          <div class="pt-4 flex flex-wrap items-center gap-6 text-xs text-[#5f6864] font-medium">
+            <span class="flex items-center gap-1.5"><span class="text-[#c88770]">✦</span> ${councilBadge}</span>
+            <span class="flex items-center gap-1.5"><span class="text-[#c88770]">✦</span> Sigilo Ético Rigoroso</span>
+            <span class="flex items-center gap-1.5"><span class="text-[#c88770]">✦</span> Horários Flexíveis</span>
+          </div>
+        </div>
+
+        <!-- Right Column (Stitch Organic Card Image) -->
+        <div class="lg:col-span-5 relative">
+          <div class="relative rounded-3xl overflow-hidden shadow-xl border border-[#e8e2d9] aspect-[4/5] bg-[#f3efea] group">
+            <img src="${heroImage}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#17382d]/80 via-transparent to-transparent"></div>
+            
+            <!-- Floating Overlay Card -->
+            <div class="absolute bottom-5 left-5 right-5 p-5 rounded-2xl bg-white/95 backdrop-blur-md border border-white/60 shadow-lg">
+              <span class="text-xs font-bold text-[#c88770] uppercase tracking-wider block">${profession}</span>
+              <span class="text-base font-bold text-[#17382d] block mt-0.5" style="font-family: ${fontHeading}">${name}</span>
+              <span class="text-xs text-[#5f6864] block mt-1">${specialty}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  ` : isModelB ? `
+  <!-- HERO MODELO B (MIDNIGHT LUMINESCENCE / DARK STITCH) -->
+  <section id="inicio" class="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden border-b border-slate-800 bg-[#090d16]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7 text-left space-y-6">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border shadow-sm bg-slate-900/80 border-slate-700 text-sky-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            ${data.attendanceType === 'online' ? 'Atendimento 100% Online' : 'Atendimento Especializado'} • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
+          </div>
+          
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.08]" style="font-family: ${fontHeading}">
+            ${data.companyName || specialty || 'Soluções Estratégicas de Alto Nível'}
+          </h1>
+          
+          <p class="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl">
+            ${data.professionalSummary || 'Atuação dedicada com rigor técnico, tecnologia de ponta e foco total nos seus melhores resultados.'}
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold rounded-xl shadow-xl shadow-sky-500/10 transition-all hover:scale-105 text-center flex items-center justify-center gap-2" style="background-color: ${accent}">
+              <span>⚡</span> Falar no WhatsApp
+            </a>
+            <a href="#contato" class="px-8 py-4 bg-slate-900 border border-slate-700 text-white font-bold rounded-xl hover:bg-slate-800 transition text-center">
+              Enviar Mensagem
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 relative">
+          <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-800 aspect-[4/5] group bg-slate-950">
+            <img src="${heroImage}" alt="${specialty}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
+            <div class="absolute bottom-5 left-5 right-5 p-4 rounded-xl backdrop-blur-md bg-slate-900/90 border border-slate-700">
+              <span class="text-xs font-bold text-sky-400 block">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</span>
+              <span class="text-base font-bold text-white block mt-0.5">${name}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  ` : isModelC ? `
+  <!-- HERO MODELO C (ATELIER EDITORIAL / NOBREZA CLÁSSICA) -->
+  <section id="inicio" class="py-20 md:py-32 border-b border-stone-300 bg-[#faf7f2]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7 space-y-6">
+          <div class="border-l-2 pl-6 border-stone-800">
+            <span class="text-xs uppercase tracking-widest font-bold text-stone-500 block mb-2">${profession} • ${data.city || 'São Paulo'}</span>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-stone-900 leading-[1.12]" style="font-family: ${fontHeading}">
+              ${data.companyName || specialty || 'Excelência e Rigor Profissional'}
+            </h1>
+          </div>
+          
+          <p class="text-base sm:text-lg text-stone-700 leading-relaxed font-serif">
+            ${data.professionalSummary || 'Trabalho pautado na ética irrestrita, precisão técnica e compromisso individualizado em cada etapa.'}
+          </p>
+
+          <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold text-center tracking-widest text-xs uppercase shadow-sm transition hover:opacity-90" style="background-color: ${primary}">
+              AGENDAR CONSULTA
+            </a>
+            <a href="#contato" class="px-8 py-4 border border-stone-400 text-stone-900 font-bold text-center tracking-widest text-xs uppercase hover:bg-stone-200 transition">
+              ENVIAR MENSAGEM
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5">
+          <div class="p-3 bg-white border border-stone-300 shadow-md">
+            <img src="${heroImage}" alt="${specialty}" class="w-full h-80 lg:h-96 object-cover grayscale contrast-125">
+            <p class="text-[11px] font-serif text-stone-500 mt-2 text-center uppercase tracking-widest">${specialty} • ${councilBadge}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  ` : `
+  <!-- HERO MODELO D (MODERN BENTO PULSE / ALTA CONVERSÃO) -->
   <section id="inicio" class="relative pt-16 pb-20 md:pt-24 md:pb-28 bg-gradient-to-b from-slate-100 via-white to-slate-50 border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div class="lg:col-span-7 text-left">
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-sm">
+        <div class="lg:col-span-7 text-left space-y-6">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-sm">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            Disponível para Atendimento • ${data.city || 'São Paulo'} (${data.attendanceType === 'online' ? '100% Online' : data.attendanceType === 'presencial' ? 'Presencial' : 'Híbrido'})
+            Disponível para Atendimento • ${data.city || 'São Paulo'} (${data.attendanceType === 'online' ? '100% Online' : 'Presencial'})
           </div>
           
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.08] mb-6" style="font-family: ${fontHeading}">
-            ${data.companyName || specialty || 'Consultoria e Soluções Estratégicas de Alto Nível'}
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.08]" style="font-family: ${fontHeading}">
+            ${data.companyName || specialty || 'Soluções Estratégicas com Agilidade e Foco'}
           </h1>
           
-          <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-8 max-w-2xl font-normal">
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl font-normal">
             ${data.professionalSummary || 'Atendimento ágil, foco em resultados concretos e segurança técnica em cada detalhe.'}
           </p>
 
@@ -148,19 +307,13 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
               <span>⚡</span> Falar no WhatsApp Agora
             </a>
             <a href="#contato" class="px-8 py-4 bg-white border-2 border-slate-300 text-slate-800 font-bold rounded-2xl hover:border-slate-900 transition text-center">
-              Agendar Reunião / Proposta
+              Agendar Reunião
             </a>
-          </div>
-
-          <div class="mt-8 flex items-center gap-6 text-xs text-slate-500 font-semibold">
-            <span class="flex items-center gap-1.5">✓ Resposta Rápida</span>
-            <span class="flex items-center gap-1.5">✓ Confidencialidade Total</span>
-            <span class="flex items-center gap-1.5">✓ Atendimento Personalizado</span>
           </div>
         </div>
 
         <div class="lg:col-span-5 relative">
-          <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-[4/3] lg:aspect-[4/5] group bg-slate-100">
+          <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-[4/5] group bg-slate-100">
             <img src="${heroImage}" alt="${specialty}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
             <div class="absolute bottom-6 left-6 right-6 p-5 rounded-2xl backdrop-blur-md bg-white/95 border border-white/40 shadow-xl">
@@ -173,298 +326,267 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
       </div>
     </div>
   </section>
-  ` : isModern ? `
-  <!-- HERO MODELO B (MODERNO PREMIUM / DARK COM IMAGEM) -->
-  <section id="inicio" class="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden border-b border-slate-800 bg-slate-950">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div class="lg:col-span-7 text-left">
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6 border shadow-sm" style="background-color: ${primary}25; border-color: ${primary}66; color: #ffffff">
-            <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${accent}"></span>
-            ${data.attendanceType === 'online' ? 'Atendimento 100% Online' : data.attendanceType === 'presencial' ? 'Atendimento Presencial' : 'Atendimento Online & Presencial'} • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
-          </div>
-          
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6" style="font-family: ${fontHeading}">
-            ${data.companyName || specialty || 'Soluções Estratégicas e Atendimento de Alta Performance'}
-          </h1>
-          
-          <p class="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
-            ${data.professionalSummary || 'Atuação dedicada, ética e com rigor técnico para entregar os melhores resultados com atendimento próximo e transparente.'}
-          </p>
-
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold rounded-xl shadow-xl transition-all hover:scale-105 text-center" style="background-color: ${accent}">
-              Falar Diretamente no WhatsApp
-            </a>
-            <a href="#contato" class="px-8 py-4 bg-slate-900 border border-slate-700 text-white font-bold rounded-xl hover:bg-slate-800 transition text-center">
-              Solicitar Contato
-            </a>
-          </div>
-        </div>
-
-        <div class="lg:col-span-5 relative">
-          <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-800 aspect-[4/3] lg:aspect-[4/5] group">
-            <img src="${heroImage}" alt="${specialty}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
-            <div class="absolute bottom-6 left-6 right-6 p-4 rounded-xl backdrop-blur-md bg-slate-900/80 border border-slate-700/60">
-              <span class="text-xs font-bold text-amber-400 block">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</span>
-              <span class="text-sm font-semibold text-white block mt-0.5">${name}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  ` : isEditorial ? `
-  <!-- HERO MODELO C (MINIMALISTA EDITORIAL / CLÁSSICO COM IMAGEM) -->
-  <section id="inicio" class="py-20 md:py-28 border-b border-stone-300 bg-[#faf9f6]">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div class="lg:col-span-7">
-          <div class="border-l-4 pl-6 sm:pl-8 mb-6" style="border-color: ${primary}">
-            <span class="text-xs uppercase tracking-widest font-semibold text-stone-500 block mb-2">${profession} • ${data.city || 'São Paulo'}/${data.state || 'SP'}</span>
-            <h1 class="text-4xl sm:text-5xl font-serif text-stone-900 leading-tight" style="font-family: ${fontHeading}">
-              ${data.companyName || specialty || 'Excelência Profissional e Atendimento Dedicado'}
-            </h1>
-          </div>
-          
-          <p class="text-base sm:text-lg text-stone-700 leading-relaxed mb-8 font-serif">
-            ${data.professionalSummary || 'Atuação orientada por princípios de qualidade, clareza e dedicação para proporcionar as soluções mais adequadas.'}
-          </p>
-
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold text-center tracking-wider text-xs shadow-sm transition hover:opacity-90" style="background-color: ${primary}">
-              CONSULTAR VIA WHATSAPP
-            </a>
-            <a href="#contato" class="px-8 py-4 border border-stone-400 text-stone-900 font-bold text-center tracking-wider text-xs hover:bg-stone-200 transition">
-              ENVIAR MENSAGEM
-            </a>
-          </div>
-        </div>
-
-        <div class="lg:col-span-5">
-          <div class="p-3 bg-white border border-stone-300 shadow-md">
-            <img src="${heroImage}" alt="${specialty}" class="w-full h-80 lg:h-96 object-cover grayscale contrast-125">
-            <p class="text-[11px] font-serif text-stone-500 mt-2 text-center uppercase tracking-widest">${specialty} • ${data.city || 'Atuação Especializada'}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  ` : `
-  <!-- HERO MODELO A (INSTITUCIONAL CONFIÁVEL COM IMAGEM SPLIT) -->
-  <section id="inicio" class="relative pt-16 pb-20 md:pt-20 md:pb-28 bg-white overflow-hidden border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div class="lg:col-span-7">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-6 border" style="background-color: ${secondary}15; border-color: ${secondary}40; color: ${primary}">
-            <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: ${accent}"></span>
-            ${data.attendanceType === 'online' ? 'Atendimento 100% Online' : data.attendanceType === 'presencial' ? 'Atendimento Presencial' : 'Atendimento Online e Presencial'} • ${data.city || 'São Paulo'} - ${data.state || 'SP'}
-          </div>
-          
-          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950 leading-[1.15] mb-6" style="font-family: ${fontHeading}">
-            ${data.companyName || specialty || 'Serviços Especializados com Atendimento Individualizado'}
-          </h1>
-          
-          <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-8">
-            ${data.professionalSummary || 'Atuação com alto padrão técnico, responsabilidade e transparência em todas as etapas de atendimento.'}
-          </p>
-
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            <a href="https://wa.me/${whatsappDigits}" target="_blank" class="px-8 py-4 text-white font-bold rounded-xl shadow-lg text-center transition hover:opacity-90" style="background-color: ${primary}">
-              Falar pelo WhatsApp
-            </a>
-            <a href="#contato" class="px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-center transition">
-              Enviar Mensagem
-            </a>
-          </div>
-        </div>
-
-        <div class="lg:col-span-5">
-          <div class="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 aspect-[4/3] lg:aspect-[4/4]">
-            <img src="${heroImage}" alt="${specialty}" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
-            <div class="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-white/95 backdrop-blur-sm shadow-md border border-slate-100">
-              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">${profession}</span>
-              <span class="text-sm font-bold text-slate-900 block">${name}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
   `}
 
-  <!-- SERVIÇOS / ÁREAS DE ATUAÇÃO -->
-  <section id="servicos" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : isConversion ? 'bg-white border-b border-slate-200' : 'bg-slate-50 border-b border-slate-200'}">
+  <!-- ==================== ÁREAS DE ATUAÇÃO / SERVIÇOS ==================== -->
+  <section id="servicos" class="py-20 md:py-28 ${
+    isModelA ? 'bg-[#f3efea]/60 border-b border-[#e8e2d9]' : 
+    isModelB ? 'bg-[#0f172a] border-b border-slate-800' : 
+    isModelC ? 'bg-[#f0ece1] border-b border-stone-300' : 
+    'bg-white border-b border-slate-200'
+  }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-2xl mx-auto mb-16">
-        <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Serviços & Soluções</h2>
-        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl" style="font-family: ${fontHeading}">Áreas de Atuação e Especialidades</p>
-        <p class="mt-3 text-sm ${isModern ? 'text-slate-400' : 'text-slate-600'}">Soluções estruturadas para atender às necessidades específicas do seu perfil.</p>
+      
+      <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+        <h2 class="text-xs uppercase tracking-widest font-bold ${isModelA ? 'text-[#c88770]' : isModelB ? 'text-sky-400' : 'text-stone-500'}">
+          ${isModelA ? 'Especialidades Clínicas & Serviços' : 'Áreas de Atuação'}
+        </h2>
+        <p class="text-3xl sm:text-4xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">
+          Como Posso Ajudar Você
+        </p>
+        <p class="text-sm ${isModelB ? 'text-slate-400' : 'text-stone-600'}">
+          Soluções e acompanhamento estruturado para o seu momento e necessidades.
+        </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         ${servicesList.map((s, index) => `
-          <div class="${isModern ? 'bg-slate-950 border-slate-800 hover:border-slate-700' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-slate-50 border-slate-200/80 rounded-3xl hover:bg-slate-100/80 hover:border-slate-300' : 'bg-white border-slate-200 rounded-2xl'} p-8 border shadow-sm hover:shadow-md transition-all">
-            <div class="w-12 h-12 ${isEditorial ? 'rounded-none' : isConversion ? 'rounded-2xl' : 'rounded-xl'} text-white flex items-center justify-center font-bold mb-6 text-xl shadow-md" style="background-color: ${primary}">
-              ${index === 0 ? '✨' : index === 1 ? '🎯' : '⭐'}
+          <div class="${
+            isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl p-8 hover:shadow-lg transition-all border' : 
+            isModelB ? 'bg-slate-900/80 border-slate-800 rounded-2xl p-8 hover:border-slate-700 transition-all border' : 
+            isModelC ? 'bg-white border-stone-300 p-8 rounded-none border shadow-sm' : 
+            'bg-slate-50 border-slate-200 rounded-3xl p-8 hover:bg-slate-100 transition-all border'
+          }">
+            <div class="w-12 h-12 ${isModelC ? 'rounded-none' : isModelA ? 'rounded-2xl' : 'rounded-xl'} text-white flex items-center justify-center font-bold mb-6 text-xl shadow-sm" style="background-color: ${primary}">
+              ${index === 0 ? '✦' : index === 1 ? '✧' : '❖'}
             </div>
-            <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mb-3" style="font-family: ${fontHeading}">${s.title}</h3>
-            <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-6">${s.shortDescription}</p>
-            <a href="https://wa.me/${whatsappDigits}?text=${encodeURIComponent('Olá, gostaria de informações sobre ' + s.title)}" target="_blank" class="text-sm font-bold inline-flex items-center hover:underline" style="color: ${primary}">
-              ${s.ctaText || 'Saber mais'} →
+            <h3 class="text-xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'} mb-3" style="font-family: ${fontHeading}">
+              ${s.title}
+            </h3>
+            <p class="${isModelB ? 'text-slate-400' : 'text-stone-600'} text-sm leading-relaxed mb-6">
+              ${s.shortDescription}
+            </p>
+            <a href="https://wa.me/${whatsappDigits}?text=${encodeURIComponent('Olá, gostaria de saber mais sobre ' + s.title)}" target="_blank" class="text-sm font-bold inline-flex items-center gap-1 hover:underline" style="color: ${isModelB ? secondary : primary}">
+              ${s.ctaText || 'Saber mais'} <span>→</span>
             </a>
           </div>
         `).join('')}
       </div>
+
     </div>
   </section>
 
-  <!-- COMO FUNCIONA -->
-  <section id="como-funciona" class="py-20 ${isModern ? 'bg-slate-950 border-b border-slate-800' : isEditorial ? 'bg-[#faf9f6] border-b border-stone-300' : isConversion ? 'bg-slate-50 border-b border-slate-200' : 'bg-white border-b border-slate-200'}">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-2xl mx-auto mb-16">
-        <h2 class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Processo</h2>
-        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl" style="font-family: ${fontHeading}">Como Funciona o Atendimento</p>
+  <!-- ==================== COMO FUNCIONA ==================== -->
+  <section id="como-funciona" class="py-20 md:py-28 ${
+    isModelA ? 'bg-[#fbf9f6] border-b border-[#e8e2d9]' : 
+    isModelB ? 'bg-[#090d16] border-b border-slate-800' : 
+    isModelC ? 'bg-[#faf7f2] border-b border-stone-300' : 
+    'bg-slate-50 border-b border-slate-200'
+  }">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16 space-y-2">
+        <h2 class="text-xs uppercase tracking-widest font-bold ${isModelA ? 'text-[#c88770]' : isModelB ? 'text-sky-400' : 'text-stone-500'}">Etapas de Acolhimento</h2>
+        <p class="text-3xl sm:text-4xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">
+          Como Funciona o Atendimento
+        </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-white border-slate-200 rounded-3xl shadow-sm' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
-          <div class="w-12 h-12 mx-auto ${isConversion ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">1</div>
-          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}" style="font-family: ${fontHeading}">Primeiro Contato</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Você entra em contato via WhatsApp ou formulário apresentando sua necessidade.</p>
+        
+        <!-- Step 1 -->
+        <div class="p-8 ${isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl' : isModelB ? 'bg-slate-900 border-slate-800 rounded-2xl' : isModelC ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} border text-center space-y-3">
+          <div class="w-12 h-12 mx-auto ${isModelA ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center text-sm shadow-sm" style="background-color: ${primary}">1</div>
+          <h3 class="font-bold text-lg ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">Primeiro Contato</h3>
+          <p class="${isModelB ? 'text-slate-400' : 'text-stone-600'} text-sm leading-relaxed">Você entra em contato via WhatsApp ou formulário informando sua necessidade e preferências de horário.</p>
         </div>
-        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-white border-slate-200 rounded-3xl shadow-sm' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
-          <div class="w-12 h-12 mx-auto ${isConversion ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">2</div>
-          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}" style="font-family: ${fontHeading}">Diagnóstico Personalizado</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Avaliamos seu caso detalhadamente para estruturar a abordagem mais eficiente e sob medida.</p>
+
+        <!-- Step 2 -->
+        <div class="p-8 ${isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl' : isModelB ? 'bg-slate-900 border-slate-800 rounded-2xl' : isModelC ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} border text-center space-y-3">
+          <div class="w-12 h-12 mx-auto ${isModelA ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center text-sm shadow-sm" style="background-color: ${primary}">2</div>
+          <h3 class="font-bold text-lg ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">Sessão & Alinhamento</h3>
+          <p class="${isModelB ? 'text-slate-400' : 'text-stone-600'} text-sm leading-relaxed">Realizamos o diagnóstico aprofundado para compreender sua demanda e definir o plano de trabalho ideal.</p>
         </div>
-        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-white border-slate-200 rounded-3xl shadow-sm' : 'bg-slate-50 border-slate-200 rounded-2xl'} border text-center">
-          <div class="w-12 h-12 mx-auto ${isConversion ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center mb-4 shadow-md" style="background-color: ${primary}">3</div>
-          <h3 class="font-bold text-lg mb-2 ${isModern ? 'text-white' : 'text-slate-900'}" style="font-family: ${fontHeading}">Execução & Resultados</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm">Iniciamos os trabalhos com suporte contínuo, transparência e foco nos melhores resultados.</p>
+
+        <!-- Step 3 -->
+        <div class="p-8 ${isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl' : isModelB ? 'bg-slate-900 border-slate-800 rounded-2xl' : isModelC ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} border text-center space-y-3">
+          <div class="w-12 h-12 mx-auto ${isModelA ? 'rounded-2xl' : 'rounded-full'} text-white font-bold flex items-center justify-center text-sm shadow-sm" style="background-color: ${primary}">3</div>
+          <h3 class="font-bold text-lg ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">Evolução Contínua</h3>
+          <p class="${isModelB ? 'text-slate-400' : 'text-stone-600'} text-sm leading-relaxed">Desenvolvimento focado e acompanhamento constante para consolidação de resultados consistentes.</p>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- SOBRE O PROFISSIONAL / EMPRESA COM FOTO -->
-  <section id="sobre" class="py-20 ${isModern ? 'bg-slate-900 border-b border-slate-800' : isEditorial ? 'bg-[#f4f2eb] border-b border-stone-300' : isConversion ? 'bg-white border-b border-slate-200' : 'bg-slate-50 border-b border-slate-200'}">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="${isModern ? 'bg-slate-950 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : isConversion ? 'bg-slate-50 border-slate-200/80 rounded-3xl shadow-sm' : 'bg-white border-slate-200 rounded-3xl'} p-8 sm:p-12 border shadow-sm">
+  <!-- ==================== SOBRE O PROFISSIONAL ==================== -->
+  <section id="sobre" class="py-20 md:py-28 ${
+    isModelA ? 'bg-[#f3efea]/50 border-b border-[#e8e2d9]' : 
+    isModelB ? 'bg-[#0f172a] border-b border-slate-800' : 
+    isModelC ? 'bg-[#f0ece1] border-b border-stone-300' : 
+    'bg-white border-b border-slate-200'
+  }">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="${
+        isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl' : 
+        isModelB ? 'bg-slate-900/90 border-slate-800 rounded-2xl' : 
+        isModelC ? 'bg-white border-stone-300 rounded-none' : 
+        'bg-slate-50 border-slate-200 rounded-3xl'
+      } p-8 sm:p-12 border shadow-sm">
+        
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          
           <div class="lg:col-span-4">
-            <div class="${isConversion ? 'rounded-3xl' : 'rounded-2xl'} overflow-hidden border border-slate-200/80 shadow-md aspect-[3/4]">
+            <div class="${isModelC ? 'rounded-none' : isModelA ? 'rounded-3xl' : 'rounded-2xl'} overflow-hidden border ${isModelB ? 'border-slate-800' : 'border-stone-200'} aspect-[3/4] shadow-md">
               <img src="${aboutImage}" alt="${name}" class="w-full h-full object-cover">
             </div>
           </div>
 
-          <div class="lg:col-span-8">
-            <h2 class="text-xs uppercase tracking-widest font-bold mb-2" style="color: ${secondary}">Apresentação</h2>
-            <h3 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} mb-3" style="font-family: ${fontHeading}">${name}</h3>
-            <p class="text-sm font-semibold ${isModern ? 'text-slate-400' : 'text-slate-500'} mb-6">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''} • Atendimento em ${data.city || 'São Paulo'}/${data.state || 'SP'}</p>
+          <div class="lg:col-span-8 space-y-4">
+            <span class="text-xs uppercase tracking-widest font-bold ${isModelA ? 'text-[#c88770]' : isModelB ? 'text-sky-400' : 'text-stone-500'}">Apresentação Profissional</span>
+            <h3 class="text-3xl sm:text-4xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">${name}</h3>
+            <p class="text-xs font-semibold ${isModelB ? 'text-slate-400' : 'text-stone-500'}">${profession} • ${councilBadge} • ${data.city || 'São Paulo'}/${data.state || 'SP'}</p>
             
-            <p class="${isModern ? 'text-slate-300' : 'text-slate-700'} leading-relaxed mb-6">
-              ${data.bio || data.professionalSummary || 'Dedicado a oferecer soluções de alto nível com rigor técnico, ética e transparência, proporcionando uma experiência diferenciada a cada cliente.'}
+            <p class="${isModelB ? 'text-slate-300' : 'text-stone-700'} leading-relaxed text-sm sm:text-base pt-2">
+              ${data.bio || data.professionalSummary || 'Dedicado a oferecer um atendimento de excelência com rigor técnico, acolhimento e compromisso ético irrestrito para cada pessoa atendida.'}
             </p>
 
-            <div class="pt-6 border-t ${isModern ? 'border-slate-800' : 'border-slate-100'} flex flex-wrap gap-4 text-xs font-semibold ${isModern ? 'text-slate-300' : 'text-slate-600'}">
-              <span class="px-3 py-1.5 ${isModern ? 'bg-slate-900' : 'bg-slate-100'} rounded-lg">🕒 Horário: ${data.businessHours || 'Segunda a Sexta, das 09h às 18h'}</span>
-              <span class="px-3 py-1.5 ${isModern ? 'bg-slate-900' : 'bg-slate-100'} rounded-lg">📍 Atendimento: ${data.attendanceType === 'online' ? '100% Online' : data.attendanceType === 'presencial' ? 'Presencial' : 'Híbrido (Online e Presencial)'}</span>
-              <span class="px-3 py-1.5 ${isModern ? 'bg-slate-900' : 'bg-slate-100'} rounded-lg">✉️ ${data.publicEmail || 'Atendimento Direto'}</span>
+            <div class="pt-6 border-t ${isModelB ? 'border-slate-800' : 'border-stone-100'} flex flex-wrap gap-4 text-xs font-semibold ${isModelB ? 'text-slate-300' : 'text-stone-600'}">
+              <span class="px-3.5 py-2 ${isModelB ? 'bg-slate-800' : 'bg-stone-100'} rounded-xl">🕒 ${data.businessHours || 'Segunda a Sexta, das 09h às 18h'}</span>
+              <span class="px-3.5 py-2 ${isModelB ? 'bg-slate-800' : 'bg-stone-100'} rounded-xl">📍 ${data.attendanceType === 'online' ? '100% Online' : data.attendanceType === 'presencial' ? 'Presencial' : 'Híbrido (Online/Presencial)'}</span>
+              <span class="px-3.5 py-2 ${isModelB ? 'bg-slate-800' : 'bg-stone-100'} rounded-xl">✉️ ${data.publicEmail || 'Atendimento Direto'}</span>
             </div>
           </div>
+
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- ARTIGOS E INFORMATIVOS -->
-  <section id="artigos" class="py-20 ${isModern ? 'bg-slate-950 border-b border-slate-800' : isEditorial ? 'bg-[#faf9f6] border-b border-stone-300' : 'bg-white border-b border-slate-200'}">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-2xl mx-auto mb-16">
-        <h2 class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Conteúdo</h2>
-        <p class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'} sm:text-4xl" style="font-family: ${fontHeading}">Artigos & Orientações</p>
+  <!-- ==================== ARTIGOS E ORIENTAÇÕES ==================== -->
+  <section id="artigos" class="py-20 md:py-28 ${
+    isModelA ? 'bg-[#fbf9f6] border-b border-[#e8e2d9]' : 
+    isModelB ? 'bg-[#090d16] border-b border-slate-800' : 
+    isModelC ? 'bg-[#faf7f2] border-b border-stone-300' : 
+    'bg-white border-b border-slate-200'
+  }">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16 space-y-2">
+        <h2 class="text-xs uppercase tracking-widest font-bold ${isModelA ? 'text-[#c88770]' : isModelB ? 'text-sky-400' : 'text-stone-500'}">Conteúdo & Psicoeducação</h2>
+        <p class="text-3xl sm:text-4xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">
+          Artigos & Orientações
+        </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border">
-          <span class="text-xs font-bold uppercase" style="color: ${secondary}">Guia Informativo</span>
-          <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mt-2 mb-3" style="font-family: ${fontHeading}">Principais Cuidados e Estratégias para Escolher o Serviço Ideal</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-4">Entenda os fatores determinantes na tomada de decisão e como um planejamento adequado pode economizar tempo e recursos.</p>
-          <span class="text-xs text-slate-500 font-medium">Leitura: 4 min • Por ${name}</span>
+        
+        <div class="p-8 ${isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl' : isModelB ? 'bg-slate-900 border-slate-800 rounded-2xl' : isModelC ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border space-y-3">
+          <span class="text-xs font-bold uppercase tracking-wider ${isModelA ? 'text-[#c88770]' : isModelB ? 'text-sky-400' : 'text-stone-500'}">Guia Prático</span>
+          <h3 class="text-xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">
+            Como Identificar o Momento Certo para Iniciar um Atendimento
+          </h3>
+          <p class="${isModelB ? 'text-slate-400' : 'text-stone-600'} text-sm leading-relaxed">
+            Entenda os principais sinais, benefícios do acompanhamento precoce e o impacto positivo na qualidade de vida e tomada de decisão.
+          </p>
+          <div class="text-xs ${isModelB ? 'text-slate-500' : 'text-stone-400'} pt-2">Leitura: 4 min • Por ${name}</div>
         </div>
 
-        <div class="p-8 ${isModern ? 'bg-slate-900 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border">
-          <span class="text-xs font-bold uppercase" style="color: ${secondary}">Artigo Técnico</span>
-          <h3 class="text-xl font-bold ${isModern ? 'text-white' : 'text-slate-900'} mt-2 mb-3" style="font-family: ${fontHeading}">A Importância do Acompanhamento Especializado</h3>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm leading-relaxed mb-4">Como a assistência profissional qualificada previne problemas e assegura a máxima eficiência em cada projeto.</p>
-          <span class="text-xs text-slate-500 font-medium">Leitura: 3 min • Por ${name}</span>
+        <div class="p-8 ${isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl' : isModelB ? 'bg-slate-900 border-slate-800 rounded-2xl' : isModelC ? 'bg-white border-stone-300 rounded-none' : 'bg-slate-50 border-slate-200 rounded-2xl'} border space-y-3">
+          <span class="text-xs font-bold uppercase tracking-wider ${isModelA ? 'text-[#c88770]' : isModelB ? 'text-sky-400' : 'text-stone-500'}">Artigo Técnico</span>
+          <h3 class="text-xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">
+            A Importância do Vínculo e da Abordagem Estruturada
+          </h3>
+          <p class="${isModelB ? 'text-slate-400' : 'text-stone-600'} text-sm leading-relaxed">
+            Como o método, a escuta acolhedora e a clareza nos objetivos constroem resultados sustentáveis ao longo do processo.
+          </p>
+          <div class="text-xs ${isModelB ? 'text-slate-500' : 'text-stone-400'} pt-2">Leitura: 3 min • Por ${name}</div>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- FORMULÁRIO DE CONTATO DIRETO -->
-  <section id="contato" class="py-20 ${isModern ? 'bg-slate-900' : isEditorial ? 'bg-[#f4f2eb]' : 'bg-slate-50'}">
+  <!-- ==================== FORMULÁRIO DE CONTATO DIRETO ==================== -->
+  <section id="contato" class="py-20 md:py-28 ${
+    isModelA ? 'bg-[#f3efea]/60' : 
+    isModelB ? 'bg-[#0f172a]' : 
+    isModelC ? 'bg-[#f0ece1]' : 
+    'bg-slate-50'
+  }">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="${isModern ? 'bg-slate-950 border-slate-800' : isEditorial ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} p-8 sm:p-12 border shadow-sm">
-        <div class="text-center mb-8">
-          <h2 class="text-3xl font-extrabold ${isModern ? 'text-white' : 'text-slate-900'}" style="font-family: ${fontHeading}">Formulário de Contato Direto</h2>
-          <p class="${isModern ? 'text-slate-400' : 'text-slate-600'} text-sm mt-2">Envie sua mensagem. Seus dados são confidenciais e retornaremos o mais breve possível.</p>
+      <div class="${
+        isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl' : 
+        isModelB ? 'bg-[#090d16] border-slate-800 rounded-2xl' : 
+        isModelC ? 'bg-white border-stone-300 rounded-none' : 
+        'bg-white border-slate-200 rounded-3xl'
+      } p-8 sm:p-12 border shadow-sm space-y-8">
+        
+        <div class="text-center space-y-2">
+          <h2 class="text-3xl sm:text-4xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">
+            Solicitar Contato / Agendamento
+          </h2>
+          <p class="${isModelB ? 'text-slate-400' : 'text-stone-600'} text-sm">
+            Envie sua mensagem. Seus dados são confidenciais e retornaremos o mais breve possível.
+          </p>
         </div>
 
-        <form onsubmit="event.preventDefault(); alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');" class="space-y-4">
+        <form onsubmit="event.preventDefault(); alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');" class="space-y-5">
           <div>
-            <label class="block text-xs font-bold ${isModern ? 'text-slate-300' : 'text-slate-700'} uppercase mb-1">Nome Completo *</label>
-            <input type="text" required placeholder="Seu nome completo" class="w-full px-4 py-3 rounded-xl border ${isModern ? 'bg-slate-900 border-slate-700 text-white' : 'border-slate-300'} text-sm focus:outline-none">
+            <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">Nome Completo *</label>
+            <input type="text" required placeholder="Seu nome completo" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label class="block text-xs font-bold ${isModern ? 'text-slate-300' : 'text-slate-700'} uppercase mb-1">Telefone / WhatsApp *</label>
-              <input type="tel" required placeholder="(11) 99999-9999" class="w-full px-4 py-3 rounded-xl border ${isModern ? 'bg-slate-900 border-slate-700 text-white' : 'border-slate-300'} text-sm focus:outline-none">
+              <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">Telefone / WhatsApp *</label>
+              <input type="tel" required placeholder="(11) 99999-9999" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
             </div>
             <div>
-              <label class="block text-xs font-bold ${isModern ? 'text-slate-300' : 'text-slate-700'} uppercase mb-1">E-mail *</label>
-              <input type="email" required placeholder="seu@email.com" class="w-full px-4 py-3 rounded-xl border ${isModern ? 'bg-slate-900 border-slate-700 text-white' : 'border-slate-300'} text-sm focus:outline-none">
+              <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">E-mail *</label>
+              <input type="email" required placeholder="seu@email.com" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-bold ${isModern ? 'text-slate-300' : 'text-slate-700'} uppercase mb-1">Motivo do Contato *</label>
-            <select class="w-full px-4 py-3 rounded-xl border ${isModern ? 'bg-slate-900 border-slate-700 text-white' : 'border-slate-300'} text-sm focus:outline-none">
-              <option>Solicitação de Orçamento / Proposta</option>
-              <option>Agendamento de Consulta / Reunião</option>
-              <option>Dúvidas Gerais sobre Serviços</option>
+            <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">Motivo do Contato *</label>
+            <select class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
+              <option>Agendamento de Atendimento / Consulta</option>
+              <option>Dúvidas sobre Abordagem e Especialidades</option>
+              <option>Informações de Horários e Formatos</option>
               <option>Outros Assuntos</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-xs font-bold ${isModern ? 'text-slate-300' : 'text-slate-700'} uppercase mb-1">Mensagem / Resumo *</label>
-            <textarea rows="4" required placeholder="Descreva brevemente a sua solicitação..." class="w-full px-4 py-3 rounded-xl border ${isModern ? 'bg-slate-900 border-slate-700 text-white' : 'border-slate-300'} text-sm focus:outline-none"></textarea>
+            <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">Mensagem / Observação</label>
+            <textarea rows="4" placeholder="Descreva brevemente o que você procura..." class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]"></textarea>
           </div>
 
-          <p class="text-xs text-slate-500">Ao enviar este formulário, você concorda com a política de privacidade e o tratamento confidencial das informações.</p>
+          <p class="text-xs ${isModelB ? 'text-slate-500' : 'text-stone-500'}">
+            Ao enviar este formulário, você concorda com o tratamento ético e confidencial dos seus dados.
+          </p>
 
-          <button type="submit" class="w-full py-4 text-white font-bold ${isEditorial ? 'rounded-none' : 'rounded-xl'} shadow-md transition-all hover:opacity-90" style="background-color: ${primary}">
+          <button type="submit" class="w-full py-4 text-white font-bold ${
+            isModelC ? 'rounded-none uppercase tracking-widest text-xs' : isModelA ? 'rounded-full' : 'rounded-2xl'
+          } shadow-md transition-all hover:opacity-90 active:scale-95" style="background-color: ${primary}">
             Enviar Informações com Segurança
           </button>
         </form>
+
       </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer class="${isModern ? 'bg-black text-white' : 'bg-slate-950 text-white'} py-12 border-t border-slate-800">
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="${isModelB ? 'bg-black text-white' : isModelA ? 'bg-[#17382d] text-white' : 'bg-[#1c1917] text-white'} py-16 border-t border-black/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
       <div>
-        <p class="font-bold text-lg">${name}</p>
-        <p class="text-xs text-slate-400 mt-1">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</p>
+        <p class="font-bold text-lg font-serif" style="font-family: ${fontHeading}">${name}</p>
+        <p class="text-xs text-stone-300 mt-1">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</p>
       </div>
-      <p class="text-xs text-slate-500 text-center sm:text-right">
+      <p class="text-xs text-stone-400 text-center sm:text-right">
         © ${new Date().getFullYear()} ${name}. Todos os direitos reservados.<br>
         Tecnologia e infraestrutura por <strong>SitePronto</strong>.
       </p>

@@ -24,25 +24,25 @@ export async function POST(req: NextRequest) {
     // Renderiza o HTML completo para cada uma das 4 variantes
     const previews = {
       MODEL_A: {
-        title: 'Modelo A — Institucional Confiável',
-        description: 'Estrutura clássica, foco em autoridade e alta legibilidade com todas as seções e formulário.',
+        title: 'Modelo A — Serene Haven (Google Stitch)',
+        description: 'Design orgânico com paleta botânica e mineral (verde sábio/terracota), tons quentes de linho e tipografia Playfair Display.',
         spec: specs.MODEL_A,
         html: renderCompleteSiteHtml(data, specs.MODEL_A),
       },
       MODEL_B: {
-        title: 'Modelo B — Moderno Dark Premium',
-        description: 'Forte impacto visual, tipografia contemporânea, atmosfera noturna e cartões dinâmicos.',
+        title: 'Modelo B — Midnight Luminescence',
+        description: 'Estética noturna refinada com superfícies obsidiana, bordas bioluminescentes sutis e alto contraste.',
         spec: specs.MODEL_B,
         html: renderCompleteSiteHtml(data, specs.MODEL_B),
       },
       MODEL_C: {
-        title: 'Modelo C — Minimalista Editorial',
-        description: 'Design editorial e nobre com tipografia clássica, espaçamento generoso e elegância executiva.',
+        title: 'Modelo C — Atelier Editorial',
+        description: 'Design editorial e nobre com tipografia clássica, espaçamento generoso e elegância executiva de alta autoridade.',
         spec: specs.MODEL_C,
         html: renderCompleteSiteHtml(data, specs.MODEL_C),
       },
       MODEL_D: {
-        title: 'Modelo D — Consultoria & Alta Conversão (Stitch Pulse)',
+        title: 'Modelo D — Modern Bento Pulse',
         description: 'Estrutura moderna estilo Bento Grid, hero dinâmico focado em conversão e agendamento ágil.',
         spec: specs.MODEL_D,
         html: renderCompleteSiteHtml(data, specs.MODEL_D),
