@@ -78,6 +78,40 @@ export const ServiceItemSchema = z.object({
   order: z.number().default(0),
 });
 
+// Schema de Foto da Galeria
+export const GalleryItemSchema = z.object({
+  id: z.string().optional(),
+  url: z.string().min(1, 'URL da foto é obrigatória'),
+  title: z.string().optional(),
+  caption: z.string().optional(),
+});
+
+// Schema de Depoimento de Cliente
+export const TestimonialItemSchema = z.object({
+  id: z.string().optional(),
+  clientName: z.string().min(2, 'Nome do cliente é obrigatório'),
+  role: z.string().optional(),
+  content: z.string().min(5, 'Depoimento é obrigatório'),
+  photoUrl: z.string().optional(),
+  rating: z.number().min(1).max(5).default(5),
+});
+
+// Schema de Configuração Modular das Seções do Site
+export const SectionsConfigSchema = z.object({
+  inicio: z.boolean().default(true),
+  servicos: z.boolean().default(true),
+  'como-funciona': z.boolean().default(true),
+  sobre: z.boolean().default(true),
+  galeria: z.boolean().default(true),
+  depoimentos: z.boolean().default(true),
+  artigos: z.boolean().default(true),
+  contato: z.boolean().default(true),
+});
+
+export type GalleryItem = z.infer<typeof GalleryItemSchema>;
+export type TestimonialItem = z.infer<typeof TestimonialItemSchema>;
+export type SectionsConfig = z.infer<typeof SectionsConfigSchema>;
+
 // Schema de Dados de Onboarding
 export const OnboardingDataSchema = z.object({
   // Identificação Pessoal/Profissional
@@ -153,9 +187,24 @@ export const OnboardingDataSchema = z.object({
   visualStyle: z.enum(VisualStyles).default('moderno'),
   themePreference: z.enum(ThemeTypes).default('claro'),
   
+  // Galeria, Depoimentos e Configuração Modular
+  gallery: z.array(GalleryItemSchema).default([]),
+  testimonials: z.array(TestimonialItemSchema).default([]),
+  sectionsConfig: SectionsConfigSchema.default({
+    inicio: true,
+    servicos: true,
+    'como-funciona': true,
+    sobre: true,
+    galeria: true,
+    depoimentos: true,
+    artigos: true,
+    contato: true,
+  }),
+
   // Domínio
   hasCustomDomain: z.boolean().default(false),
   customDomainName: z.string().optional(),
+  registerDomainOnCompletion: z.boolean().default(false),
 });
 
 export type OnboardingData = z.infer<typeof OnboardingDataSchema>;

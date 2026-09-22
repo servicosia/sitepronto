@@ -20,9 +20,16 @@ export async function POST(req: NextRequest) {
     } = body;
 
     // 1. Analisar profissão para enriquecimento contextual e detecção de conselho
-    const { analyzeProfessionContext } = await import('@/lib/design-system/profession-intelligence');
+    const { 
+      analyzeProfessionContext, 
+      getContextualGallery, 
+      getContextualTestimonials 
+    } = await import('@/lib/design-system/profession-intelligence');
     const analysis = analyzeProfessionContext(profession, specialty, professionalName);
     const hasCouncil = analysis.suggestedCouncil.hasCouncil;
+
+    const contextualGallery = getContextualGallery(profession, specialty, professionalName);
+    const contextualTestimonials = getContextualTestimonials(profession, specialty, professionalName);
 
     // 2. Montar payload válido de OnboardingData
     const onboardingData = {
@@ -42,6 +49,18 @@ export async function POST(req: NextRequest) {
         { title: `Soluções em ${specialty}`, shortDescription: 'Planejamento estratégico e execução prática focada em excelência.', ctaText: 'Agendar' },
         { title: 'Consultoria Especializada', shortDescription: 'Acompanhamento dedicado com suporte contínuo para os melhores resultados.', ctaText: 'Consultar' }
       ],
+      gallery: contextualGallery,
+      testimonials: contextualTestimonials,
+      sectionsConfig: {
+        inicio: true,
+        servicos: true,
+        'como-funciona': true,
+        sobre: true,
+        galeria: true,
+        depoimentos: true,
+        artigos: true,
+        contato: true,
+      },
       hasProfessionalCouncil: hasCouncil,
       councilType: hasCouncil ? `${analysis.suggestedCouncil.councilAcronym}/SP` : undefined,
       councilNumber: hasCouncil ? '123456' : undefined,

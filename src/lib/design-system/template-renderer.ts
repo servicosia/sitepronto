@@ -1,6 +1,10 @@
 import type { OnboardingData } from '../validation/onboarding';
 import type { DesignSpec } from './specs';
-import { analyzeProfessionContext } from './profession-intelligence';
+import { 
+  analyzeProfessionContext, 
+  getContextualGallery, 
+  getContextualTestimonials 
+} from './profession-intelligence';
 
 /**
  * Mapeador de Imagens Contextuais Inteligente e Amplo (Unsplash Editorial)
@@ -27,6 +31,14 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   const images = getContextualImages(profession, specialty, data.companyName);
   const heroImage = data.coverPhotoUrl || images.hero;
   const aboutImage = data.profilePhotoUrl || images.about;
+
+  const galleryList = (data.gallery && data.gallery.length > 0)
+    ? data.gallery
+    : getContextualGallery(profession, specialty, data.companyName);
+
+  const testimonialsList = (data.testimonials && data.testimonials.length > 0)
+    ? data.testimonials
+    : getContextualTestimonials(profession, specialty, data.companyName);
 
   const isModelA = variantName === 'MODEL_A'; // Serene Haven (Inspirado em psicologia.servicos.ia.br)
   const isModelB = variantName === 'MODEL_B'; // Midnight Luminescence (Dark Stitch)
@@ -70,6 +82,11 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
     }
   ];
 
+  const isSectionActive = (sec: string): boolean => {
+    if (!data.sectionsConfig) return true;
+    return (data.sectionsConfig as any)[sec] !== false;
+  };
+
   return `
 <div class="template-wrapper ${
     isModelA ? 'bg-[#fbf9f6] text-[#1e2824]' : 
@@ -101,13 +118,15 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
       </a>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold ${isModelB ? 'text-slate-300' : isModelC ? 'text-stone-700 tracking-wider text-xs uppercase' : 'text-stone-600'}">
-        <a href="#inicio" class="hover:opacity-80 transition py-1">Início</a>
-        <a href="#servicos" class="hover:opacity-80 transition py-1">Atuação</a>
-        <a href="#como-funciona" class="hover:opacity-80 transition py-1">Como Funciona</a>
-        <a href="#sobre" class="hover:opacity-80 transition py-1">Sobre</a>
-        <a href="#artigos" class="hover:opacity-80 transition py-1">Orientações</a>
-        <a href="#contato" class="hover:opacity-80 transition py-1">Contato</a>
+      <nav class="hidden md:flex items-center space-x-6 lg:space-x-8 text-sm font-semibold ${isModelB ? 'text-slate-300' : isModelC ? 'text-stone-700 tracking-wider text-xs uppercase' : 'text-stone-600'}">
+        <a href="#inicio" data-nav-section="inicio" class="hover:opacity-80 transition py-1" style="${!isSectionActive('inicio') ? 'display: none !important;' : ''}">Início</a>
+        <a href="#servicos" data-nav-section="servicos" class="hover:opacity-80 transition py-1" style="${!isSectionActive('servicos') ? 'display: none !important;' : ''}">Atuação</a>
+        <a href="#como-funciona" data-nav-section="como-funciona" class="hover:opacity-80 transition py-1" style="${!isSectionActive('como-funciona') ? 'display: none !important;' : ''}">Como Funciona</a>
+        <a href="#sobre" data-nav-section="sobre" class="hover:opacity-80 transition py-1" style="${!isSectionActive('sobre') ? 'display: none !important;' : ''}">Sobre</a>
+        <a href="#galeria" data-nav-section="galeria" class="hover:opacity-80 transition py-1" style="${!isSectionActive('galeria') ? 'display: none !important;' : ''}">Galeria</a>
+        <a href="#depoimentos" data-nav-section="depoimentos" class="hover:opacity-80 transition py-1" style="${!isSectionActive('depoimentos') ? 'display: none !important;' : ''}">Depoimentos</a>
+        <a href="#artigos" data-nav-section="artigos" class="hover:opacity-80 transition py-1" style="${!isSectionActive('artigos') ? 'display: none !important;' : ''}">Orientações</a>
+        <a href="#contato" data-nav-section="contato" class="hover:opacity-80 transition py-1" style="${!isSectionActive('contato') ? 'display: none !important;' : ''}">Contato</a>
       </nav>
 
       <!-- CTA Action & Mobile Toggle -->
@@ -133,12 +152,14 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
     <!-- Mobile Menu Dropdown -->
     <div class="mobile-nav-menu hidden md:hidden border-t ${isModelB ? 'bg-[#090d16] border-slate-800' : isModelC ? 'bg-[#faf7f2] border-stone-300' : 'bg-white border-stone-200'} px-4 pt-3 pb-6 space-y-3 shadow-xl">
       <div class="flex flex-col space-y-2 text-sm font-semibold ${isModelB ? 'text-slate-200' : 'text-stone-800'}">
-        <a href="#inicio" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Início</a>
-        <a href="#servicos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Atuação</a>
-        <a href="#como-funciona" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Como Funciona</a>
-        <a href="#sobre" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Sobre</a>
-        <a href="#artigos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Orientações</a>
-        <a href="#contato" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition">Contato</a>
+        <a href="#inicio" data-nav-section="inicio" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('inicio') ? 'display: none !important;' : ''}">Início</a>
+        <a href="#servicos" data-nav-section="servicos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('servicos') ? 'display: none !important;' : ''}">Atuação</a>
+        <a href="#como-funciona" data-nav-section="como-funciona" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('como-funciona') ? 'display: none !important;' : ''}">Como Funciona</a>
+        <a href="#sobre" data-nav-section="sobre" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('sobre') ? 'display: none !important;' : ''}">Sobre</a>
+        <a href="#galeria" data-nav-section="galeria" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('galeria') ? 'display: none !important;' : ''}">Galeria</a>
+        <a href="#depoimentos" data-nav-section="depoimentos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('depoimentos') ? 'display: none !important;' : ''}">Depoimentos</a>
+        <a href="#artigos" data-nav-section="artigos" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('artigos') ? 'display: none !important;' : ''}">Orientações</a>
+        <a href="#contato" data-nav-section="contato" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('contato') ? 'display: none !important;' : ''}">Contato</a>
       </div>
       <div class="pt-2">
         <a href="https://wa.me/${whatsappDigits}" target="_blank" class="w-full text-center px-5 py-3 text-white text-sm font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2" style="background-color: ${primary}">
@@ -151,7 +172,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   <!-- ==================== HERO SECTION ==================== -->
   ${isModelA ? `
   <!-- HERO MODELO A (SERENE HAVEN / STITCH PSICOLOGIA) -->
-  <section id="inicio" class="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden border-b border-[#e8e2d9]">
+  <section id="inicio" data-section-id="inicio" style="${!isSectionActive('inicio') ? 'display: none !important;' : ''}" class="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden border-b border-[#e8e2d9]">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         
@@ -207,7 +228,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   </section>
   ` : isModelB ? `
   <!-- HERO MODELO B (MIDNIGHT LUMINESCENCE / DARK STITCH) -->
-  <section id="inicio" class="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden border-b border-slate-800 bg-[#090d16]">
+  <section id="inicio" data-section-id="inicio" style="${!isSectionActive('inicio') ? 'display: none !important;' : ''}" class="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden border-b border-slate-800 bg-[#090d16]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7 text-left space-y-6">
@@ -249,7 +270,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   </section>
   ` : isModelC ? `
   <!-- HERO MODELO C (ATELIER EDITORIAL / NOBREZA CLÁSSICA) -->
-  <section id="inicio" class="py-20 md:py-32 border-b border-stone-300 bg-[#faf7f2]">
+  <section id="inicio" data-section-id="inicio" style="${!isSectionActive('inicio') ? 'display: none !important;' : ''}" class="py-20 md:py-32 border-b border-stone-300 bg-[#faf7f2]">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7 space-y-6">
@@ -285,7 +306,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   </section>
   ` : `
   <!-- HERO MODELO D (MODERN BENTO PULSE / ALTA CONVERSÃO) -->
-  <section id="inicio" class="relative pt-16 pb-20 md:pt-24 md:pb-28 bg-gradient-to-b from-slate-100 via-white to-slate-50 border-b border-slate-200">
+  <section id="inicio" data-section-id="inicio" style="${!isSectionActive('inicio') ? 'display: none !important;' : ''}" class="relative pt-16 pb-20 md:pt-24 md:pb-28 bg-gradient-to-b from-slate-100 via-white to-slate-50 border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7 text-left space-y-6">
@@ -329,7 +350,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   `}
 
   <!-- ==================== ÁREAS DE ATUAÇÃO / SERVIÇOS ==================== -->
-  <section id="servicos" class="py-20 md:py-28 ${
+  <section id="servicos" data-section-id="servicos" style="${!isSectionActive('servicos') ? 'display: none !important;' : ''}" class="py-20 md:py-28 ${
     isModelA ? 'bg-[#f3efea]/60 border-b border-[#e8e2d9]' : 
     isModelB ? 'bg-[#0f172a] border-b border-slate-800' : 
     isModelC ? 'bg-[#f0ece1] border-b border-stone-300' : 
@@ -349,7 +370,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="services-cards-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         ${servicesList.map((s, index) => `
           <div class="${
             isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl p-8 hover:shadow-lg transition-all border' : 
@@ -377,7 +398,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   </section>
 
   <!-- ==================== COMO FUNCIONA ==================== -->
-  <section id="como-funciona" class="py-20 md:py-28 ${
+  <section id="como-funciona" data-section-id="como-funciona" style="${!isSectionActive('como-funciona') ? 'display: none !important;' : ''}" class="py-20 md:py-28 ${
     isModelA ? 'bg-[#fbf9f6] border-b border-[#e8e2d9]' : 
     isModelB ? 'bg-[#090d16] border-b border-slate-800' : 
     isModelC ? 'bg-[#faf7f2] border-b border-stone-300' : 
@@ -392,7 +413,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="steps-cards-grid grid grid-cols-1 md:grid-cols-3 gap-8">
         
         <!-- Step 1 -->
         <div class="p-8 ${isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl' : isModelB ? 'bg-slate-900 border-slate-800 rounded-2xl' : isModelC ? 'bg-white border-stone-300 rounded-none' : 'bg-white border-slate-200 rounded-3xl'} border text-center space-y-3">
@@ -420,7 +441,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   </section>
 
   <!-- ==================== SOBRE O PROFISSIONAL ==================== -->
-  <section id="sobre" class="py-20 md:py-28 ${
+  <section id="sobre" data-section-id="sobre" style="${!isSectionActive('sobre') ? 'display: none !important;' : ''}" class="py-20 md:py-28 ${
     isModelA ? 'bg-[#f3efea]/50 border-b border-[#e8e2d9]' : 
     isModelB ? 'bg-[#0f172a] border-b border-slate-800' : 
     isModelC ? 'bg-[#f0ece1] border-b border-stone-300' : 
@@ -464,8 +485,105 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
     </div>
   </section>
 
+  <!-- ==================== GALERIA DE FOTOS ==================== -->
+  <section id="galeria" data-section-id="galeria" style="${!isSectionActive('galeria') ? 'display: none !important;' : ''}" class="py-20 md:py-28 ${
+    isModelA ? 'bg-[#fbf9f6] border-b border-[#e8e2d9]' : 
+    isModelB ? 'bg-[#090d16] border-b border-slate-800' : 
+    isModelC ? 'bg-[#faf7f2] border-b border-stone-300' : 
+    'bg-slate-50 border-b border-slate-200'
+  }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+        <h2 class="text-xs uppercase tracking-widest font-bold ${isModelA ? 'text-[#c88770]' : isModelB ? 'text-sky-400' : 'text-stone-500'}">
+          Galeria & Estrutura
+        </h2>
+        <p class="text-3xl sm:text-4xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">
+          Registros do Nosso Espaço e Atuação
+        </p>
+        <p class="text-sm ${isModelB ? 'text-slate-400' : 'text-stone-600'}">
+          Conheça nosso ambiente e padrão de excelência preparado para o seu atendimento.
+        </p>
+      </div>
+
+      <div class="gallery-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        ${galleryList.map((item, idx) => `
+          <div class="group relative overflow-hidden ${
+            isModelA ? 'rounded-3xl border border-[#e8e2d9] shadow-sm bg-white' : 
+            isModelB ? 'rounded-2xl border border-slate-800 shadow-xl bg-slate-900/80' : 
+            isModelC ? 'rounded-none border border-stone-300 shadow-sm bg-white' : 
+            'rounded-3xl border border-slate-200 shadow-sm bg-white'
+          } cursor-pointer transition-all hover:-translate-y-1 hover:shadow-xl" onclick="openGalleryLightbox('${item.url}', '${encodeURIComponent(item.title || 'Foto ' + (idx + 1))}')">
+            <div class="aspect-[4/3] w-full overflow-hidden bg-slate-200">
+              <img src="${item.url}" alt="${item.title || 'Foto ' + (idx + 1)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+            </div>
+            <div class="p-4 ${isModelB ? 'bg-slate-900/90' : 'bg-white'} border-t ${isModelB ? 'border-slate-800' : 'border-stone-100'}">
+              <h4 class="font-bold text-sm ${isModelB ? 'text-white' : 'text-slate-900'} truncate">${item.title || 'Registro de Atendimento'}</h4>
+              ${item.caption ? `<p class="text-xs ${isModelB ? 'text-slate-400' : 'text-slate-500'} mt-0.5 truncate">${item.caption}</p>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== DEPOIMENTOS DE CLIENTES ==================== -->
+  <section id="depoimentos" data-section-id="depoimentos" style="${!isSectionActive('depoimentos') ? 'display: none !important;' : ''}" class="py-20 md:py-28 ${
+    isModelA ? 'bg-[#f3efea]/60 border-b border-[#e8e2d9]' : 
+    isModelB ? 'bg-[#0f172a] border-b border-slate-800' : 
+    isModelC ? 'bg-[#f0ece1] border-b border-stone-300' : 
+    'bg-white border-b border-slate-200'
+  }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+        <h2 class="text-xs uppercase tracking-widest font-bold ${isModelA ? 'text-[#c88770]' : isModelB ? 'text-sky-400' : 'text-stone-500'}">
+          Avaliações & Experiências
+        </h2>
+        <p class="text-3xl sm:text-4xl font-bold ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}" style="font-family: ${fontHeading}">
+          O Que Dizem Quem Já Confiou
+        </p>
+        <p class="text-sm ${isModelB ? 'text-slate-400' : 'text-stone-600'}">
+          Histórias reais de transformação, confiança e resultados conquistados.
+        </p>
+      </div>
+
+      <div class="testimonials-cards-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        ${testimonialsList.map((t) => `
+          <div class="p-8 ${
+            isModelA ? 'bg-white border-[#e8e2d9] rounded-3xl shadow-sm' : 
+            isModelB ? 'bg-slate-900/80 border-slate-800 rounded-2xl shadow-xl' : 
+            isModelC ? 'bg-white border-stone-300 rounded-none shadow-sm' : 
+            'bg-slate-50 border-slate-200 rounded-3xl shadow-sm'
+          } border flex flex-col justify-between space-y-6 hover:shadow-md transition-all">
+            <div class="space-y-4">
+              <!-- Estrelas de Avaliação -->
+              <div class="flex items-center space-x-1 text-amber-400 text-base">
+                ${'★'.repeat(t.rating || 5)}${'☆'.repeat(5 - (t.rating || 5))}
+              </div>
+              <p class="${isModelB ? 'text-slate-300' : 'text-stone-700'} text-sm leading-relaxed italic">
+                "${t.content}"
+              </p>
+            </div>
+            
+            <!-- Perfil do Cliente -->
+            <div class="flex items-center space-x-4 pt-4 border-t ${isModelB ? 'border-slate-800' : 'border-stone-100'}">
+              <img src="${t.photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'}" alt="${t.clientName}" class="w-12 h-12 ${isModelC ? 'rounded-none' : 'rounded-full'} object-cover border-2 ${isModelB ? 'border-sky-400/40' : 'border-emerald-700/20'} shrink-0">
+              <div class="min-w-0">
+                <h4 class="font-bold text-sm ${isModelB ? 'text-white' : 'text-slate-900'} truncate">${t.clientName}</h4>
+                <p class="text-xs ${isModelB ? 'text-slate-400' : 'text-slate-500'} truncate">${t.role || 'Cliente Atendido'}</p>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+    </div>
+  </section>
+
   <!-- ==================== ARTIGOS E ORIENTAÇÕES ==================== -->
-  <section id="artigos" class="py-20 md:py-28 ${
+  <section id="artigos" data-section-id="artigos" style="${!isSectionActive('artigos') ? 'display: none !important;' : ''}" class="py-20 md:py-28 ${
     isModelA ? 'bg-[#fbf9f6] border-b border-[#e8e2d9]' : 
     isModelB ? 'bg-[#090d16] border-b border-slate-800' : 
     isModelC ? 'bg-[#faf7f2] border-b border-stone-300' : 
@@ -509,7 +627,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   </section>
 
   <!-- ==================== FORMULÁRIO DE CONTATO DIRETO ==================== -->
-  <section id="contato" class="py-20 md:py-28 ${
+  <section id="contato" data-section-id="contato" style="${!isSectionActive('contato') ? 'display: none !important;' : ''}" class="py-20 md:py-28 ${
     isModelA ? 'bg-[#f3efea]/60' : 
     isModelB ? 'bg-[#0f172a]' : 
     isModelC ? 'bg-[#f0ece1]' : 
@@ -609,6 +727,7 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   const primary = data.primaryColor || '#0f172a';
   const secondary = data.secondaryColor || '#2563eb';
   const accent = data.accentColor || '#10b981';
+  const whatsappDigits = (data.whatsapp || '').replace(/[^0-9]/g, '');
 
   const htmlA = renderSingleTemplateHtml(data, 'MODEL_A');
   const htmlB = renderSingleTemplateHtml(data, 'MODEL_B');
@@ -665,7 +784,20 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     ${htmlD}
   </div>
 
-  <!-- SCRIPT DE NAVEGAÇÃO SUAVE E TROCA DE TEMPLATE -->
+  <!-- LIGHTBOX MODAL PARA GALERIA -->
+  <div id="galleryLightbox" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="closeGalleryLightbox()">
+    <div class="relative max-w-4xl w-full bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-700" onclick="event.stopPropagation()">
+      <button onclick="closeGalleryLightbox()" aria-label="Fechar" class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/90 transition text-lg font-bold">✕</button>
+      <div class="max-h-[75vh] overflow-hidden flex items-center justify-center bg-black">
+        <img id="lightboxImg" src="" alt="" class="max-h-[75vh] w-auto object-contain">
+      </div>
+      <div class="p-4 bg-slate-900 text-white">
+        <h4 id="lightboxTitle" class="font-bold text-base"></h4>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT DE NAVEGAÇÃO SUAVE, MODULARIDADE E TROCA DE TEMPLATE -->
   <script>
     // 1. Inicializa o template ativo
     (function() {
@@ -736,6 +868,139 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
         }
       }
     });
+
+    // 4. Lightbox modal controls
+    window.openGalleryLightbox = function(url, encodedTitle) {
+      const modal = document.getElementById('galleryLightbox');
+      const img = document.getElementById('lightboxImg');
+      const title = document.getElementById('lightboxTitle');
+      if (modal && img && title) {
+        img.src = url;
+        title.innerText = decodeURIComponent(encodedTitle || '');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+      }
+    };
+
+    window.closeGalleryLightbox = function() {
+      const modal = document.getElementById('galleryLightbox');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
+      }
+    };
+
+    // 5. Aplicação modular de seções (ativação/desativação sincronizada com /master)
+    function applySectionsConfig() {
+      try {
+        const raw = localStorage.getItem('site_sections_config');
+        if (!raw) return;
+        const config = JSON.parse(raw);
+        const sections = ['inicio', 'servicos', 'como-funciona', 'sobre', 'galeria', 'depoimentos', 'artigos', 'contato'];
+        sections.forEach(function(sec) {
+          const isVisible = config[sec] !== false;
+          document.querySelectorAll('[data-section-id="' + sec + '"]').forEach(function(el) {
+            el.style.display = isVisible ? '' : 'none';
+          });
+          document.querySelectorAll('[data-nav-section="' + sec + '"]').forEach(function(link) {
+            link.style.display = isVisible ? '' : 'none';
+          });
+        });
+      } catch (err) {
+        console.error('Erro ao sincronizar seções modulares:', err);
+      }
+    }
+
+    // 6. Hidratação dinâmica de cards (adição/remoção feita no /master)
+    function applyCustomCards() {
+      try {
+        // A. Áreas de Atuação
+        const rawServices = localStorage.getItem('site_services');
+        if (rawServices) {
+          const services = JSON.parse(rawServices);
+          if (Array.isArray(services) && services.length > 0) {
+            document.querySelectorAll('.services-cards-grid').forEach(function(grid) {
+              grid.innerHTML = services.map(function(s, idx) {
+                const icon = idx === 0 ? '✦' : idx === 1 ? '✧' : '❖';
+                return '<div class="p-8 rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-all">' +
+                  '<div class="w-12 h-12 rounded-2xl text-white flex items-center justify-center font-bold mb-6 text-xl shadow-sm" style="background-color: var(--primary-color, #0f172a)">' +
+                    icon +
+                  '</div>' +
+                  '<h3 class="text-xl font-bold text-slate-900 mb-3">' + (s.title || '') + '</h3>' +
+                  '<p class="text-slate-600 text-sm leading-relaxed mb-6">' + (s.shortDescription || '') + '</p>' +
+                  '<a href="https://wa.me/${whatsappDigits}?text=' + encodeURIComponent('Olá, gostaria de saber mais sobre ' + (s.title || '')) + '" target="_blank" class="text-sm font-bold inline-flex items-center gap-1 hover:underline text-slate-900">' +
+                    (s.ctaText || 'Saber mais') + ' <span>→</span>' +
+                  '</a>' +
+                '</div>';
+              }).join('');
+            });
+          }
+        }
+
+        // B. Galeria de Fotos
+        const rawGallery = localStorage.getItem('site_gallery');
+        if (rawGallery) {
+          const gallery = JSON.parse(rawGallery);
+          if (Array.isArray(gallery) && gallery.length > 0) {
+            document.querySelectorAll('.gallery-cards-grid').forEach(function(grid) {
+              grid.innerHTML = gallery.map(function(item, idx) {
+                const title = item.title || ('Foto ' + (idx + 1));
+                const captionHtml = item.caption ? '<p class="text-xs text-slate-500 mt-0.5 truncate">' + item.caption + '</p>' : '';
+                return '<div class="group relative overflow-hidden rounded-3xl border border-slate-200 shadow-sm bg-white cursor-pointer transition-all hover:-translate-y-1 hover:shadow-xl" onclick="openGalleryLightbox(\'' + item.url + '\', \'' + encodeURIComponent(title) + '\')">' +
+                  '<div class="aspect-[4/3] w-full overflow-hidden bg-slate-200">' +
+                    '<img src="' + item.url + '" alt="' + title + '" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">' +
+                  '</div>' +
+                  '<div class="p-4 bg-white border-t border-slate-100">' +
+                    '<h4 class="font-bold text-sm text-slate-900 truncate">' + title + '</h4>' +
+                    captionHtml +
+                  '</div>' +
+                '</div>';
+              }).join('');
+            });
+          }
+        }
+
+        // C. Depoimentos
+        const rawTestimonials = localStorage.getItem('site_testimonials');
+        if (rawTestimonials) {
+          const testimonials = JSON.parse(rawTestimonials);
+          if (Array.isArray(testimonials) && testimonials.length > 0) {
+            document.querySelectorAll('.testimonials-cards-grid').forEach(function(grid) {
+              grid.innerHTML = testimonials.map(function(t) {
+                const rating = t.rating || 5;
+                const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+                const photo = t.photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+                return '<div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm flex flex-col justify-between space-y-6 hover:shadow-md transition-all">' +
+                  '<div class="space-y-4">' +
+                    '<div class="flex items-center space-x-1 text-amber-400 text-base">' +
+                      stars +
+                    '</div>' +
+                    '<p class="text-slate-700 text-sm leading-relaxed italic">"' +
+                      (t.content || '') +
+                    '"</p>' +
+                  '</div>' +
+                  '<div class="flex items-center space-x-4 pt-4 border-t border-slate-100">' +
+                    '<img src="' + photo + '" alt="' + (t.clientName || '') + '" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-700/20 shrink-0">' +
+                    '<div class="min-w-0">' +
+                      '<h4 class="font-bold text-sm text-slate-900 truncate">' + (t.clientName || '') + '</h4>' +
+                      '<p class="text-xs text-slate-500 truncate">' + (t.role || 'Cliente Atendido') + '</p>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>';
+              }).join('');
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao hidratar cards customizados:', err);
+      }
+    }
+
+    // Executa ao inicializar
+    applySectionsConfig();
+    applyCustomCards();
   </script>
 
 </body>

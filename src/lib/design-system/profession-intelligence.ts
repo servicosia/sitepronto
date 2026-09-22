@@ -642,3 +642,98 @@ export function analyzeProfessionContext(
     },
   };
 }
+
+export interface GalleryImageSuggestion {
+  url: string;
+  title: string;
+  caption?: string;
+}
+
+export interface TestimonialSuggestion {
+  clientName: string;
+  role: string;
+  content: string;
+  photoUrl: string;
+  rating: number;
+}
+
+/**
+ * Curadoria inteligente de fotos contextuais para a Galeria de Fotos
+ */
+export function getContextualGallery(profession?: string, specialty?: string, companyName?: string): GalleryImageSuggestion[] {
+  const norm = normalizeText(`${profession || ''} ${specialty || ''} ${companyName || ''}`);
+
+  if (norm.includes('psico') || norm.includes('terap') || norm.includes('saude mental')) {
+    return [
+      { url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=800&q=80', title: 'Espaço de Escuta Acolhedor', caption: 'Ambiente planejado para sigilo e conforto' },
+      { url: 'https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=800&q=80', title: 'Consultório Humanizado', caption: 'Mobiliário ergonômico e luz natural' },
+      { url: 'https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=800&q=80', title: 'Atendimento Online Seguro', caption: 'Tecnologia criptografada e privacidade' },
+      { url: 'https://images.unsplash.com/photo-1516307365426-bea591f05011?auto=format&fit=crop&w=800&q=80', title: 'Harmonia & Bem-Estar', caption: 'Abordagem centrada na transformação da pessoa' }
+    ];
+  }
+
+  if (norm.includes('advog') || norm.includes('jurid') || norm.includes('direito') || norm.includes('oab')) {
+    return [
+      { url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80', title: 'Sala de Reuniões & Negociação', caption: 'Estrutura reservada para alinhamentos estratégicos' },
+      { url: 'https://images.unsplash.com/photo-1453733190371-0a9bedd82893?auto=format&fit=crop&w=800&q=80', title: 'Acervo Técnico e Biblioteca', caption: 'Pesquisa jurisprudencial e doutrinária sólida' },
+      { url: 'https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&w=800&q=80', title: 'Análise Documental Rigorosa', caption: 'Auditoria minuciosa e segurança jurídica' },
+      { url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80', title: 'Sede Corporativa', caption: 'Localização privilegiada e fácil acesso' }
+    ];
+  }
+
+  if (norm.includes('churras') || norm.includes('carne') || norm.includes('buffet') || norm.includes('gastronom')) {
+    return [
+      { url: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80', title: 'Cortes Especiais na Parrilla', caption: 'Ponto perfeito e marmoreio nobre selecionado' },
+      { url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80', title: 'Apresentação & Finalização', caption: 'Experiência gastronômica completa para convidados' },
+      { url: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=800&q=80', title: 'Fogo de Chão & Tradição', caption: 'Técnicas artesanais de cocção lenta' },
+      { url: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80', title: 'Eventos Corporativos e Sociais', caption: 'Buffet estruturado para grupos de alta exigência' }
+    ];
+  }
+
+  if (norm.includes('medic') || norm.includes('clinica') || norm.includes('doutor') || norm.includes('dentist')) {
+    return [
+      { url: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80', title: 'Consultório Moderno', caption: 'Tecnologia avançada para seu diagnóstico' },
+      { url: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=800&q=80', title: 'Recepção e Conforto', caption: 'Espaço climatizado e atendimento cordial' },
+      { url: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80', title: 'Equipamentos de Precisão', caption: 'Segurança sanitária e alto rigor técnico' },
+      { url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80', title: 'Cuidado Humanizado', caption: 'Acolhimento empático em todas as etapas' }
+    ];
+  }
+
+  // Padrão de Alta Qualidade Corporativa / Geral
+  return [
+    { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80', title: 'Estrutura Executiva', caption: 'Ambiente corporativo de alta performance' },
+    { url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80', title: 'Tecnologia & Inovação', caption: 'Ferramentas modernas para agilidade nos processos' },
+    { url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80', title: 'Atendimento Consultivo', caption: 'Foco total no diagnóstico e metas do cliente' },
+    { url: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80', title: 'Reuniões Estratégicas', caption: 'Alinhamento periódico com relatórios e clareza' }
+  ];
+}
+
+/**
+ * Curadoria de Depoimentos Realistas e Humanizados
+ */
+export function getContextualTestimonials(profession?: string, specialty?: string, companyName?: string): TestimonialSuggestion[] {
+  return [
+    {
+      clientName: 'Mariana Souza',
+      role: 'Cliente Atendida',
+      content: 'Atendimento impecável e de altíssimo nível. A escuta atenta, o preparo técnico e a clareza em cada orientação me trouxeram total confiança.',
+      photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      rating: 5,
+    },
+    {
+      clientName: 'Carlos Eduardo Mendes',
+      role: 'Empresário / Gestor',
+      content: 'Profissional pontual, ético e extremamente assertivo nas soluções. Conseguiu resolver com maestria o que há meses estávamos buscando.',
+      photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+      rating: 5,
+    },
+    {
+      clientName: 'Fernanda Oliveira',
+      role: 'Atendimento Individual',
+      content: 'Superou todas as minhas expectativas. O ambiente é seguro, acolhedor e os resultados foram visíveis logo nas primeiras etapas. Recomendo de olhos fechados!',
+      photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+      rating: 5,
+    }
+  ];
+}
+

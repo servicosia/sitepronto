@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { VercelProvider } from '@/lib/providers/deployment/vercel';
 import { NeonProvider } from '@/lib/providers/database/neon';
+import { CloudflareProvider } from '@/lib/providers/domains/cloudflare';
 
-// Excluir Projeto/Site da Plataforma, Vercel e Neon
+// Excluir Projeto/Site da Plataforma, Vercel, Neon e Cloudflare
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -34,6 +35,12 @@ export async function DELETE(req: NextRequest) {
     const neon = new NeonProvider();
     if (site.neonProjectId) {
       await neon.deleteDatabase(site.neonProjectId);
+    }
+
+    // 3. Exclusão no Cloudflare
+    const cloudflare = new CloudflareProvider();
+    if (site.customDomain) {
+      await cloudflare.deleteZoneByDomain(site.customDomain);
     }
 
     // 3. Exclui steps, jobs e o registro do Site no Banco Central

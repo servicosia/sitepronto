@@ -31,6 +31,38 @@ export default function ProgressoPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Controle de abertura da aba do Registro.br
+  const [domainToRegister, setDomainToRegister] = useState<{ domain: string; url: string } | null>(null);
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('registerDomainOnCompletion');
+      if (stored) {
+        setDomainToRegister(JSON.parse(stored));
+      } else {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('registerDomain') === '1' && siteData?.customDomain) {
+          setDomainToRegister({
+            domain: siteData.customDomain,
+            url: `https://registro.br/busca/?query=${encodeURIComponent(siteData.customDomain)}`,
+          });
+        }
+      }
+    } catch {}
+  }, [siteData]);
+
+  useEffect(() => {
+    if (siteData?.completed && domainToRegister && !hasAutoOpened) {
+      setHasAutoOpened(true);
+      try {
+        window.open(domainToRegister.url, '_blank');
+      } catch {
+        console.warn('Bloqueador de popup ativo; botão manual disponível na tela.');
+      }
+    }
+  }, [siteData?.completed, domainToRegister, hasAutoOpened]);
+
   useEffect(() => {
     if (!siteId) return;
 
@@ -258,6 +290,32 @@ export default function ProgressoPage() {
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </a>
               </div>
+
+              {/* Banner de Conclusão do Registro de Domínio no Registro.br */}
+              {domainToRegister && (
+                <div className="mt-4 p-5 bg-white/90 rounded-2xl border-2 border-amber-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold text-[11px] uppercase tracking-wider">
+                      Registro.br • Etapa Final
+                    </span>
+                    <h4 className="font-bold text-slate-900 text-sm">
+                      Conclua o Registro de <span className="text-amber-700 font-mono underline">{domainToRegister.domain}</span>
+                    </h4>
+                    <p className="text-xs text-slate-600">
+                      Uma nova aba foi aberta para você registrar este domínio no Registro.br. Se o navegador bloqueou, utilize o botão ao lado.
+                    </p>
+                  </div>
+                  <a
+                    href={domainToRegister.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="shrink-0 px-5 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2"
+                  >
+                    <span>Registrar Domínio Agora</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              )}
             </div>
           )}
 

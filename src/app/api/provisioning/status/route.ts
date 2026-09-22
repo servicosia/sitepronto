@@ -34,6 +34,8 @@ export async function GET(req: NextRequest) {
       status: site.status,
       githubRepoUrl: site.githubRepoUrl,
       vercelUrl: site.vercelUrl,
+      customDomain: site.customDomain,
+      domainStatus: site.domainStatus,
       lastError: site.lastError,
       steps: site.steps.map((s) => ({
         step: s.step,

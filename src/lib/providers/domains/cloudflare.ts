@@ -216,4 +216,55 @@ export class CloudflareProvider {
       });
     }
   }
+
+  /**
+   * Exclui uma zona DNS específica pelo seu zoneId
+   */
+  async deleteZone(zoneId: string): Promise<boolean> {
+    if (!this.apiToken || !zoneId || zoneId.startsWith('zone_')) return true;
+    try {
+      const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${this.apiToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+      return Boolean(data.success);
+    } catch (err: any) {
+      console.warn(`[CloudflareProvider] Erro ao excluir zona ${zoneId}:`, err.message);
+      return false;
+    }
+  }
+
+  /**
+   * Localiza e exclui a zona DNS associada a um domínio raiz no Cloudflare
+   */
+  async deleteZoneByDomain(domain: string): Promise<boolean> {
+    const { rootDomain } = CloudflareProvider.normalizeDomain(domain);
+    if (!this.apiToken) return true;
+
+    try {
+      const listRes = await fetch(`https://api.cloudflare.com/client/v4/zones?name=${rootDomain}`, {
+        headers: {
+          Authorization: `Bearer ${this.apiToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const listData = await listRes.json();
+      if (listData.success && listData.result && listData.result.length > 0) {
+        let allDeleted = true;
+        for (const zone of listData.result) {
+          const deleted = await this.deleteZone(zone.id);
+          if (!deleted) allDeleted = false;
+        }
+        return allDeleted;
+      }
+      return true;
+    } catch (err: any) {
+      console.warn(`[CloudflareProvider] Erro ao excluir zona do domínio ${rootDomain}:`, err.message);
+      return false;
+    }
+  }
 }

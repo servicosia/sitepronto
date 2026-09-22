@@ -69,6 +69,30 @@ export class NeonProvider implements DatabaseProvider {
     }
   }
 
+  async updateProjectName(projectId: string, newName: string): Promise<boolean> {
+    if (!this.apiKey || !projectId || projectId.startsWith('neon_')) return true;
+    try {
+      const cleanName = newName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      const res = await fetch(`https://console.neon.tech/api/v2/projects/${projectId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          project: {
+            name: cleanName.startsWith('site-') ? cleanName : `site-${cleanName}`,
+          },
+        }),
+      });
+      return res.status === 200 || res.status === 204;
+    } catch (err: any) {
+      console.warn(`[NeonProvider] Falha ao atualizar nome do projeto Neon ${projectId}:`, err.message);
+      return false;
+    }
+  }
+
   async deleteDatabase(projectId: string): Promise<boolean> {
     if (!this.apiKey || !projectId || projectId.startsWith('neon_')) return false;
     try {

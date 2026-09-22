@@ -16,16 +16,25 @@ import {
   Palette, 
   Eye, 
   Layers, 
-  Loader2 
+  Loader2,
+  Image as ImageIcon,
+  MessageSquare,
+  Plus,
+  Trash2,
+  CheckCircle2,
+  Search,
+  Star,
+  ExternalLink,
+  Briefcase
 } from 'lucide-react';
-import { OnboardingData } from '@/lib/validation/onboarding';
+import { OnboardingData, SectionsConfig, GalleryItem, TestimonialItem } from '@/lib/validation/onboarding';
 import { analyzeProfessionContext } from '@/lib/design-system/profession-intelligence';
 
 const steps = [
   { id: 1, name: 'Identificação', desc: 'Nome e Atividade' },
   { id: 2, name: 'Especialidades', desc: 'Resumo e Atuação' },
-  { id: 3, name: 'Serviços', desc: 'Áreas e Ofertas' },
-  { id: 4, name: 'Contatos', desc: 'WhatsApp e Local' },
+  { id: 3, name: 'Módulos & Conteúdo', desc: 'Seções, Serviços e Galeria' },
+  { id: 4, name: 'Domínio & Contatos', desc: 'Registro.br e WhatsApp' },
   { id: 5, name: 'Identidade', desc: 'Cores e Estilo' },
   { id: 6, name: 'Modelos de UI', desc: 'Escolha seu Design' },
   { id: 7, name: 'Revisão', desc: 'Confirmação Final' },
@@ -65,6 +74,40 @@ function OnboardingContent() {
   const [stitchEngineUsed, setStitchEngineUsed] = useState<string>('GoogleStitch');
   const [previewsData, setPreviewsData] = useState<Record<string, { title: string; description: string; html: string }>>({});
 
+  // Estados de verificação de domínio (Registro.br isavail)
+  const [checkingDomain, setCheckingDomain] = useState(false);
+  const [domainVerified, setDomainVerified] = useState(false);
+  const [domainCheckResult, setDomainCheckResult] = useState<{
+    available: boolean;
+    status: number;
+    message: string;
+    domain: string;
+    suggestions?: string[];
+    registrationUrl?: string;
+  } | null>(null);
+
+  async function checkDomainAvailability(domainToCheck?: string) {
+    const raw = domainToCheck || formData.customDomainName;
+    if (!raw || !raw.trim()) return;
+    setCheckingDomain(true);
+    try {
+      const res = await fetch(`/api/domain/check-availability?domain=${encodeURIComponent(raw.trim())}`);
+      const data = await res.json();
+      setDomainCheckResult(data);
+      setDomainVerified(true);
+    } catch {
+      setDomainCheckResult({
+        available: false,
+        status: -1,
+        domain: raw,
+        message: 'Erro de conexão ao consultar Registro.br.',
+      });
+      setDomainVerified(true);
+    } finally {
+      setCheckingDomain(false);
+    }
+  }
+
   // Estado do formulário de onboarding
   const [formData, setFormData] = useState<Partial<OnboardingData>>({
     fullName: '',
@@ -94,6 +137,84 @@ function OnboardingContent() {
         ctaText: 'Falar no WhatsApp',
         active: true,
         order: 1,
+      },
+      {
+        title: 'Avaliação & Diagnóstico Técnico',
+        shortDescription: 'Mapeamento estratégico e planejamento estruturado para resultados consistentes.',
+        icon: 'Target',
+        ctaText: 'Agendar Avaliação',
+        active: true,
+        order: 2,
+      },
+      {
+        title: 'Acompanhamento Contínuo',
+        shortDescription: 'Suporte dedicado e orientação periódica para evolução sustentável.',
+        icon: 'Shield',
+        ctaText: 'Falar no WhatsApp',
+        active: true,
+        order: 3,
+      }
+    ],
+    sectionsConfig: {
+      inicio: true,
+      servicos: true,
+      'como-funciona': true,
+      sobre: true,
+      galeria: true,
+      depoimentos: true,
+      artigos: true,
+      contato: true,
+    },
+    gallery: [
+      {
+        id: '1',
+        url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+        title: 'Ambiente de Atendimento',
+        caption: 'Espaço climatizado, confortável e com acessibilidade garantida.',
+      },
+      {
+        id: '2',
+        url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80',
+        title: 'Recepção e Acolhimento',
+        caption: 'Recepção ampla para clientes com pontualidade e tranquilidade.',
+      },
+      {
+        id: '3',
+        url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
+        title: 'Estrutura Moderna',
+        caption: 'Equipamentos e tecnologia para garantir precisão e agilidade.',
+      },
+      {
+        id: '4',
+        url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+        title: 'Consultoria e Planejamento',
+        caption: 'Foco em soluções personalizadas e atendimento humanizado.',
+      }
+    ],
+    testimonials: [
+      {
+        id: '1',
+        clientName: 'Mariana Mendonça',
+        role: 'Cliente Atendida',
+        content: 'Excelente profissional! O atendimento superou todas as minhas expectativas em rapidez, atenção e dedicação.',
+        photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80',
+        rating: 5,
+      },
+      {
+        id: '2',
+        clientName: 'Carlos Eduardo Ramos',
+        role: 'Empresário',
+        content: 'A clareza nas orientações e a postura ética fizeram toda a diferença. Recomendo de olhos fechados!',
+        photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+        rating: 5,
+      },
+      {
+        id: '3',
+        clientName: 'Fernanda Vasconcelos',
+        role: 'Profissional Liberal',
+        content: 'Estrutura impecável e pontualidade. Me senti muito bem acolhida e os resultados foram visíveis desde o início.',
+        photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
+        rating: 5,
       }
     ],
     primaryColor: '#0f172a',
@@ -102,6 +223,7 @@ function OnboardingContent() {
     visualStyle: 'moderno',
     themePreference: 'claro',
     hasCustomDomain: false,
+    registerDomainOnCompletion: false,
   });
 
   // Carrega dados salvos
@@ -240,6 +362,77 @@ function OnboardingContent() {
     setFormData((prev) => ({ ...prev, services: updated }));
   }
 
+  function toggleSection(key: keyof SectionsConfig) {
+    setFormData((prev) => ({
+      ...prev,
+      sectionsConfig: {
+        inicio: prev.sectionsConfig?.inicio ?? true,
+        servicos: prev.sectionsConfig?.servicos ?? true,
+        'como-funciona': prev.sectionsConfig?.['como-funciona'] ?? true,
+        sobre: prev.sectionsConfig?.sobre ?? true,
+        galeria: prev.sectionsConfig?.galeria ?? true,
+        depoimentos: prev.sectionsConfig?.depoimentos ?? true,
+        artigos: prev.sectionsConfig?.artigos ?? true,
+        contato: prev.sectionsConfig?.contato ?? true,
+        [key]: !((prev.sectionsConfig as any)?.[key] ?? true),
+      },
+    }));
+  }
+
+  function addGalleryPhoto() {
+    setFormData((prev) => ({
+      ...prev,
+      gallery: [
+        ...(prev.gallery || []),
+        {
+          id: String(Date.now()),
+          url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+          title: 'Nova Foto da Estrutura',
+          caption: 'Registro do nosso atendimento e espaço.',
+        }
+      ]
+    }));
+  }
+
+  function updateGalleryPhoto(index: number, field: string, value: string) {
+    const updated = [...(formData.gallery || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData((prev) => ({ ...prev, gallery: updated }));
+  }
+
+  function removeGalleryPhoto(index: number) {
+    const updated = (formData.gallery || []).filter((_, i) => i !== index);
+    setFormData((prev) => ({ ...prev, gallery: updated }));
+  }
+
+  function addTestimonial() {
+    setFormData((prev) => ({
+      ...prev,
+      testimonials: [
+        ...(prev.testimonials || []),
+        {
+          id: String(Date.now()),
+          clientName: 'Novo Cliente',
+          role: 'Cliente Atendido',
+          content: 'Excelente atendimento, recomendo muito pelo profissionalismo e atenção!',
+          photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+          rating: 5,
+        }
+      ]
+    }));
+  }
+
+  function updateTestimonial(index: number, field: string, value: any) {
+    const updated = [...(formData.testimonials || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData((prev) => ({ ...prev, testimonials: updated }));
+  }
+
+  function removeTestimonial(index: number) {
+    const updated = (formData.testimonials || []).filter((_, i) => i !== index);
+    setFormData((prev) => ({ ...prev, testimonials: updated }));
+  }
+
   async function handleFinalizeAndProvision() {
     if (!accountEmail || !accountPassword) {
       alert('Por favor, informe seu e-mail e crie uma senha para acessar o painel administrativo do seu site.');
@@ -268,8 +461,19 @@ function OnboardingContent() {
         return;
       }
 
+      // Se optou por registrar o domínio, salva no sessionStorage
+      if (formData.registerDomainOnCompletion && formData.customDomainName) {
+        try {
+          sessionStorage.setItem('registerDomainOnCompletion', JSON.stringify({
+            domain: formData.customDomainName,
+            url: domainCheckResult?.registrationUrl || `https://registro.br/busca/?query=${encodeURIComponent(formData.customDomainName)}`,
+          }));
+        } catch {}
+      }
+
       // Redireciona para tela de progresso em tempo real
-      router.push(`/progresso/${result.siteId}`);
+      const regParam = formData.registerDomainOnCompletion ? '?registerDomain=1' : '';
+      router.push(`/progresso/${result.siteId}${regParam}`);
     } catch (err) {
       alert('Falha ao conectar com o servidor.');
       setProvisioning(false);
@@ -507,150 +711,605 @@ function OnboardingContent() {
             </div>
           )}
 
-          {/* ETAPA 3: Serviços */}
+          {/* ETAPA 3: Módulos, Seções & Conteúdo */}
           {currentStep === 3 && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-slate-900">Serviços / Áreas de Atuação</h2>
-                  <p className="text-slate-600 text-sm mt-1">Cadastre os serviços que serão exibidos nos cards do site.</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={addService}
-                  className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800"
-                >
-                  + Adicionar Serviço
-                </button>
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">Módulos, Seções & Conteúdo do Site</h2>
+                <p className="text-slate-600 text-sm mt-1">
+                  Ative ou desative as seções que farão parte do seu site e gerencie a quantidade de cards, fotos e depoimentos.
+                </p>
               </div>
 
-              <div className="space-y-4">
-                {(formData.services || []).map((service, index) => (
-                  <div key={index} className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-slate-700">Serviço #{index + 1}</span>
-                      {formData.services!.length > 1 && (
+              {/* 1. ATIVAÇÃO / DESATIVAÇÃO DE SEÇÕES (MODULARIDADE) */}
+              <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                      <Layers className="w-5 h-5 text-slate-700" />
+                      Estrutura de Seções do Site
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Clique no botão de cada seção para ativá-la ou ocultá-la no menu e na página do seu site.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                  {[
+                    { key: 'inicio', label: 'Início (Hero Banner)', desc: 'Apresentação principal e chamada de ação' },
+                    { key: 'servicos', label: 'Áreas de Atuação', desc: 'Cards de serviços com botão WhatsApp' },
+                    { key: 'como-funciona', label: 'Como Funciona', desc: 'Passo a passo do seu atendimento' },
+                    { key: 'sobre', label: 'Sobre Nós', desc: 'Perfil profissional, história e horários' },
+                    { key: 'galeria', label: '🖼️ Galeria de Fotos', desc: 'Fotos do espaço físico e instalações' },
+                    { key: 'depoimentos', label: '💬 Depoimentos', desc: 'Avaliações reais de clientes com fotos' },
+                    { key: 'artigos', label: 'Orientações / Artigos', desc: 'Conteúdo informativo e esclarecimentos' },
+                    { key: 'contato', label: 'Contato & Local', desc: 'Formulário direto e botão WhatsApp' },
+                  ].map((sec) => {
+                    const isActive = (formData.sectionsConfig as any)?.[sec.key] !== false;
+                    return (
+                      <div
+                        key={sec.key}
+                        onClick={() => toggleSection(sec.key as keyof SectionsConfig)}
+                        className={`p-3.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                          isActive
+                            ? 'border-emerald-600 bg-emerald-50/50 shadow-xs'
+                            : 'border-slate-200 bg-slate-50 opacity-60 hover:opacity-80'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className={`text-xs font-bold ${isActive ? 'text-emerald-950' : 'text-slate-600'}`}>
+                            {sec.label}
+                          </span>
+                          <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                            isActive ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-slate-700'
+                          }`}>
+                            {isActive ? 'Ativa' : 'Oculta'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 leading-snug">
+                          {sec.desc}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. CARDS DE SERVIÇOS / ÁREAS DE ATUAÇÃO */}
+              {formData.sectionsConfig?.servicos !== false && (
+                <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div>
+                      <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                        <Briefcase className="w-5 h-5 text-slate-700" />
+                        Cards da Seção de Serviços / Atuação
+                        <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                          {formData.services?.length || 0} cards ativos
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Adicione ou remova cards conforme a necessidade da sua empresa.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addService}
+                      className="px-3.5 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 flex items-center gap-1.5 self-start sm:self-auto shadow-sm"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Adicionar Card de Serviço
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {(formData.services || []).map((service, index) => (
+                      <div key={index} className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col justify-between space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-xs text-slate-700">Card #{index + 1}</span>
+                          {formData.services!.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeService(index)}
+                              className="text-xs text-red-600 hover:text-red-800 font-semibold flex items-center gap-1"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" /> Remover
+                            </button>
+                          )}
+                        </div>
+                        <div className="space-y-2.5">
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">Título do Card</label>
+                            <input
+                              type="text"
+                              value={service.title}
+                              onChange={(e) => updateService(index, 'title', e.target.value)}
+                              placeholder="Ex: Consultoria Personalizada"
+                              className="mt-0.5 block w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-1 focus:ring-slate-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">Texto do Botão (CTA)</label>
+                            <input
+                              type="text"
+                              value={service.ctaText}
+                              onChange={(e) => updateService(index, 'ctaText', e.target.value)}
+                              placeholder="Ex: Falar no WhatsApp"
+                              className="mt-0.5 block w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-1 focus:ring-slate-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">Descrição Curta</label>
+                            <textarea
+                              rows={2}
+                              value={service.shortDescription}
+                              onChange={(e) => updateService(index, 'shortDescription', e.target.value)}
+                              placeholder="Resumo das atividades..."
+                              className="mt-0.5 block w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-1 focus:ring-slate-900"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 3. GALERIA DE FOTOS DO ESPAÇO & ATUAÇÃO */}
+              {formData.sectionsConfig?.galeria !== false && (
+                <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div>
+                      <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                        <ImageIcon className="w-5 h-5 text-slate-700" />
+                        Galeria de Fotos do Espaço & Atuação
+                        <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                          {formData.gallery?.length || 0} fotos cadastradas
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Insira fotos do seu consultório, oficina, loja ou equipe para transmitir credibilidade.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addGalleryPhoto}
+                      className="px-3.5 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 flex items-center gap-1.5 self-start sm:self-auto shadow-sm"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Adicionar Foto à Galeria
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {(formData.gallery || []).map((photo, index) => (
+                      <div key={photo.id || index} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-col justify-between space-y-3">
+                        <div className="aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-200 relative border border-slate-300">
+                          <img
+                            src={photo.url}
+                            alt={photo.title || 'Foto'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLElement).setAttribute('src', 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80');
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">URL da Imagem</label>
+                            <input
+                              type="text"
+                              value={photo.url}
+                              onChange={(e) => updateGalleryPhoto(index, 'url', e.target.value)}
+                              placeholder="https://..."
+                              className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">Título da Foto</label>
+                            <input
+                              type="text"
+                              value={photo.title || ''}
+                              onChange={(e) => updateGalleryPhoto(index, 'title', e.target.value)}
+                              placeholder="Ex: Recepção Principal"
+                              className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">Legenda Curta</label>
+                            <input
+                              type="text"
+                              value={photo.caption || ''}
+                              onChange={(e) => updateGalleryPhoto(index, 'caption', e.target.value)}
+                              placeholder="Ex: Ambiente climatizado"
+                              className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                            />
+                          </div>
+                        </div>
                         <button
                           type="button"
-                          onClick={() => removeService(index)}
-                          className="text-xs text-red-600 font-semibold hover:underline"
+                          onClick={() => removeGalleryPhoto(index)}
+                          className="text-xs text-red-600 hover:text-red-800 font-semibold flex items-center justify-center gap-1 pt-1 border-t border-slate-200"
                         >
-                          Remover
+                          <Trash2 className="w-3.5 h-3.5" /> Remover Foto
                         </button>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-600">Título do Serviço</label>
-                        <input
-                          type="text"
-                          value={service.title}
-                          onChange={(e) => updateService(index, 'title', e.target.value)}
-                          placeholder="Ex: Atendimento Individualizado"
-                          className="mt-1 block w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white"
-                        />
                       </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-600">Texto do Botão (CTA)</label>
-                        <input
-                          type="text"
-                          value={service.ctaText}
-                          onChange={(e) => updateService(index, 'ctaText', e.target.value)}
-                          placeholder="Solicitar Atendimento"
-                          className="mt-1 block w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600">Descrição Curta</label>
-                      <textarea
-                        rows={2}
-                        value={service.shortDescription}
-                        onChange={(e) => updateService(index, 'shortDescription', e.target.value)}
-                        placeholder="Explique resumidamente o que abrange este serviço."
-                        className="mt-1 block w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white"
-                      />
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* 4. DEPOIMENTOS DE CLIENTES */}
+              {formData.sectionsConfig?.depoimentos !== false && (
+                <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div>
+                      <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                        <MessageSquare className="w-5 h-5 text-slate-700" />
+                        Depoimentos de Clientes & Avaliações
+                        <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                          {formData.testimonials?.length || 0} depoimentos cadastrados
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Exiba a opinião real de pessoas atendidas para aumentar a confiança de novos clientes.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addTestimonial}
+                      className="px-3.5 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 flex items-center gap-1.5 self-start sm:self-auto shadow-sm"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Adicionar Depoimento
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {(formData.testimonials || []).map((t, index) => (
+                      <div key={t.id || index} className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col justify-between space-y-3">
+                        <div className="flex items-center space-x-3">
+                          <img
+                            src={t.photoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'}
+                            alt={t.clientName}
+                            className="w-10 h-10 rounded-full object-cover border border-slate-300 shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <span className="font-bold text-xs text-slate-900 block truncate">{t.clientName || 'Cliente'}</span>
+                            <span className="text-[11px] text-slate-500 block truncate">{t.role || 'Cliente Atendido'}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeTestimonial(index)}
+                            className="text-slate-400 hover:text-red-600 p-1"
+                            title="Remover depoimento"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">Nome do Cliente</label>
+                            <input
+                              type="text"
+                              value={t.clientName}
+                              onChange={(e) => updateTestimonial(index, 'clientName', e.target.value)}
+                              placeholder="Ex: Dra. Ana Paula"
+                              className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">Ocupação / Cidade</label>
+                            <input
+                              type="text"
+                              value={t.role || ''}
+                              onChange={(e) => updateTestimonial(index, 'role', e.target.value)}
+                              placeholder="Ex: Empresária - São Paulo"
+                              className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">Foto do Cliente (URL)</label>
+                            <input
+                              type="text"
+                              value={t.photoUrl || ''}
+                              onChange={(e) => updateTestimonial(index, 'photoUrl', e.target.value)}
+                              placeholder="https://..."
+                              className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600">Depoimento Pequeno</label>
+                            <textarea
+                              rows={3}
+                              value={t.content}
+                              onChange={(e) => updateTestimonial(index, 'content', e.target.value)}
+                              placeholder="Relato sobre a experiência..."
+                              className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* ETAPA 4: Contatos */}
+          {/* ETAPA 4: Domínio & Contatos */}
           {currentStep === 4 && (
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900">Dados de Contato e Atendimento</h2>
-                <p className="text-slate-600 text-sm mt-1">Canais para os clientes falarem diretamente com você.</p>
+                <h2 className="text-2xl font-bold text-slate-900">Domínio e Canais de Atendimento</h2>
+                <p className="text-slate-600 text-sm mt-1">
+                  Defina o endereço oficial na internet e os canais diretos para os clientes entrarem em contato.
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700">WhatsApp Comercial *</label>
-                  <input
-                    type="text"
-                    value={formData.whatsapp || ''}
-                    onChange={(e) => handleInputChange('whatsapp', e.target.value)}
-                    placeholder="Ex: (11) 99999-8888"
-                    className="mt-1 block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900"
-                  />
-                </div>
+              {/* SELEÇÃO DO TIPO DE DOMÍNIO (STITCH SCREEN 3) */}
+              <div className="space-y-4">
+                <label className="block text-sm font-bold text-slate-900">
+                  Como você deseja publicar o endereço do seu site?
+                </label>
 
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700">E-mail de Contato Público *</label>
-                  <input
-                    type="email"
-                    value={formData.publicEmail || ''}
-                    onChange={(e) => handleInputChange('publicEmail', e.target.value)}
-                    placeholder="contato@seunome.com.br"
-                    className="mt-1 block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-slate-700">Horário de Atendimento</label>
-                  <input
-                    type="text"
-                    value={formData.businessHours || ''}
-                    onChange={(e) => handleInputChange('businessHours', e.target.value)}
-                    placeholder="Segunda a Sexta, das 09h às 18h"
-                    className="mt-1 block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900"
-                  />
-                </div>
-
-                {/* Domínio Próprio .BR */}
-                <div className="sm:col-span-2 p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 mt-2">
-                  <div className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      id="hasCustomDomain"
-                      checked={formData.hasCustomDomain || false}
-                      onChange={(e) => handleInputChange('hasCustomDomain', e.target.checked)}
-                      className="w-4 h-4 text-slate-900 rounded border-slate-300 focus:ring-slate-900"
-                    />
-                    <label htmlFor="hasCustomDomain" className="text-sm font-semibold text-slate-800 cursor-pointer">
-                      Já possuo ou pretendo utilizar meu próprio domínio .BR (ex: Registro.br)
-                    </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Opção A: Subdomínio Provisório */}
+                  <div
+                    onClick={() => {
+                      handleInputChange('hasCustomDomain', false);
+                      setDomainVerified(true);
+                    }}
+                    className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                      !formData.hasCustomDomain
+                        ? 'border-slate-900 bg-slate-50 shadow-sm ring-2 ring-slate-900/10'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-700">Subdomínio Imediato</span>
+                        {!formData.hasCustomDomain && (
+                          <span className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold">✓</span>
+                        )}
+                      </div>
+                      <h3 className="font-bold text-base text-slate-900 mb-1">Subdomínio Gratuito do Sistema</h3>
+                      <p className="text-xs text-slate-600 mb-3">
+                        Seu site entra no ar imediatamente com SSL grátis sem precisar registrar ou pagar domínio agora.
+                      </p>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs font-mono text-slate-700">
+                      https://{formData.professionalName ? formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'seusite'}.sitepronto.com.br
+                    </div>
                   </div>
 
-                  {formData.hasCustomDomain && (
-                    <div className="pt-2 pl-7 space-y-2">
-                      <label className="block text-xs font-semibold text-slate-700">
-                        Qual é o seu domínio .BR?
+                  {/* Opção B: Domínio Próprio .BR com Registro.br */}
+                  <div
+                    onClick={() => {
+                      handleInputChange('hasCustomDomain', true);
+                      setDomainVerified(false);
+                      if (!formData.customDomainName && formData.professionalName) {
+                        const sug = formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com.br';
+                        handleInputChange('customDomainName', sug);
+                      }
+                    }}
+                    className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+                      formData.hasCustomDomain
+                        ? 'border-emerald-600 bg-emerald-50/40 shadow-sm ring-2 ring-emerald-600/20'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">Oficial Registro.br</span>
+                        {formData.hasCustomDomain && (
+                          <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</span>
+                        )}
+                      </div>
+                      <h3 className="font-bold text-base text-slate-900 mb-1">Meu Domínio Próprio .BR</h3>
+                      <p className="text-xs text-slate-600 mb-3">
+                        Consulte a disponibilidade no Registro.br e registre ou aponte seu próprio endereço .com.br ou .adv.br.
+                      </p>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-xl border border-emerald-200 text-xs font-mono text-emerald-900 font-semibold">
+                      https://www.seunegocio.com.br
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CAMPO DO DOMÍNIO PRÓPRIO E CONSULTA ISAVAIL NO REGISTRO.BR */}
+              {formData.hasCustomDomain && (
+                <div className="p-6 rounded-2xl border-2 border-emerald-500/60 bg-emerald-50/20 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-900">
+                        Digite o domínio .BR para verificar no Registro.br <span className="text-red-500">*</span>
                       </label>
+                      <p className="text-xs text-slate-600">
+                        O sistema consulta a API oficial <code>isavail</code> do Registro.br em tempo real.
+                      </p>
+                    </div>
+                    <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full flex items-center gap-1">
+                      <Globe className="w-3.5 h-3.5" /> Consulta Direta
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2.5">
+                    <div className="relative flex-1">
                       <input
                         type="text"
                         value={formData.customDomainName || ''}
-                        onChange={(e) => handleInputChange('customDomainName', e.target.value)}
-                        placeholder="Ex: seunome.com.br, consultoriadra.adv.br, clinica.med.br"
-                        className="block w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 bg-white font-mono"
+                        onChange={(e) => {
+                          handleInputChange('customDomainName', e.target.value.toLowerCase().replace(/\s+/g, ''));
+                          setDomainCheckResult(null);
+                          setDomainVerified(false);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            checkDomainAvailability();
+                          }
+                        }}
+                        placeholder="Ex: seunegocio.com.br, consultoriadra.adv.br, clinica.med.br"
+                        className="block w-full pl-4 pr-10 py-3 text-sm font-mono border-2 border-slate-300 rounded-xl focus:border-slate-900 focus:ring-2 focus:ring-slate-900/20 bg-white"
                       />
-                      <p className="text-xs text-slate-500">
-                        Ao final da publicação, nós configuramos a Vercel e o Cloudflare automaticamente e forneceremos exatamente os servidores DNS para você alterar no Registro.br com 1 clique.
-                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={checkingDomain || !formData.customDomainName?.trim()}
+                      onClick={() => checkDomainAvailability()}
+                      className="px-6 py-3 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-bold text-xs rounded-xl transition flex items-center justify-center shrink-0 shadow-md gap-2"
+                    >
+                      {checkingDomain ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Consultando Registro.br...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="w-4 h-4" />
+                          Verificar Disponibilidade (Registro.br)
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Card de Resultado da Consulta isavail */}
+                  {domainCheckResult && (
+                    <div
+                      className={`p-5 rounded-xl border text-xs space-y-3 shadow-sm ${
+                        domainCheckResult.available
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
+                          : domainCheckResult.status === 2
+                          ? 'bg-blue-50 border-blue-300 text-blue-950'
+                          : 'bg-amber-50 border-amber-300 text-amber-950'
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <span className="font-bold text-sm block flex items-center gap-1.5">
+                            {domainCheckResult.available ? (
+                              <>
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                🎉 Domínio Disponível para Registro!
+                              </>
+                            ) : domainCheckResult.status === 2 ? (
+                              <>
+                                <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                                ℹ️ Domínio já Registrado no Registro.br
+                              </>
+                            ) : (
+                              '⚠️ Atenção'
+                            )}
+                          </span>
+                          <p className="mt-1 font-medium">{domainCheckResult.message}</p>
+                        </div>
+
+                        {/* Botão de Ação Rápida: Prosseguir com o Domínio */}
+                        <button
+                          type="button"
+                          onClick={() => setCurrentStep(5)}
+                          className={`px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-sm flex items-center gap-1.5 shrink-0 transition ${
+                            domainCheckResult.available
+                              ? 'bg-emerald-600 hover:bg-emerald-700'
+                              : 'bg-slate-900 hover:bg-slate-800'
+                          }`}
+                        >
+                          Prosseguir com este Domínio <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Opção de abrir Registro.br ao finalizar */}
+                      {domainCheckResult.available && (
+                        <label className="flex items-center space-x-2.5 pt-2 border-t border-emerald-200/80 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.registerDomainOnCompletion !== false}
+                            onChange={(e) => handleInputChange('registerDomainOnCompletion', e.target.checked)}
+                            className="w-4 h-4 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-600"
+                          />
+                          <span className="text-xs font-semibold text-emerald-900">
+                            Abrir o Registro.br em nova aba ao finalizar a criação do site para eu registrar oficialmente
+                          </span>
+                        </label>
+                      )}
+
+                      {/* Sugestões alternativas */}
+                      {domainCheckResult.suggestions && domainCheckResult.suggestions.length > 0 && (
+                        <div className="pt-2 border-t border-slate-200/60">
+                          <span className="text-[11px] font-semibold opacity-80 block mb-1">
+                            Extensões alternativas disponíveis:
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {domainCheckResult.suggestions.map((sug) => (
+                              <button
+                                key={sug}
+                                type="button"
+                                onClick={() => {
+                                  handleInputChange('customDomainName', sug);
+                                  checkDomainAvailability(sug);
+                                }}
+                                className="px-2.5 py-1 bg-white hover:bg-slate-100 text-[11px] font-mono rounded-lg border border-slate-300 transition shadow-2xs font-semibold"
+                              >
+                                {sug}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
+
+                  {!domainCheckResult && !checkingDomain && (
+                    <p className="text-xs text-amber-800 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                      💡 <strong>Atenção:</strong> Clique no botão <strong>"Verificar Disponibilidade"</strong> acima para consultar o Registro.br antes de avançar para a próxima etapa.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* DADOS DE CONTATO E WHATSAPP */}
+              <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5">
+                <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                  <Phone className="w-5 h-5 text-slate-700" />
+                  Canais de Contato e Atendimento
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">WhatsApp Comercial *</label>
+                    <input
+                      type="text"
+                      value={formData.whatsapp || ''}
+                      onChange={(e) => handleInputChange('whatsapp', e.target.value)}
+                      placeholder="Ex: (11) 99999-8888"
+                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
+                    />
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Os botões de agendamento em todo o site direcionarão os clientes para este WhatsApp.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail de Contato Público *</label>
+                    <input
+                      type="email"
+                      value={formData.publicEmail || ''}
+                      onChange={(e) => handleInputChange('publicEmail', e.target.value)}
+                      placeholder="contato@seunome.com.br"
+                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Horário de Atendimento</label>
+                    <input
+                      type="text"
+                      value={formData.businessHours || ''}
+                      onChange={(e) => handleInputChange('businessHours', e.target.value)}
+                      placeholder="Segunda a Sexta, das 09h às 18h"
+                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1019,10 +1678,34 @@ function OnboardingContent() {
             {currentStep < 7 ? (
               <button
                 type="button"
-                onClick={() => setCurrentStep(currentStep + 1)}
-                className="inline-flex items-center px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 shadow-md"
+                onClick={() => {
+                  if (
+                    currentStep === 4 &&
+                    Boolean(formData.hasCustomDomain) &&
+                    formData.customDomainName?.trim() &&
+                    !domainVerified
+                  ) {
+                    checkDomainAvailability();
+                    return;
+                  }
+                  setCurrentStep(currentStep + 1);
+                }}
+                disabled={checkingDomain}
+                className="inline-flex items-center px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 shadow-md disabled:opacity-50"
               >
-                Avançar <ArrowRight className="w-4 h-4 ml-2" />
+                {checkingDomain ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Verificando Registro.br...
+                  </>
+                ) : currentStep === 4 && Boolean(formData.hasCustomDomain) && formData.customDomainName?.trim() && !domainVerified ? (
+                  <>
+                    Verificar no Registro.br & Avançar <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                ) : (
+                  <>
+                    Avançar <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
               </button>
             ) : (
               <button

@@ -186,6 +186,28 @@ export class VercelProvider implements DeploymentProvider {
     }
   }
 
+  async removeDomainFromProject(projectIdOrName: string, domain: string): Promise<boolean> {
+    const rawDomain = domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+    if (!this.token) return true;
+
+    try {
+      const teamQuery = this.teamId ? `?teamId=${this.teamId}` : '';
+      const res = await fetch(
+        `https://api.vercel.com/v9/projects/${encodeURIComponent(projectIdOrName)}/domains/${encodeURIComponent(rawDomain)}${teamQuery}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        }
+      );
+      return res.status === 200 || res.status === 204 || res.status === 404;
+    } catch (err: any) {
+      console.warn(`[VercelProvider] Falha ao remover domínio ${rawDomain} do projeto ${projectIdOrName}:`, err.message);
+      return false;
+    }
+  }
+
   async deleteProject(projectIdOrName: string): Promise<boolean> {
     if (!this.token) return false;
     try {
