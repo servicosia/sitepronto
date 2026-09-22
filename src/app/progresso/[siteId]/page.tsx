@@ -87,13 +87,13 @@ export default function ProgressoPage() {
   }, [siteId]);
 
   const pipelineSteps = [
-    { key: 'VALIDATING', label: 'Validação e Análise de Dados' },
-    { key: 'GENERATING_CONTENT', label: 'Síntese de Conteúdo & DesignSpec' },
-    { key: 'CREATING_NEON', label: 'Provisionamento do Banco Neon PostgreSQL' },
-    { key: 'GENERATING_CODE', label: 'Geração da Estrutura e Painel /master' },
-    { key: 'CREATING_VERCEL', label: 'Publicação e Deploy na Vercel' },
-    { key: 'DOMAIN_CONFIGURATION', label: 'Configuração de Domínio .BR & Cloudflare DNS' },
-    { key: 'TESTING', label: 'Health Checks e Testes de Integridade' },
+    { key: 'VALIDATING', label: 'Verificação inicial das informações' },
+    { key: 'GENERATING_CONTENT', label: 'Criação dos textos, fotos e visual do site' },
+    { key: 'CREATING_NEON', label: 'Preparação do armazenamento seguro' },
+    { key: 'GENERATING_CODE', label: 'Construção do seu site e do painel de controle' },
+    { key: 'CREATING_VERCEL', label: 'Publicação do seu site na internet' },
+    { key: 'DOMAIN_CONFIGURATION', label: 'Configuração do endereço do seu site' },
+    { key: 'TESTING', label: 'Testes finais e confirmação de segurança' },
   ];
 
   const domainStep = siteData?.steps?.find((s: StepInfo) => s.step === 'DOMAIN_CONFIGURATION');
@@ -120,12 +120,12 @@ export default function ProgressoPage() {
           
           <div className="text-center mb-8">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-              {siteData?.completed ? '🎉 Seu site está publicado e pronto!' : 'Fabricando seu Site Profissional...'}
+              {siteData?.completed ? '🎉 Seu site está pronto e publicado!' : 'Criando seu Site Profissional...'}
             </h1>
             <p className="text-slate-600 text-sm mt-2">
               {siteData?.completed 
-                ? 'Toda a infraestrutura isolada foi provisionada com sucesso.' 
-                : 'Estamos configurando GitHub, Neon, Vercel e Cloudflare automaticamente.'}
+                ? 'Tudo pronto! Seu site e seu painel de edição já estão disponíveis.' 
+                : 'Estamos organizando o visual, os textos e preparando tudo para colocar no ar.'}
             </p>
           </div>
 
@@ -182,17 +182,17 @@ export default function ProgressoPage() {
                 <Globe className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-bold text-base text-amber-950">
-                    Instruções de Apontamento DNS no Registro.br
+                    Instruções para ativar seu endereço no Registro.br
                   </h3>
                   <p className="text-xs text-amber-900 mt-1">
-                    Seu domínio <strong>{domainStep.details?.domain}</strong> foi vinculado com sucesso na Vercel e configurado na Cloudflare.
+                    Seu endereço <strong>{domainStep.details?.domain}</strong> foi preparado para o seu novo site.
                   </p>
                 </div>
               </div>
 
               <div className="p-4 bg-white rounded-xl border border-amber-200 space-y-3">
                 <div className="text-xs font-semibold text-slate-700">
-                  Acesse sua conta no <a href="https://registro.br" target="_blank" rel="noreferrer" className="text-indigo-600 font-bold underline">Registro.br</a>, clique no seu domínio e substitua os Servidores DNS existentes por:
+                  Acesse sua conta no <a href="https://registro.br" target="_blank" rel="noreferrer" className="text-indigo-600 font-bold underline">Registro.br</a>, clique no seu domínio e substitua os servidores existentes por:
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono text-xs">
@@ -205,7 +205,7 @@ export default function ProgressoPage() {
                 </div>
 
                 <p className="text-[11px] text-slate-500">
-                  Após salvar no Registro.br, o certificado SSL e os apontamentos para o seu novo site serão ativados em poucos minutos.
+                  Após salvar no Registro.br, a proteção de segurança e o seu novo site começarão a funcionar em poucos minutos.
                 </p>
               </div>
             </div>
@@ -217,9 +217,9 @@ export default function ProgressoPage() {
               <div className="flex items-start space-x-3">
                 <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-bold text-base text-red-900">Ocorreu uma falha no provisionamento</h3>
+                  <h3 className="font-bold text-base text-red-900">Ocorreu uma instabilidade na criação</h3>
                   <p className="text-xs text-red-700 mt-1">
-                    {siteData.lastError || 'Não foi possível concluir uma das etapas da infraestrutura.'}
+                    {siteData.lastError || 'Não foi possível concluir uma das etapas. Você pode tentar novamente com um clique.'}
                   </p>
                 </div>
               </div>
@@ -248,7 +248,7 @@ export default function ProgressoPage() {
                   }}
                   className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-md cursor-pointer transition-colors"
                 >
-                  Reiniciar e Tentar Novamente
+                  Tentar Novamente
                 </button>
               </div>
             </div>
@@ -260,9 +260,9 @@ export default function ProgressoPage() {
               <div className="flex items-center space-x-3">
                 <ShieldCheck className="w-7 h-7 text-emerald-600 flex-shrink-0" />
                 <div>
-                  <h3 className="font-bold text-base">Infraestrutura 100% Isolada e Ativa</h3>
+                  <h3 className="font-bold text-base">Seu Site está 100% Ativo e Protegido</h3>
                   <p className="text-xs text-emerald-800">
-                    Seu site possui repositório próprio no GitHub, banco Neon dedicado e deploy na Vercel.
+                    Seu site já está no ar na internet e o seu painel de controle exclusivo está liberado para uso.
                   </p>
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function ProgressoPage() {
                   className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-slate-900 text-white font-bold text-sm rounded-xl hover:bg-slate-800 shadow-md"
                 >
                   <Globe className="w-4 h-4 mr-2" />
-                  Ver Meu Site Público
+                  Ver Meu Site no Ar
                   <ExternalLink className="w-3.5 h-3.5 ml-2 opacity-70" />
                 </a>
 
@@ -286,7 +286,7 @@ export default function ProgressoPage() {
                   className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-emerald-700 text-white font-bold text-sm rounded-xl hover:bg-emerald-800 shadow-md"
                 >
                   <Database className="w-4 h-4 mr-2" />
-                  Acessar Painel /master
+                  Acessar Painel de Controle
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </a>
               </div>

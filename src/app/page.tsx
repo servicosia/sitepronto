@@ -154,7 +154,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1 text-slate-500 hidden sm:flex">
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>SSL 256-bit Seguro</span>
+                <span>Site Seguro e Protegido</span>
               </div>
             </div>
           </div>
@@ -221,7 +221,7 @@ export default function HomePage() {
                   <Phone className="w-5 h-5" />
                 </div>
                 <p className="font-semibold text-sm sm:text-base">
-                  Precisa de auxílio para iniciar? Fale com nosso consultor técnico no WhatsApp.
+                  Precisa de ajuda para começar? Fale com nossa equipe no WhatsApp.
                 </p>
               </div>
               <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -232,7 +232,7 @@ export default function HomePage() {
                   className="px-4 py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-emerald-700 transition flex-1 sm:flex-initial"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>WhatsApp Especialista</span>
+                  <span>WhatsApp de Suporte</span>
                 </a>
                 <Link
                   href="/iniciar"
@@ -266,7 +266,7 @@ export default function HomePage() {
                 </h1>
 
                 <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
-                  Sem precisar programar ou entender de tecnologia. Você responde perguntas simples sobre seu negócio e nossa inteligência monta tudo: design, textos profissionais, fotos e conexão automática com Cloudflare e Vercel.
+                  Sem precisar programar ou entender de tecnologia. Você responde perguntas simples sobre seu negócio e nossa inteligência monta tudo: visual moderno, textos profissionais, fotos e coloca seu site no ar.
                 </p>
 
                 {/* Botões de Ação */}
@@ -516,7 +516,7 @@ export default function HomePage() {
                 </div>
                 <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-blue-700">
                   <Rocket className="w-4 h-4" />
-                  <span>Infraestrutura dedicada GitHub + Neon</span>
+                  <span>Estrutura segura e exclusiva para você</span>
                 </div>
               </div>
 
@@ -526,14 +526,14 @@ export default function HomePage() {
                   <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white font-extrabold text-xl flex items-center justify-center shadow-md">
                     3
                   </div>
-                  <h3 className="font-bold text-lg text-slate-900">Domínio conectado e site no ar</h3>
+                  <h3 className="font-bold text-lg text-slate-900">Endereço conectado e site no ar</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">
-                    Vinculamos seu domínio .com.br, ativamos o Cloudflare DNS e entregamos o painel /master para você gerenciar módulos e cards com total autonomia.
+                    Conectamos o endereço da sua empresa na internet e entregamos um painel fácil para você editar informações e fotos quando quiser.
                   </p>
                 </div>
                 <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-emerald-700">
                   <ShieldCheck className="w-4 h-4" />
-                  <span>Sem burocracia técnica</span>
+                  <span>Sem burocracia nem complicação</span>
                 </div>
               </div>
             </div>
@@ -553,7 +553,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
               {/* Plano Essencial */}
               <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 flex flex-col justify-between">
                 <div>
@@ -572,7 +572,7 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Domínio próprio</strong> configurado na Vercel</span>
+                      <span><strong>Endereço próprio (.com.br)</strong> incluso e configurado</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -580,7 +580,7 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Certificado SSL Incluso</span>
+                      <span>Cadeado de Segurança Incluso (Site Seguro)</span>
                     </li>
                   </ul>
                 </div>
@@ -616,19 +616,19 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Cards dinâmicos ilimitados</strong> (adicione ou remova livremente)</span>
+                      <span><strong>Itens e fotos ilimitados</strong> (adicione ou remova livremente)</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Domínio .com.br incluso</strong> com DNS Cloudflare</span>
+                      <span><strong>Endereço próprio (.com.br)</strong> incluso e ativo</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Painel <strong>/master</strong> com banco Neon PostgreSQL</span>
+                      <span><strong>Painel de controle fácil</strong> para editar seu site</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>SEO Automático para buscas no Google</span>
+                      <span>Otimizado para aparecer nas buscas do Google</span>
                     </li>
                   </ul>
                 </div>
@@ -638,45 +638,6 @@ export default function HomePage() {
                   className="mt-8 w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition text-center block shadow-md"
                 >
                   Resgatar no Plano Profissional
-                </Link>
-              </div>
-
-              {/* Plano Avançado */}
-              <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-extrabold text-xl text-slate-900">Plano Avançado</h3>
-                  <p className="text-xs text-slate-500 mt-1">Para clínicas, escritórios e empresas consolidadas</p>
-                  
-                  <div className="my-6">
-                    <span className="text-3xl sm:text-4xl font-extrabold text-slate-900">R$ 119</span>
-                    <span className="text-xs text-slate-500 font-semibold"> / mês</span>
-                  </div>
-
-                  <ul className="space-y-3 text-xs text-slate-700">
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Multi-domínios</strong> e landing pages de conversão</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>E-mails transacionais com Resend integrados</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Galeria de alta resolução com CDN Global</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Suporte prioritário via WhatsApp com técnico dedicado</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <Link
-                  href="/iniciar"
-                  className="mt-8 w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl transition text-center block"
-                >
-                  Resgatar no Plano Avançado
                 </Link>
               </div>
             </div>
@@ -814,20 +775,20 @@ export default function HomePage() {
             <div className="space-y-3">
               {[
                 {
-                  q: 'O que é um domínio próprio e eu preciso pagar algo a mais por ele?',
-                  a: 'O domínio é o endereço oficial da sua marca na internet (como www.suaempresa.com.br). Com o voucher e nos nossos planos, o registro e apontamento no Cloudflare já são realizados sem complicações.'
+                  q: 'O que é um endereço próprio (domínio) e eu preciso pagar algo a mais por ele?',
+                  a: 'O domínio é o endereço da sua empresa na internet (como www.suaempresa.com.br). Com o voucher e nos nossos planos, tudo é configurado automaticamente para o seu site funcionar sem complicações.'
                 },
                 {
-                  q: 'Consigo ativar/desativar seções e alterar fotos e cards depois?',
-                  a: 'Sim! No painel /master você tem uma aba exclusiva para Módulos & Seções onde pode ativar ou desativar qualquer bloco (incluindo Galeria e Depoimentos), além de adicionar ou diminuir cards com 1 clique.'
+                  q: 'Consigo ativar/desativar seções e alterar fotos e textos depois?',
+                  a: 'Sim! No seu painel de controle você pode ativar ou desativar qualquer bloco (incluindo Galeria de fotos e Depoimentos), além de adicionar ou alterar itens com facilidade.'
                 },
                 {
                   q: 'Como funciona a verificação de disponibilidade no Registro.br?',
-                  a: 'Durante a criação ou alteração do domínio, nosso sistema consulta a interface isavail oficial do Registro.br. Se o domínio estiver disponível, você pode registrar na hora ou ao concluir o processo.'
+                  a: 'Durante a criação do seu site, nosso sistema consulta se o endereço desejado está livre para registro. Se estiver disponível, você pode registrar na hora ou ao concluir o processo.'
                 },
                 {
-                  q: 'Eu já tenho um domínio registrado no Registro.br, posso usar aqui?',
-                  a: 'Com certeza! Basta informar o seu domínio existente. O sistema gera automaticamente os servidores DNS do Cloudflare (Master e Slave 1) para você colar na sua conta do Registro.br.'
+                  q: 'Eu já tenho um endereço registrado no Registro.br, posso usar aqui?',
+                  a: 'Com certeza! Basta informar o seu endereço existente. O sistema gera automaticamente as informações necessárias para você colar na sua conta do Registro.br de forma simples e guiada.'
                 }
               ].map((item, idx) => (
                 <div key={idx} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
@@ -921,15 +882,15 @@ export default function HomePage() {
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Segurança & Nuvem</h4>
+              <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Segurança & Confiabilidade</h4>
               <div className="space-y-2">
                 <div className="p-2.5 bg-white rounded-xl border border-slate-200">
-                  <div className="font-bold text-slate-900">Cloudflare DNS & Vercel</div>
-                  <div className="text-[10px] text-slate-500">99.9% Uptime garantido</div>
+                  <div className="font-bold text-slate-900">Hospedagem Rápida</div>
+                  <div className="text-[10px] text-slate-500">Site sempre no ar 24h por dia</div>
                 </div>
                 <div className="p-2.5 bg-white rounded-xl border border-slate-200">
-                  <div className="font-bold text-slate-900">Neon PostgreSQL</div>
-                  <div className="text-[10px] text-slate-500">Banco de dados dedicado</div>
+                  <div className="font-bold text-slate-900">Armazenamento Seguro</div>
+                  <div className="text-[10px] text-slate-500">Seus dados e fotos protegidos</div>
                 </div>
               </div>
             </div>
@@ -967,15 +928,15 @@ export default function HomePage() {
 
             <div className="space-y-2 text-xs">
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                <span className="font-semibold text-slate-700">Google Core Web Vitals</span>
-                <span className="font-bold text-emerald-600">100 / 100</span>
+                <span className="font-semibold text-slate-700">Velocidade de Carregamento</span>
+                <span className="font-bold text-emerald-600">Nota Máxima (Abertura Instantânea)</span>
               </div>
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                <span className="font-semibold text-slate-700">Acessibilidade Digital</span>
-                <span className="font-bold text-emerald-600">WCAG 2.1 AA</span>
+                <span className="font-semibold text-slate-700">Facilidade de Uso</span>
+                <span className="font-bold text-emerald-600">Acessível para Qualquer Pessoa</span>
               </div>
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                <span className="font-semibold text-slate-700">Tempo de Criação do Site</span>
+                <span className="font-semibold text-slate-700">Tempo para Ficar Pronto</span>
                 <span className="font-bold text-blue-600">Menos de 15 minutos</span>
               </div>
             </div>
