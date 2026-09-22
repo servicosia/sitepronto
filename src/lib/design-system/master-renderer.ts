@@ -30,9 +30,9 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     ? data.testimonials
     : getContextualTestimonials(profession, data.mainSpecialty, data.companyName);
 
-  const safeJsonServices = JSON.stringify(services).replace(/</g, '\\u003c').replace(/'/g, "\\'");
-  const safeJsonGallery = JSON.stringify(gallery).replace(/</g, '\\u003c').replace(/'/g, "\\'");
-  const safeJsonTestimonials = JSON.stringify(testimonials).replace(/</g, '\\u003c').replace(/'/g, "\\'");
+  const safeJsonServices = JSON.stringify(services).replace(/</g, '\\u003c');
+  const safeJsonGallery = JSON.stringify(gallery).replace(/</g, '\\u003c');
+  const safeJsonTestimonials = JSON.stringify(testimonials).replace(/</g, '\\u003c');
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -628,27 +628,27 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     let servicesList = (function() {
       try {
         const stored = localStorage.getItem('site_services');
-        return stored ? JSON.parse(stored) : JSON.parse('${safeJsonServices}');
+        return stored ? JSON.parse(stored) : ${safeJsonServices};
       } catch(e) {
-        return JSON.parse('${safeJsonServices}');
+        return ${safeJsonServices};
       }
     })();
 
     let testimonialsList = (function() {
       try {
         const stored = localStorage.getItem('site_testimonials');
-        return stored ? JSON.parse(stored) : JSON.parse('${safeJsonTestimonials}');
+        return stored ? JSON.parse(stored) : ${safeJsonTestimonials};
       } catch(e) {
-        return JSON.parse('${safeJsonTestimonials}');
+        return ${safeJsonTestimonials};
       }
     })();
 
     let galleryList = (function() {
       try {
         const stored = localStorage.getItem('site_gallery');
-        return stored ? JSON.parse(stored) : JSON.parse('${safeJsonGallery}');
+        return stored ? JSON.parse(stored) : ${safeJsonGallery};
       } catch(e) {
-        return JSON.parse('${safeJsonGallery}');
+        return ${safeJsonGallery};
       }
     })();
 
@@ -690,8 +690,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           '</div>' +
           '<div>' +
             '<label class="relative inline-flex items-center cursor-pointer">' +
-              '<input type="checkbox" ' + (isActive ? 'checked' : '') + ' onchange="toggleSection(\'' + sec.id + '\', this.checked)" class="sr-only peer">' +
-              '<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-900"></div>' +
+              '<input type="checkbox" data-sec-id="' + sec.id + '" ' + (isActive ? 'checked' : '') + ' onchange="toggleSection(this.dataset.secId, this.checked)" class="sr-only peer">' +
+              '<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\\\'\\\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-900"></div>' +
             '</label>' +
           '</div>' +
         '</div>';
@@ -736,15 +736,15 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           '</div>' +
           '<div>' +
             '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Título do Serviço</label>' +
-            '<input type="text" value="' + (s.title || '') + '" oninput="updateServiceItem(' + idx + ', \'title\', this.value)" class="w-full px-3 py-1.5 text-sm font-bold bg-white border border-slate-300 rounded-lg">' +
+            '<input type="text" name="title" value="' + (s.title || '') + '" oninput="updateServiceItem(' + idx + ', this.name, this.value)" class="w-full px-3 py-1.5 text-sm font-bold bg-white border border-slate-300 rounded-lg">' +
           '</div>' +
           '<div>' +
             '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Descrição</label>' +
-            '<textarea rows="3" oninput="updateServiceItem(' + idx + ', \'shortDescription\', this.value)" class="w-full px-3 py-1.5 text-xs text-slate-600 bg-white border border-slate-300 rounded-lg">' + (s.shortDescription || '') + '</textarea>' +
+            '<textarea rows="3" name="shortDescription" oninput="updateServiceItem(' + idx + ', this.name, this.value)" class="w-full px-3 py-1.5 text-xs text-slate-600 bg-white border border-slate-300 rounded-lg">' + (s.shortDescription || '') + '</textarea>' +
           '</div>' +
           '<div>' +
             '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Texto do Botão (CTA)</label>' +
-            '<input type="text" value="' + (s.ctaText || 'Saber mais') + '" oninput="updateServiceItem(' + idx + ', \'ctaText\', this.value)" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
+            '<input type="text" name="ctaText" value="' + (s.ctaText || 'Saber mais') + '" oninput="updateServiceItem(' + idx + ', this.name, this.value)" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
           '</div>' +
         '</div>';
       }).join('');
@@ -818,16 +818,16 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           '<div class="grid grid-cols-2 gap-2">' +
             '<div>' +
               '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Nome do Cliente</label>' +
-              '<input type="text" value="' + (t.clientName || '') + '" oninput="updateTestimonialItem(' + idx + ', \'clientName\', this.value)" class="w-full px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 rounded-lg">' +
+              '<input type="text" name="clientName" value="' + (t.clientName || '') + '" oninput="updateTestimonialItem(' + idx + ', this.name, this.value)" class="w-full px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 rounded-lg">' +
             '</div>' +
             '<div>' +
               '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Papel / Qualificação</label>' +
-              '<input type="text" value="' + (t.role || 'Cliente Atendido') + '" oninput="updateTestimonialItem(' + idx + ', \'role\', this.value)" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
+              '<input type="text" name="role" value="' + (t.role || 'Cliente Atendido') + '" oninput="updateTestimonialItem(' + idx + ', this.name, this.value)" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
             '</div>' +
           '</div>' +
           '<div>' +
             '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Avaliação em Estrelas</label>' +
-            '<select onchange="updateTestimonialItem(' + idx + ', \'rating\', parseInt(this.value))" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
+            '<select name="rating" onchange="updateTestimonialItem(' + idx + ', this.name, parseInt(this.value))" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
               '<option value="5" ' + (rating === 5 ? 'selected' : '') + '>★★★★★ (5 Estrelas)</option>' +
               '<option value="4" ' + (rating === 4 ? 'selected' : '') + '>★★★★☆ (4 Estrelas)</option>' +
               '<option value="3" ' + (rating === 3 ? 'selected' : '') + '>★★★☆☆ (3 Estrelas)</option>' +
@@ -835,7 +835,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           '</div>' +
           '<div>' +
             '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Depoimento Curto</label>' +
-            '<textarea rows="3" oninput="updateTestimonialItem(' + idx + ', \'content\', this.value)" class="w-full px-3 py-1.5 text-xs text-slate-600 bg-white border border-slate-300 rounded-lg">' + (t.content || '') + '</textarea>' +
+            '<textarea rows="3" name="content" oninput="updateTestimonialItem(' + idx + ', this.name, this.value)" class="w-full px-3 py-1.5 text-xs text-slate-600 bg-white border border-slate-300 rounded-lg">' + (t.content || '') + '</textarea>' +
           '</div>' +
         '</div>';
       }).join('');
@@ -913,11 +913,11 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           '</div>' +
           '<div>' +
             '<label class="block text-[10px] font-bold text-slate-500 uppercase">Título</label>' +
-            '<input type="text" value="' + (item.title || '') + '" oninput="updateGalleryItem(' + idx + ', \'title\', this.value)" class="w-full px-2 py-1 text-xs font-bold bg-white border border-slate-300 rounded-lg">' +
+            '<input type="text" name="title" value="' + (item.title || '') + '" oninput="updateGalleryItem(' + idx + ', this.name, this.value)" class="w-full px-2 py-1 text-xs font-bold bg-white border border-slate-300 rounded-lg">' +
           '</div>' +
           '<div>' +
             '<label class="block text-[10px] font-bold text-slate-500 uppercase">Legenda Opcional</label>' +
-            '<input type="text" value="' + (item.caption || '') + '" oninput="updateGalleryItem(' + idx + ', \'caption\', this.value)" class="w-full px-2 py-1 text-[11px] bg-white border border-slate-300 rounded-lg">' +
+            '<input type="text" name="caption" value="' + (item.caption || '') + '" oninput="updateGalleryItem(' + idx + ', this.name, this.value)" class="w-full px-2 py-1 text-[11px] bg-white border border-slate-300 rounded-lg">' +
           '</div>' +
           '<button onclick="deleteGalleryPhoto(' + idx + ')" class="w-full py-1 text-xs text-rose-600 hover:bg-rose-50 rounded-lg font-bold transition flex items-center justify-center gap-1">' +
             '🗑️ Excluir Foto' +

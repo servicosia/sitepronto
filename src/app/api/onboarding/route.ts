@@ -26,12 +26,18 @@ export async function POST(req: NextRequest) {
       where: { voucherId },
     });
 
+    let sanitizedData = data ? { ...(session ? (session.data as object) : {}), ...data } : (session?.data || {});
+    if (sanitizedData && sanitizedData.hasCustomDomain === false) {
+      sanitizedData.customDomainName = '';
+      sanitizedData.registerDomainOnCompletion = false;
+    }
+
     if (!session) {
       session = await prisma.onboardingSession.create({
         data: {
           voucherId,
           step: step || 1,
-          data: data || {},
+          data: sanitizedData,
           selectedDesign: selectedDesign || null,
         },
       });
@@ -40,7 +46,7 @@ export async function POST(req: NextRequest) {
         where: { id: session.id },
         data: {
           step: step !== undefined ? step : session.step,
-          data: data ? { ...(session.data as object), ...data } : session.data,
+          data: sanitizedData,
           selectedDesign: selectedDesign !== undefined ? selectedDesign : session.selectedDesign,
         },
       });

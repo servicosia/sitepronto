@@ -493,6 +493,8 @@ export default function PlatformAdminPage() {
                       <td className="py-3 px-4 text-xs font-mono">
                         <Link 
                           href={`/iniciar?voucher=${encodeURIComponent(v.code)}`} 
+                          target="_blank"
+                          rel="noreferrer"
                           className="text-indigo-600 hover:underline flex items-center gap-1 font-semibold"
                           title={`Resgatar voucher ${v.code}`}
                         >
@@ -538,7 +540,7 @@ export default function PlatformAdminPage() {
                   <th className="py-3 px-4">Nome do Site</th>
                   <th className="py-3 px-4">Profissão</th>
                   <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Deploy Vercel</th>
+                  <th className="py-3 px-4">Site & Painel /master</th>
                   <th className="py-3 px-4">Progresso</th>
                   <th className="py-3 px-4 text-right">Ação</th>
                 </tr>
@@ -562,9 +564,16 @@ export default function PlatformAdminPage() {
                       </td>
                       <td className="py-3 px-4 text-xs">
                         {s.vercelUrl ? (
-                          <a href={s.vercelUrl} target="_blank" rel="noreferrer" className="text-emerald-600 font-semibold hover:underline">
-                            Ver Site
-                          </a>
+                          <div className="flex items-center gap-3">
+                            <a href={s.vercelUrl} target="_blank" rel="noreferrer" className="text-emerald-600 font-semibold hover:underline flex items-center gap-1">
+                              <span>Ver Site</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                            <a href={`${s.vercelUrl}/master`} target="_blank" rel="noreferrer" className="text-indigo-600 font-semibold hover:underline flex items-center gap-1">
+                              <span>Painel /master</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
                         ) : '-'}
                       </td>
                       <td className="py-3 px-4 text-xs">

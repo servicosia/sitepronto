@@ -704,10 +704,17 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
         <p class="font-bold text-lg font-serif" style="font-family: ${fontHeading}">${name}</p>
         <p class="text-xs text-stone-300 mt-1">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</p>
       </div>
-      <p class="text-xs text-stone-400 text-center sm:text-right">
-        © ${new Date().getFullYear()} ${name}. Todos os direitos reservados.<br>
-        Tecnologia e infraestrutura por <strong>SitePronto</strong>.
-      </p>
+      <div class="text-xs text-stone-400 text-center sm:text-right space-y-1">
+        <p>
+          © ${new Date().getFullYear()} ${name}. Todos os direitos reservados.<br>
+          Tecnologia e infraestrutura por <strong>SitePronto</strong>.
+        </p>
+        <p>
+          <a href="/master" class="text-stone-300 hover:text-white transition underline opacity-75 hover:opacity-100 text-[11px] font-semibold">
+            ⚙️ Painel Administrativo (/master)
+          </a>
+        </p>
+      </div>
     </div>
   </footer>
 

@@ -37,12 +37,31 @@ export default function ProgressoPage() {
 
   useEffect(() => {
     try {
-      const stored = sessionStorage.getItem('registerDomainOnCompletion');
-      if (stored) {
-        setDomainToRegister(JSON.parse(stored));
-      } else {
+      // Se o site é subdomínio (não tem customDomain), NUNCA exibe ou abre Registro.br!
+      if (siteData && !siteData.customDomain) {
+        setDomainToRegister(null);
+        try {
+          sessionStorage.removeItem('registerDomainOnCompletion');
+        } catch {}
+        return;
+      }
+
+      // Se o site tem customDomain próprio, o registro deve ser estritamente para o domínio do site
+      if (siteData?.customDomain) {
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('registerDomain') === '1' && siteData?.customDomain) {
+        const stored = sessionStorage.getItem('registerDomainOnCompletion');
+        let shouldRegister = urlParams.get('registerDomain') === '1';
+
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (parsed.domain === siteData.customDomain || (!parsed.siteId || parsed.siteId === siteId)) {
+              shouldRegister = true;
+            }
+          } catch {}
+        }
+
+        if (shouldRegister) {
           setDomainToRegister({
             domain: siteData.customDomain,
             url: `https://registro.br/busca-dominio/?fqdn=${encodeURIComponent(siteData.customDomain)}`,
@@ -50,10 +69,10 @@ export default function ProgressoPage() {
         }
       }
     } catch {}
-  }, [siteData]);
+  }, [siteData, siteId]);
 
   useEffect(() => {
-    if (siteData?.completed && domainToRegister && !hasAutoOpened) {
+    if (siteData?.completed && siteData?.customDomain && domainToRegister && !hasAutoOpened) {
       setHasAutoOpened(true);
       try {
         window.open(domainToRegister.url, '_blank');
@@ -61,7 +80,7 @@ export default function ProgressoPage() {
         console.warn('Bloqueador de popup ativo; botão manual disponível na tela.');
       }
     }
-  }, [siteData?.completed, domainToRegister, hasAutoOpened]);
+  }, [siteData?.completed, siteData?.customDomain, domainToRegister, hasAutoOpened]);
 
   useEffect(() => {
     if (!siteId) return;
@@ -292,14 +311,14 @@ export default function ProgressoPage() {
               </div>
 
               {/* Banner de Conclusão do Registro de Domínio no Registro.br */}
-              {domainToRegister && (
+              {domainToRegister && siteData?.customDomain && (
                 <div className="mt-4 p-5 bg-white/90 rounded-2xl border-2 border-amber-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold text-[11px] uppercase tracking-wider">
                       Registro.br • Etapa Final
                     </span>
                     <h4 className="font-bold text-slate-900 text-sm">
-                      Conclua o Registro de <span className="text-amber-700 font-mono underline">{domainToRegister.domain}</span>
+                      Conclua o Registro de <span className="text-amber-700 font-mono underline">{siteData.customDomain}</span>
                     </h4>
                     <p className="text-xs text-slate-600">
                       Uma nova aba foi aberta para você registrar este domínio no Registro.br. Se o navegador bloqueou, utilize o botão ao lado.

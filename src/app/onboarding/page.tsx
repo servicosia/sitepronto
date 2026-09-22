@@ -478,18 +478,23 @@ function OnboardingContent() {
         return;
       }
 
-      // Se optou por registrar o domínio, salva no sessionStorage
-      if (formData.registerDomainOnCompletion && formData.customDomainName) {
+      // Se optou por registrar o domínio próprio, salva no sessionStorage
+      if (formData.hasCustomDomain && formData.registerDomainOnCompletion && formData.customDomainName) {
         try {
           sessionStorage.setItem('registerDomainOnCompletion', JSON.stringify({
+            siteId: result.siteId,
             domain: formData.customDomainName,
             url: domainCheckResult?.registrationUrl || `https://registro.br/busca-dominio/?fqdn=${encodeURIComponent(formData.customDomainName)}`,
           }));
         } catch {}
+      } else {
+        try {
+          sessionStorage.removeItem('registerDomainOnCompletion');
+        } catch {}
       }
 
       // Redireciona para tela de progresso em tempo real
-      const regParam = formData.registerDomainOnCompletion ? '?registerDomain=1' : '';
+      const regParam = (formData.hasCustomDomain && formData.registerDomainOnCompletion && formData.customDomainName) ? '?registerDomain=1' : '';
       router.push(`/progresso/${result.siteId}${regParam}`);
     } catch (err) {
       alert('Falha ao conectar com o servidor.');
@@ -1119,7 +1124,13 @@ function OnboardingContent() {
                   <div
                     onClick={() => {
                       handleInputChange('hasCustomDomain', false);
+                      handleInputChange('registerDomainOnCompletion', false);
+                      handleInputChange('customDomainName', '');
+                      setDomainCheckResult(null);
                       setDomainVerified(true);
+                      try {
+                        sessionStorage.removeItem('registerDomainOnCompletion');
+                      } catch {}
                     }}
                     className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
                       !formData.hasCustomDomain
@@ -1286,7 +1297,7 @@ function OnboardingContent() {
                         <label className="flex items-center space-x-2.5 pt-2 border-t border-emerald-200/80 cursor-pointer">
                           <input
                             type="checkbox"
-                            checked={formData.registerDomainOnCompletion !== false}
+                            checked={Boolean(formData.registerDomainOnCompletion)}
                             onChange={(e) => handleInputChange('registerDomainOnCompletion', e.target.checked)}
                             className="w-4 h-4 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-600"
                           />
