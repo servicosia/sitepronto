@@ -87,19 +87,30 @@ export async function GET(req: NextRequest) {
       providerUsed = designResult.providerUsed;
     }
 
+    // Garante que o e-mail ou nome cadastrados no voucher sejam refletidos nos dados da sessão
+    const rawData = (session?.data as any) || {};
+    const mergedSessionData = {
+      ...rawData,
+      publicEmail: rawData.publicEmail || validation.voucher.clientEmail || '',
+      adminEmail: rawData.adminEmail || validation.voucher.clientEmail || '',
+      fullName: rawData.fullName || validation.voucher.clientName || '',
+      professionalName: rawData.professionalName || rawData.fullName || validation.voucher.clientName || '',
+    };
+
     return NextResponse.json({
-      session: session ? {
-        id: session.id,
-        step: session.step,
-        data: session.data,
-        selectedDesign: session.selectedDesign,
-        isComplete: session.isComplete,
-      } : null,
+      session: {
+        id: session?.id || null,
+        step: session?.step || 1,
+        data: mergedSessionData,
+        selectedDesign: session?.selectedDesign || null,
+        isComplete: session?.isComplete || false,
+      },
       designs,
       providerUsed,
       voucher: {
         code: validation.voucher.code,
         clientName: validation.voucher.clientName,
+        clientEmail: validation.voucher.clientEmail,
         plan: validation.voucher.plan,
       },
     });

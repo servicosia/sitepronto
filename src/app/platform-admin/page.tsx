@@ -492,10 +492,12 @@ export default function PlatformAdminPage() {
                       </td>
                       <td className="py-3 px-4 text-xs font-mono">
                         <Link 
-                          href={`/iniciar`} 
-                          className="text-indigo-600 hover:underline flex items-center"
+                          href={`/iniciar?voucher=${encodeURIComponent(v.code)}`} 
+                          className="text-indigo-600 hover:underline flex items-center gap-1 font-semibold"
+                          title={`Resgatar voucher ${v.code}`}
                         >
-                          /iniciar <ExternalLink className="w-3 h-3 ml-1" />
+                          <span>/iniciar?voucher={v.code}</span>
+                          <ExternalLink className="w-3 h-3 shrink-0" />
                         </Link>
                       </td>
                       <td className="py-3 px-4 text-xs text-slate-400">

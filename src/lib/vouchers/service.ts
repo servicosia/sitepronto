@@ -35,6 +35,26 @@ export async function createVoucher(input: CreateVoucherInput) {
     },
   });
 
+  // Salva e pré-carrega o e-mail e nome no formulário de criação do site (OnboardingSession)
+  if (input.clientEmail || input.clientName) {
+    try {
+      await prisma.onboardingSession.create({
+        data: {
+          voucherId: voucher.id,
+          step: 1,
+          data: {
+            fullName: input.clientName || '',
+            professionalName: input.clientName || '',
+            publicEmail: input.clientEmail || '',
+            adminEmail: input.clientEmail || '',
+          },
+        },
+      });
+    } catch (sessionErr) {
+      console.warn('[createVoucher] Não foi possível pré-inicializar a sessão:', sessionErr);
+    }
+  }
+
   await prisma.auditEvent.create({
     data: {
       eventType: 'VOUCHER_CREATED',

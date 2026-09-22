@@ -768,19 +768,19 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
 <body class="bg-slate-50 antialiased min-h-screen">
 
   <!-- CONTAINERS DOS MODELOS DE TEMPLATE -->
-  <div id="tpl-MODEL_A" class="template-container">
+  <div id="tpl-MODEL_A" class="template-container ${defaultVariant === 'MODEL_A' ? 'active' : ''}">
     ${htmlA}
   </div>
 
-  <div id="tpl-MODEL_B" class="template-container">
+  <div id="tpl-MODEL_B" class="template-container ${defaultVariant === 'MODEL_B' ? 'active' : ''}">
     ${htmlB}
   </div>
 
-  <div id="tpl-MODEL_C" class="template-container">
+  <div id="tpl-MODEL_C" class="template-container ${defaultVariant === 'MODEL_C' ? 'active' : ''}">
     ${htmlC}
   </div>
 
-  <div id="tpl-MODEL_D" class="template-container">
+  <div id="tpl-MODEL_D" class="template-container ${defaultVariant === 'MODEL_D' ? 'active' : ''}">
     ${htmlD}
   </div>
 
@@ -801,14 +801,24 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   <script>
     // 1. Inicializa o template ativo
     (function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlTemplate = urlParams.get('t') || urlParams.get('template');
-      const storedTemplate = localStorage.getItem('site_selected_template');
-      const activeTemplate = urlTemplate || storedTemplate || '${defaultVariant}';
-      
-      const targetEl = document.getElementById('tpl-' + activeTemplate) || document.getElementById('tpl-MODEL_A');
-      if (targetEl) {
-        targetEl.classList.add('active');
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlTemplate = urlParams.get('t') || urlParams.get('template');
+        let storedTemplate = null;
+        try {
+          storedTemplate = localStorage.getItem('site_selected_template');
+        } catch (e) {}
+        const activeTemplate = urlTemplate || '${defaultVariant}' || storedTemplate || 'MODEL_A';
+        
+        document.querySelectorAll('.template-container').forEach(function(el) {
+          el.classList.remove('active');
+        });
+        const targetEl = document.getElementById('tpl-' + activeTemplate) || document.getElementById('tpl-MODEL_A');
+        if (targetEl) {
+          targetEl.classList.add('active');
+        }
+      } catch (err) {
+        console.warn('Erro ao inicializar container de template:', err);
       }
     })();
 
@@ -895,7 +905,8 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     // 5. Aplicação modular de seções (ativação/desativação sincronizada com /master)
     function applySectionsConfig() {
       try {
-        const raw = localStorage.getItem('site_sections_config');
+        let raw = null;
+        try { raw = localStorage.getItem('site_sections_config'); } catch (e) {}
         if (!raw) return;
         const config = JSON.parse(raw);
         const sections = ['inicio', 'servicos', 'como-funciona', 'sobre', 'galeria', 'depoimentos', 'artigos', 'contato'];
@@ -917,7 +928,8 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     function applyCustomCards() {
       try {
         // A. Áreas de Atuação
-        const rawServices = localStorage.getItem('site_services');
+        let rawServices = null;
+        try { rawServices = localStorage.getItem('site_services'); } catch (e) {}
         if (rawServices) {
           const services = JSON.parse(rawServices);
           if (Array.isArray(services) && services.length > 0) {
@@ -940,7 +952,8 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
         }
 
         // B. Galeria de Fotos
-        const rawGallery = localStorage.getItem('site_gallery');
+        let rawGallery = null;
+        try { rawGallery = localStorage.getItem('site_gallery'); } catch (e) {}
         if (rawGallery) {
           const gallery = JSON.parse(rawGallery);
           if (Array.isArray(gallery) && gallery.length > 0) {
@@ -963,7 +976,8 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
         }
 
         // C. Depoimentos
-        const rawTestimonials = localStorage.getItem('site_testimonials');
+        let rawTestimonials = null;
+        try { rawTestimonials = localStorage.getItem('site_testimonials'); } catch (e) {}
         if (rawTestimonials) {
           const testimonials = JSON.parse(rawTestimonials);
           if (Array.isArray(testimonials) && testimonials.length > 0) {

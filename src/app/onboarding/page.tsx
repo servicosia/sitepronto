@@ -34,7 +34,7 @@ const steps = [
   { id: 1, name: 'Identificação', desc: 'Nome e Atividade' },
   { id: 2, name: 'Especialidades', desc: 'Resumo e Atuação' },
   { id: 3, name: 'Módulos & Conteúdo', desc: 'Seções, Serviços e Galeria' },
-  { id: 4, name: 'Domínio & Contatos', desc: 'Registro.br e WhatsApp' },
+  { id: 4, name: 'Contatos & Domínio', desc: 'WhatsApp e Registro.br' },
   { id: 5, name: 'Identidade', desc: 'Cores e Estilo' },
   { id: 6, name: 'Modelos de UI', desc: 'Escolha seu Design' },
   { id: 7, name: 'Revisão', desc: 'Confirmação Final' },
@@ -237,10 +237,27 @@ function OnboardingContent() {
       try {
         const res = await fetch(`/api/onboarding?voucher=${encodeURIComponent(voucherCode)}`);
         const data = await res.json();
+        const voucherEmail = data.voucher?.clientEmail || '';
+        const sessionData = data.session?.data || {};
+
         if (data.session?.data) {
-          setFormData((prev) => ({ ...prev, ...data.session.data }));
+          setFormData((prev) => ({ 
+            ...prev, 
+            ...sessionData,
+            publicEmail: sessionData.publicEmail || voucherEmail || prev.publicEmail || '',
+          }));
           if (data.session.step) setCurrentStep(data.session.step);
           if (data.session.selectedDesign) setSelectedModel(data.session.selectedDesign);
+        } else if (voucherEmail) {
+          setFormData((prev) => ({
+            ...prev,
+            publicEmail: voucherEmail,
+          }));
+        }
+
+        const effectiveEmail = sessionData.publicEmail || sessionData.adminEmail || voucherEmail;
+        if (effectiveEmail) {
+          setAccountEmail(effectiveEmail);
         }
       } catch (err) {
         console.error('Failed to load session:', err);
@@ -466,7 +483,7 @@ function OnboardingContent() {
         try {
           sessionStorage.setItem('registerDomainOnCompletion', JSON.stringify({
             domain: formData.customDomainName,
-            url: domainCheckResult?.registrationUrl || `https://registro.br/busca/?query=${encodeURIComponent(formData.customDomainName)}`,
+            url: domainCheckResult?.registrationUrl || `https://registro.br/busca-dominio/?fqdn=${encodeURIComponent(formData.customDomainName)}`,
           }));
         } catch {}
       }
@@ -1035,17 +1052,63 @@ function OnboardingContent() {
             </div>
           )}
 
-          {/* ETAPA 4: Domínio & Contatos */}
+          {/* ETAPA 4: Contatos & Domínio */}
           {currentStep === 4 && (
             <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900">Domínio e Canais de Atendimento</h2>
+                <h2 className="text-2xl font-bold text-slate-900">Canais de Atendimento e Domínio</h2>
                 <p className="text-slate-600 text-sm mt-1">
-                  Defina o endereço oficial na internet e os canais diretos para os clientes entrarem em contato.
+                  Defina os canais diretos para os clientes entrarem em contato e o endereço oficial na internet.
                 </p>
               </div>
 
-              {/* SELEÇÃO DO TIPO DE DOMÍNIO (STITCH SCREEN 3) */}
+              {/* 1. DADOS DE CONTATO E WHATSAPP (PRIMEIRO) */}
+              <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5">
+                <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                  <Phone className="w-5 h-5 text-slate-700" />
+                  Canais de Contato e Atendimento
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">WhatsApp Comercial *</label>
+                    <input
+                      type="text"
+                      value={formData.whatsapp || ''}
+                      onChange={(e) => handleInputChange('whatsapp', e.target.value)}
+                      placeholder="Ex: (11) 99999-8888"
+                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
+                    />
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Os botões de agendamento em todo o site direcionarão os clientes para este WhatsApp.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail de Contato Público *</label>
+                    <input
+                      type="email"
+                      value={formData.publicEmail || ''}
+                      onChange={(e) => handleInputChange('publicEmail', e.target.value)}
+                      placeholder="contato@seunome.com.br"
+                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Horário de Atendimento</label>
+                    <input
+                      type="text"
+                      value={formData.businessHours || ''}
+                      onChange={(e) => handleInputChange('businessHours', e.target.value)}
+                      placeholder="Segunda a Sexta, das 09h às 18h"
+                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. SELEÇÃO DO TIPO DE DOMÍNIO (DEPOIS) */}
               <div className="space-y-4">
                 <label className="block text-sm font-bold text-slate-900">
                   Como você deseja publicar o endereço do seu site?
@@ -1266,52 +1329,6 @@ function OnboardingContent() {
                   )}
                 </div>
               )}
-
-              {/* DADOS DE CONTATO E WHATSAPP */}
-              <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5">
-                <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-                  <Phone className="w-5 h-5 text-slate-700" />
-                  Canais de Contato e Atendimento
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">WhatsApp Comercial *</label>
-                    <input
-                      type="text"
-                      value={formData.whatsapp || ''}
-                      onChange={(e) => handleInputChange('whatsapp', e.target.value)}
-                      placeholder="Ex: (11) 99999-8888"
-                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
-                    />
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      Os botões de agendamento em todo o site direcionarão os clientes para este WhatsApp.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail de Contato Público *</label>
-                    <input
-                      type="email"
-                      value={formData.publicEmail || ''}
-                      onChange={(e) => handleInputChange('publicEmail', e.target.value)}
-                      placeholder="contato@seunome.com.br"
-                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Horário de Atendimento</label>
-                    <input
-                      type="text"
-                      value={formData.businessHours || ''}
-                      onChange={(e) => handleInputChange('businessHours', e.target.value)}
-                      placeholder="Segunda a Sexta, das 09h às 18h"
-                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
@@ -1565,6 +1582,7 @@ function OnboardingContent() {
                       }`}>
                         {previewsData[selectedModel]?.html ? (
                           <iframe
+                            key={`${selectedModel}-${previewViewport}`}
                             title="Live UI Preview"
                             srcDoc={previewsData[selectedModel].html}
                             className="w-full h-full border-0"

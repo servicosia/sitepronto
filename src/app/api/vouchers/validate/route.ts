@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
         id: result.voucher!.id,
         code: result.voucher!.code,
         clientName: result.voucher!.clientName,
+        clientEmail: result.voucher!.clientEmail,
         plan: result.voucher!.plan,
       }
     });

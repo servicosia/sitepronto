@@ -45,7 +45,7 @@ export default function ProgressoPage() {
         if (urlParams.get('registerDomain') === '1' && siteData?.customDomain) {
           setDomainToRegister({
             domain: siteData.customDomain,
-            url: `https://registro.br/busca/?query=${encodeURIComponent(siteData.customDomain)}`,
+            url: `https://registro.br/busca-dominio/?fqdn=${encodeURIComponent(siteData.customDomain)}`,
           });
         }
       }

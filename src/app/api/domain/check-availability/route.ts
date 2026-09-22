@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
         status: res.status,
         domain,
         message: 'Não foi possível consultar o Registro.br no momento.',
-        registrationUrl: `https://registro.br/busca/?query=${encodeURIComponent(domain)}`,
+        registrationUrl: `https://registro.br/busca-dominio/?fqdn=${encodeURIComponent(domain)}`,
       });
     }
 
@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
       fqdn: data.fqdn || domain,
       message,
       suggestions,
-      registrationUrl: `https://registro.br/busca/?query=${encodeURIComponent(domain)}`,
+      registrationUrl: `https://registro.br/busca-dominio/?fqdn=${encodeURIComponent(domain)}`,
     });
   } catch (error: any) {
     console.warn('[CheckAvailability] Erro ao consultar Registro.br:', error.message);

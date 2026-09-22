@@ -1,19 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, Ticket, AlertCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function IniciarPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-slate-900" />
+      </div>
+    }>
+      <IniciarContent />
+    </Suspense>
+  );
+}
+
+function IniciarContent() {
   const router = useRouter();
-  const [code, setCode] = useState('');
+  const searchParams = useSearchParams();
+  const initialVoucher = searchParams.get('voucher') || searchParams.get('code') || '';
+
+  const [code, setCode] = useState(initialVoucher.toUpperCase());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!code.trim()) {
+  async function validateAndRedirect(voucherCode: string) {
+    if (!voucherCode.trim()) {
       setError('Por favor, digite o código do seu voucher.');
       return;
     }
@@ -25,7 +39,7 @@ export default function IniciarPage() {
       const res = await fetch('/api/vouchers/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code.trim() }),
+        body: JSON.stringify({ code: voucherCode.trim() }),
       });
 
       const data = await res.json();
@@ -42,6 +56,20 @@ export default function IniciarPage() {
       setError('Erro de conexão. Tente novamente.');
       setLoading(false);
     }
+  }
+
+  // Se o código de voucher veio pela URL (ex: /iniciar?voucher=SP-XXXX), auto-valida
+  useEffect(() => {
+    if (initialVoucher) {
+      const clean = initialVoucher.trim().toUpperCase();
+      setCode(clean);
+      validateAndRedirect(clean);
+    }
+  }, [initialVoucher]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    validateAndRedirect(code);
   }
 
   return (
