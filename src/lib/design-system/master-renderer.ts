@@ -30,9 +30,128 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     ? data.testimonials
     : getContextualTestimonials(profession, data.mainSpecialty, data.companyName);
 
+  const products = data.products && data.products.length > 0 ? data.products : [
+    {
+      title: 'Kit de Boas-Vindas & Acompanhamento',
+      description: 'Material exclusivo com guia de orientações, diário de hábitos e suporte prático dedicado.',
+      price: 'R$ 89,00',
+      imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
+      ctaText: 'Pedir no WhatsApp',
+    },
+    {
+      title: 'Guia Prático Estratégico',
+      description: 'Manual completo passo a passo com metodologia consolidada e orientações essenciais.',
+      price: 'R$ 59,90',
+      imageUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80',
+      ctaText: 'Pedir no WhatsApp',
+    },
+    {
+      title: 'Mentoria & Pacote de Atendimento',
+      description: 'Acompanhamento estruturado com diagnóstico aprofundado e metas personalizadas.',
+      price: '', // Opcional — sem preço / sob consulta
+      imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80',
+      ctaText: 'Consultar Valores',
+    }
+  ];
+
+  const faq = data.faq && data.faq.length > 0 ? data.faq : [
+    { question: 'Como funciona o primeiro atendimento ou consulta?', answer: 'Realizamos um diagnóstico detalhado das suas necessidades, com escuta atenta, ética e um plano de trabalho totalmente personalizado.' },
+    { question: 'Vocês atendem de forma online ou presencial?', answer: 'Oferecemos formatos flexíveis: atendimento 100% online para todo o Brasil e atendimento presencial com estrutura acolhedora e climatizada.' },
+    { question: 'Qual o tempo médio de resposta para agendamentos?', answer: 'Normalmente retornamos em até poucas horas pelo WhatsApp comercial. Você escolhe o melhor dia e horário na agenda.' },
+    { question: 'Quais são as opções de pagamento aceitas?', answer: 'Trabalhamos com PIX, cartões de crédito em até 12x e faturamento corporativo para empresas e contratos mensais.' }
+  ];
+
+  const plans = data.plans && data.plans.length > 0 ? data.plans : [
+    {
+      title: 'Atendimento Pontual',
+      badge: 'Início Rápido',
+      price: 'R$ 250',
+      period: 'por sessão',
+      description: 'Ideal para alinhamento rápido de demandas específicas e orientações imediatas.',
+      features: ['Diagnóstico aprofundado', 'Plano de ação estruturado', 'Suporte pós-atendimento'],
+      ctaText: 'Agendar Sessão',
+      highlight: false
+    },
+    {
+      title: 'Acompanhamento Estruturado',
+      badge: 'Mais Escolhido',
+      price: 'R$ 690',
+      period: 'por mês',
+      description: 'Plano com acompanhamento periódico para evolução contínua e resultados consistentes.',
+      features: ['4 Atendimentos mensais', 'Suporte prioritário via WhatsApp', 'Ajustes contínuos de metas', 'Materiais e relatórios exclusivos'],
+      ctaText: 'Contratar Pacote',
+      highlight: true
+    },
+    {
+      title: 'Assessoria Completa & VIP',
+      badge: 'Exclusivo',
+      price: 'Sob Consulta',
+      period: 'sob medida',
+      description: 'Atendimento dedicado com foco estratégico de alta intensidade para máxima segurança.',
+      features: ['Acesso prioritário irrestrito', 'Consultoria e alinhamento', 'Análise preventiva contínua', 'Atendimento presencial e online'],
+      ctaText: 'Falar com Especialista',
+      highlight: false
+    }
+  ];
+
+  const cases = data.cases && data.cases.length > 0 ? data.cases : [
+    {
+      title: 'Reestruturação Estratégica e Crescimento Seguro',
+      category: 'Consultoria & Estratégia',
+      resultBadge: '+140% em Resultados',
+      description: 'Mapeamento minucioso dos desafios e implementação de metodologia prática para destravar objetivos.',
+      imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
+      ctaText: 'Conhecer Caso'
+    },
+    {
+      title: 'Atendimento Especializado com Resolução Eficaz',
+      category: 'Atendimento Direto',
+      resultBadge: '100% Satisfação',
+      description: 'Acompanhamento humanizado e técnico para resolução de demandas complexas com total transparência.',
+      imageUrl: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80',
+      ctaText: 'Conhecer Caso'
+    }
+  ];
+
+  const bioLinks = data.bioLinks && data.bioLinks.length > 0 ? data.bioLinks : [
+    { label: '💬 Falar no WhatsApp Direto', url: 'https://wa.me/' + (data.whatsapp || '').replace(/[^0-9]/g, ''), icon: 'MessageCircle', isHighlight: true },
+    { label: '📅 Agendar Atendimento Online', url: '#contato', icon: 'Calendar', isHighlight: false },
+    { label: '⚖️ Conhecer Nossas Especialidades', url: '#servicos', icon: 'Briefcase', isHighlight: false },
+    { label: '🛍️ Ver Catálogo de Produtos', url: '#catalogo', icon: 'ShoppingBag', isHighlight: false },
+    { label: '📍 Localização e Horários', url: '#sobre', icon: 'MapPin', isHighlight: false }
+  ];
+
+  const announcement = data.announcement || {
+    active: false,
+    text: 'Aviso: Agenda aberta para novos atendimentos este mês com horários flexíveis!',
+    badge: 'COMUNICADO',
+    linkText: 'Falar no WhatsApp',
+    linkUrl: 'https://wa.me/' + (data.whatsapp || '').replace(/[^0-9]/g, '')
+  };
+
+  const partners = data.partners && data.partners.length > 0 ? data.partners : [
+    { name: 'Empresa Líder Regional', logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80', type: 'Cliente' },
+    { name: 'Grupo Inovação & Saúde', logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80', type: 'Parceiro' },
+    { name: 'Certificação de Qualidade Técnica', logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80', type: 'Certificação' }
+  ];
+
+  const simulator = data.simulator || {
+    active: false,
+    title: 'Simulador de Atendimento Personalizado',
+    subtitle: 'Escolha suas preferências e envie uma solicitação pronta no WhatsApp com 1 clique'
+  };
+
   const safeJsonServices = JSON.stringify(services).replace(/</g, '\\u003c');
   const safeJsonGallery = JSON.stringify(gallery).replace(/</g, '\\u003c');
   const safeJsonTestimonials = JSON.stringify(testimonials).replace(/</g, '\\u003c');
+  const safeJsonProducts = JSON.stringify(products).replace(/</g, '\\u003c');
+  const safeJsonFaq = JSON.stringify(faq).replace(/</g, '\\u003c');
+  const safeJsonPlans = JSON.stringify(plans).replace(/</g, '\\u003c');
+  const safeJsonCases = JSON.stringify(cases).replace(/</g, '\\u003c');
+  const safeJsonBioLinks = JSON.stringify(bioLinks).replace(/</g, '\\u003c');
+  const safeJsonAnnouncement = JSON.stringify(announcement).replace(/</g, '\\u003c');
+  const safeJsonPartners = JSON.stringify(partners).replace(/</g, '\\u003c');
+  const safeJsonSimulator = JSON.stringify(simulator).replace(/</g, '\\u003c');
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -68,11 +187,14 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         </div>
       </div>
 
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-3">
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-400 text-xs font-semibold">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          Neon & Vercel Conectados
+          Shardcloud Engine Ativo & Conectado
         </span>
+        <a href="/recuperar-senha" target="_blank" class="text-xs text-slate-300 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center">
+          🔑 Lembrete de Senha
+        </a>
         <a href="/" class="text-xs text-slate-300 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center">
           Ver Site Público ↗
         </a>
@@ -84,7 +206,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
     
     <!-- METRICS OVERVIEW -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="switchTab('tab-contacts')">
         <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Atendimentos / Leads</div>
         <div class="text-3xl font-extrabold text-slate-900 mt-2">1</div>
@@ -93,8 +215,14 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
 
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="switchTab('tab-sections')">
         <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Módulos Ativos</div>
-        <div id="activeModulesCount" class="text-3xl font-extrabold text-indigo-600 mt-2">8/8</div>
+        <div id="activeModulesCount" class="text-3xl font-extrabold text-indigo-600 mt-2">8/9</div>
         <div class="text-xs text-slate-500 mt-1">Seções configuráveis</div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="switchTab('tab-catalog')">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Catálogo (Máx 50)</div>
+        <div id="catalogCountMetric" class="text-3xl font-extrabold text-slate-900 mt-2">${products.length}/50</div>
+        <div id="catalogMetricStatus" class="text-xs font-semibold mt-1 text-slate-500">○ Desligado no site</div>
       </div>
 
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="switchTab('tab-services')">
@@ -126,6 +254,30 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           </button>
           <button id="btn-tab-sections" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-sections')">
             🧩 Módulos & Seções
+          </button>
+          <button id="btn-tab-catalog" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-catalog')">
+            🛍️ Catálogo de Produtos
+          </button>
+          <button id="btn-tab-faq" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-faq')">
+            ❓ Central de Dúvidas
+          </button>
+          <button id="btn-tab-plans" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-plans')">
+            💳 Planos & Preços
+          </button>
+          <button id="btn-tab-cases" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-cases')">
+            🏆 Casos de Sucesso
+          </button>
+          <button id="btn-tab-biolinks" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-biolinks')">
+            🔗 Bio Link (/links)
+          </button>
+          <button id="btn-tab-announcement" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-announcement')">
+            📢 Barra de Avisos
+          </button>
+          <button id="btn-tab-partners" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-partners')">
+            🤝 Parceiros & Clientes
+          </button>
+          <button id="btn-tab-simulator" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-simulator')">
+            🧮 Simulador
           </button>
           <button id="btn-tab-services" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-services')">
             ⚖️ Áreas de Atuação
@@ -244,6 +396,413 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         <div class="flex justify-end pt-4 border-t border-slate-100">
           <button onclick="saveServicesData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
             Salvar Áreas de Atuação
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA CATÁLOGO DE PRODUTOS (ATÉ 50 ITENS - OPÇÃO INICIA DESLIGADA) -->
+      <div id="tab-catalog" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <!-- Banner de Status de Ativação no Site Público -->
+        <div id="catalogStatusBanner" class="p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 border-slate-200">
+          <div class="flex items-start sm:items-center space-x-3.5">
+            <span class="text-3xl">🛍️</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-base text-slate-900">Catálogo de Produtos no Site</h4>
+                <span id="catalogStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  ○ Desligado
+                </span>
+              </div>
+              <p id="catalogStatusNotice" class="text-xs text-slate-500 mt-1">
+                Esta opção inicia desligada. Ligue o interruptor ao lado para que a seção de produtos e o link apareçam no site público.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-700">Exibir no Site:</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="catalogActivationSwitch" onchange="toggleCatalogActivationFromTab(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Cabeçalho e Ações do Catálogo -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-base text-slate-900">Gerenciar Produtos do Catálogo</h3>
+              <span id="catalogCapacityBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700">
+                0 de 50 produtos
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">
+              Cadastre até 50 produtos com foto, nome, descrição e preço (opcional). Os pedidos são direcionados para o seu WhatsApp.
+            </p>
+          </div>
+          <button id="btnAddProduct" onclick="addProductCard()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shrink-0 shadow-sm">
+            <span>+</span> Adicionar Novo Produto (Máx 50)
+          </button>
+        </div>
+
+        <!-- Lista/Grid de Produtos -->
+        <div id="catalogContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Renderizado via JavaScript -->
+        </div>
+
+        <!-- Rodapé com Salvamento -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
+          <span id="catalogCapacityFooter" class="text-xs text-slate-500">
+            Capacidade: <strong>0/50 produtos</strong> cadastrados.
+          </span>
+          <button onclick="saveCatalogData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Salvar Catálogo de Produtos
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA CENTRAL DE DÚVIDAS / FAQ -->
+      <div id="tab-faq" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <!-- Banner de Status de Ativação no Site Público -->
+        <div id="faqStatusBanner" class="p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 border-slate-200">
+          <div class="flex items-start sm:items-center space-x-3.5">
+            <span class="text-3xl">❓</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-base text-slate-900">Central de Dúvidas / FAQ no Site</h4>
+                <span id="faqStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  ○ Desligado
+                </span>
+              </div>
+              <p id="faqStatusNotice" class="text-xs text-slate-500 mt-1">
+                Esta opção inicia desligada. Ligue o interruptor ao lado para que a seção de perguntas frequentes e o menu apareçam no site público.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-700">Exibir no Site:</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="faqActivationSwitch" onchange="toggleFaqActivationFromTab(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+          <div>
+            <h3 class="font-bold text-base text-slate-900">Gerenciar Perguntas e Respostas</h3>
+            <p class="text-xs text-slate-500 mt-1">Esclareça dúvidas comuns para aumentar a conversão de clientes indecisos.</p>
+          </div>
+          <button onclick="addFaqCard()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shrink-0 shadow-sm">
+            <span>+</span> Adicionar Nova Pergunta
+          </button>
+        </div>
+
+        <div id="faqContainer" class="space-y-4">
+          <!-- Renderizado via JavaScript -->
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="saveFaqData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Salvar Perguntas & Respostas
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA TABELA DE PLANOS & PREÇOS -->
+      <div id="tab-plans" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <!-- Banner de Status de Ativação -->
+        <div id="plansStatusBanner" class="p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 border-slate-200">
+          <div class="flex items-start sm:items-center space-x-3.5">
+            <span class="text-3xl">💳</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-base text-slate-900">Tabela de Planos e Preços no Site</h4>
+                <span id="plansStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  ○ Desligado
+                </span>
+              </div>
+              <p id="plansStatusNotice" class="text-xs text-slate-500 mt-1">
+                Esta opção inicia desligada. Ligue o interruptor para exibir pacotes ou planos com tabela comparativa e botão para WhatsApp.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-700">Exibir no Site:</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="plansActivationSwitch" onchange="togglePlansActivationFromTab(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+          <div>
+            <h3 class="font-bold text-base text-slate-900">Gerenciar Pacotes & Planos</h3>
+            <p class="text-xs text-slate-500 mt-1">Defina nome do plano, badge ("Mais Escolhido"), preço, periodicidade e lista de benefícios.</p>
+          </div>
+          <button onclick="addPlanCard()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shrink-0 shadow-sm">
+            <span>+</span> Adicionar Novo Plano
+          </button>
+        </div>
+
+        <div id="plansContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Renderizado via JavaScript -->
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="savePlansData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Salvar Planos e Preços
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA CASOS DE SUCESSO / PORTFÓLIO -->
+      <div id="tab-cases" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <!-- Banner de Status de Ativação -->
+        <div id="casesStatusBanner" class="p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 border-slate-200">
+          <div class="flex items-start sm:items-center space-x-3.5">
+            <span class="text-3xl">🏆</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-base text-slate-900">Casos de Sucesso & Portfólio no Site</h4>
+                <span id="casesStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  ○ Desligado
+                </span>
+              </div>
+              <p id="casesStatusNotice" class="text-xs text-slate-500 mt-1">
+                Esta opção inicia desligada. Ligue o interruptor para apresentar projetos concluídos e resultados obtidos.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-700">Exibir no Site:</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="casesActivationSwitch" onchange="toggleCasesActivationFromTab(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+          <div>
+            <h3 class="font-bold text-base text-slate-900">Gerenciar Casos de Sucesso</h3>
+            <p class="text-xs text-slate-500 mt-1">Destaque desafios resolvidos, métricas de resultado e fotos do projeto.</p>
+          </div>
+          <button onclick="addCaseCard()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shrink-0 shadow-sm">
+            <span>+</span> Adicionar Caso de Sucesso
+          </button>
+        </div>
+
+        <div id="casesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Renderizado via JavaScript -->
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="saveCasesData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Salvar Casos de Sucesso
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA BIO LINK INTEGRADO (/LINKS) -->
+      <div id="tab-biolinks" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <!-- Banner de Status de Ativação -->
+        <div id="bioLinksStatusBanner" class="p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 border-slate-200">
+          <div class="flex items-start sm:items-center space-x-3.5">
+            <span class="text-3xl">🔗</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-base text-slate-900">Página de Bio Link Integrada (/links)</h4>
+                <span id="bioLinksStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  ○ Desligado
+                </span>
+              </div>
+              <p id="bioLinksStatusNotice" class="text-xs text-slate-500 mt-1">
+                Sua própria página estilo Linktree no seu próprio domínio (/links) para colocar na Bio do Instagram, TikTok e WhatsApp.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <a href="/links" target="_blank" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-300 transition">
+              Abrir /links ↗
+            </a>
+            <span class="text-xs font-bold text-slate-700">Exibir no Site:</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="bioLinksActivationSwitch" onchange="toggleBioLinksActivationFromTab(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+          <div>
+            <h3 class="font-bold text-base text-slate-900">Gerenciar Botões da Sua Bio</h3>
+            <p class="text-xs text-slate-500 mt-1">Ordene e personalize os links mais importantes para quem vem das redes sociais.</p>
+          </div>
+          <button onclick="addBioLinkCard()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shrink-0 shadow-sm">
+            <span>+</span> Adicionar Novo Botão
+          </button>
+        </div>
+
+        <div id="bioLinksContainer" class="space-y-3">
+          <!-- Renderizado via JavaScript -->
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="saveBioLinksData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Salvar Botões da Bio
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA BARRA DE AVISOS & COMUNICADOS -->
+      <div id="tab-announcement" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <!-- Banner de Status de Ativação -->
+        <div id="announcementStatusBanner" class="p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 border-slate-200">
+          <div class="flex items-start sm:items-center space-x-3.5">
+            <span class="text-3xl">📢</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-base text-slate-900">Barra de Avisos no Topo do Site</h4>
+                <span id="announcementStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  ○ Desligado
+                </span>
+              </div>
+              <p id="announcementStatusNotice" class="text-xs text-slate-500 mt-1">
+                Uma barra elegante fixa no topo do site para avisos de agenda aberta, feriados, novidades ou comunicados urgentes.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-700">Exibir no Site:</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="announcementActivationSwitch" onchange="toggleAnnouncementActivationFromTab(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Etiqueta / Badge do Comunicado</label>
+            <input type="text" id="announcementBadgeInput" placeholder="Ex: COMUNICADO, NOVIDADE, AGENDA 2026" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Texto Principal do Aviso *</label>
+            <textarea id="announcementTextInput" rows="2" placeholder="Ex: Agenda aberta para novos atendimentos este mês com horários flexíveis!" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm"></textarea>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Texto do Link / Botão (Opcional)</label>
+              <input type="text" id="announcementLinkTextInput" placeholder="Ex: Falar no WhatsApp" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Link do Botão (URL ou WhatsApp)</label>
+              <input type="text" id="announcementLinkUrlInput" placeholder="Ex: https://wa.me/... ou #contato" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="saveAnnouncementData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Salvar Barra de Avisos
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA PARCEIROS, CLIENTES & CERTIFICAÇÕES -->
+      <div id="tab-partners" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <!-- Banner de Status de Ativação -->
+        <div id="partnersStatusBanner" class="p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 border-slate-200">
+          <div class="flex items-start sm:items-center space-x-3.5">
+            <span class="text-3xl">🤝</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-base text-slate-900">Parceiros, Clientes & Certificações no Site</h4>
+                <span id="partnersStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  ○ Desligado
+                </span>
+              </div>
+              <p id="partnersStatusNotice" class="text-xs text-slate-500 mt-1">
+                Esta opção inicia desligada. Ligue o interruptor para exibir marcas e selos de prova social com alta autoridade.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-700">Exibir no Site:</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="partnersActivationSwitch" onchange="togglePartnersActivationFromTab(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+          <div>
+            <h3 class="font-bold text-base text-slate-900">Gerenciar Marcas & Selos</h3>
+            <p class="text-xs text-slate-500 mt-1">Adicione logotipos ou títulos de empresas atendidas, parceiros estratégicos ou entidades reguladoras.</p>
+          </div>
+          <button onclick="addPartnerCard()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shrink-0 shadow-sm">
+            <span>+</span> Adicionar Nova Marca
+          </button>
+        </div>
+
+        <div id="partnersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Renderizado via JavaScript -->
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="savePartnersData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Salvar Parceiros & Certificações
+          </button>
+        </div>
+      </div>
+
+      <!-- ABA SIMULADOR DE ATENDIMENTO INTERATIVO -->
+      <div id="tab-simulator" class="tab-content hidden p-6 sm:p-8 space-y-6">
+        <!-- Banner de Status de Ativação -->
+        <div id="simulatorStatusBanner" class="p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 border-slate-200">
+          <div class="flex items-start sm:items-center space-x-3.5">
+            <span class="text-3xl">🧮</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-base text-slate-900">Simulador de Atendimento Interativo</h4>
+                <span id="simulatorStatusBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  ○ Desligado
+                </span>
+              </div>
+              <p id="simulatorStatusNotice" class="text-xs text-slate-500 mt-1">
+                Esta opção inicia desligada. Ligue o interruptor para disponibilizar um assistente de orçamento rápido onde o cliente escolhe opções e envia a mensagem pronta no WhatsApp.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-700">Exibir no Site:</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="simulatorActivationSwitch" onchange="toggleSimulatorActivationFromTab(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Título do Simulador</label>
+            <input type="text" id="simulatorTitleInput" placeholder="Ex: Simulador de Atendimento Personalizado" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Subtítulo / Instrução</label>
+            <textarea id="simulatorSubtitleInput" rows="2" placeholder="Ex: Selecione suas necessidades e envie uma solicitação pronta no WhatsApp com 1 clique" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm"></textarea>
+          </div>
+          <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900">
+            <strong>Como funciona para os visitantes:</strong> O simulador cria etapas intuitivas (Tipo de Demanda, Formato Online/Presencial e Urgência) gerando uma mensagem rica e estruturada diretamente no seu WhatsApp para atendimento imediato.
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="saveSimulatorData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition">
+            Salvar Simulador
           </button>
         </div>
       </div>
@@ -529,12 +1088,12 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         </div>
       </div>
 
-      <!-- ABA 11: DOMÍNIO & DNS (Vercel, Neon e Cloudflare) -->
+      <!-- ABA 11: DOMÍNIO & DNS (Shardcloud e Cloudflare) -->
       <div id="tab-domain" class="tab-content hidden p-6 sm:p-8 space-y-6">
         <div>
           <h3 class="font-bold text-base text-slate-900">Gerenciamento de Domínio Próprio & DNS</h3>
           <p class="text-xs text-slate-500 mt-1">
-            Altere ou vincule um novo domínio ao seu site. Ao salvar, nosso sistema atualiza automaticamente a Vercel, o Neon e a zona DNS na Cloudflare.
+            Altere ou vincule um novo domínio ao seu site. Ao salvar, nosso sistema atualiza automaticamente o roteamento no Shardcloud e a zona DNS na Cloudflare.
           </p>
         </div>
 
@@ -543,7 +1102,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           <div>
             <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Domínio Atualmente Configurado</span>
             <span id="currentDomainDisplay" class="text-lg font-extrabold text-slate-900 font-mono block mt-1">
-              ${data.customDomainName || 'Subdomínio Vercel Padrão'}
+              ${data.customDomainName || 'Subdomínio Shardcloud Padrão'}
             </span>
           </div>
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
@@ -596,7 +1155,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
   </main>
 
   <footer class="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
-    Painel /master • Isolamento criptográfico e persistência Neon PostgreSQL.
+    Painel /master • Isolamento criptográfico e infraestrutura de alta performance Shardcloud.
   </footer>
 
   <script>
@@ -604,6 +1163,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     // ESTADO E PERSISTÊNCIA DINÂMICA
     // ==========================================
     let selectedTemplate = localStorage.getItem('site_selected_template') || 'MODEL_A';
+
+    const defaultOffModules = ['catalogo', 'faq', 'planos', 'cases', 'biolinks', 'comunicado', 'parceiros', 'simulador'];
 
     const defaultSections = {
       inicio: true,
@@ -613,7 +1174,15 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       galeria: true,
       depoimentos: true,
       artigos: true,
-      contato: true
+      contato: true,
+      catalogo: false,
+      faq: false,
+      planos: false,
+      cases: false,
+      biolinks: false,
+      comunicado: false,
+      parceiros: false,
+      simulador: false
     };
 
     let sectionsConfig = (function() {
@@ -622,6 +1191,78 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         return stored ? JSON.parse(stored) : defaultSections;
       } catch(e) {
         return defaultSections;
+      }
+    })();
+
+    let catalogProductsList = (function() {
+      try {
+        const stored = localStorage.getItem('site_catalog_products');
+        return stored ? JSON.parse(stored) : ${safeJsonProducts};
+      } catch(e) {
+        return ${safeJsonProducts};
+      }
+    })();
+
+    let faqList = (function() {
+      try {
+        const stored = localStorage.getItem('site_faq');
+        return stored ? JSON.parse(stored) : ${safeJsonFaq};
+      } catch(e) {
+        return ${safeJsonFaq};
+      }
+    })();
+
+    let plansList = (function() {
+      try {
+        const stored = localStorage.getItem('site_plans');
+        return stored ? JSON.parse(stored) : ${safeJsonPlans};
+      } catch(e) {
+        return ${safeJsonPlans};
+      }
+    })();
+
+    let casesList = (function() {
+      try {
+        const stored = localStorage.getItem('site_cases');
+        return stored ? JSON.parse(stored) : ${safeJsonCases};
+      } catch(e) {
+        return ${safeJsonCases};
+      }
+    })();
+
+    let bioLinksList = (function() {
+      try {
+        const stored = localStorage.getItem('site_biolinks');
+        return stored ? JSON.parse(stored) : ${safeJsonBioLinks};
+      } catch(e) {
+        return ${safeJsonBioLinks};
+      }
+    })();
+
+    let announcementConfig = (function() {
+      try {
+        const stored = localStorage.getItem('site_announcement');
+        return stored ? JSON.parse(stored) : ${safeJsonAnnouncement};
+      } catch(e) {
+        return ${safeJsonAnnouncement};
+      }
+    })();
+
+    let partnersList = (function() {
+      try {
+        const stored = localStorage.getItem('site_partners');
+        return stored ? JSON.parse(stored) : ${safeJsonPartners};
+      } catch(e) {
+        return ${safeJsonPartners};
+      }
+    })();
+
+    let simulatorConfig = (function() {
+      try {
+        const stored = localStorage.getItem('site_simulator');
+        return stored ? JSON.parse(stored) : ${safeJsonSimulator};
+      } catch(e) {
+        return ${safeJsonSimulator};
       }
     })();
 
@@ -657,11 +1298,19 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     // ==========================================
     const sectionMetadata = [
       { id: 'inicio', title: 'Capa & Apresentação (Hero)', desc: 'Cabeçalho impactante, chamada para ação e badge de disponibilidade.', icon: '🎯' },
+      { id: 'comunicado', title: 'Barra de Avisos de Topo', desc: 'Aviso de destaque no topo para novidades, feriados ou comunicados.', icon: '📢' },
+      { id: 'parceiros', title: 'Parceiros, Clientes & Selos', desc: 'Marcas de empresas atendidas e selos de conformidade técnica.', icon: '🤝' },
       { id: 'servicos', title: 'Áreas de Atuação / Serviços', desc: 'Cards com as especialidades, descrições e botões de atendimento.', icon: '⚖️' },
+      { id: 'catalogo', title: 'Catálogo de Produtos (Até 50 itens)', desc: 'Exiba seus produtos com foto, descrição, preço opcional e pedido no WhatsApp.', icon: '🛍️' },
+      { id: 'planos', title: 'Tabela de Planos e Preços', desc: 'Pacotes estruturados com benefícios claros e contratação rápida.', icon: '💳' },
+      { id: 'cases', title: 'Casos de Sucesso / Portfólio', desc: 'Demonstração de projetos entregues, resultados e fotos reais.', icon: '🏆' },
       { id: 'como-funciona', title: 'Como Funciona / Etapas', desc: 'Passo a passo do processo de atendimento do início ao resultado.', icon: '📋' },
       { id: 'sobre', title: 'Sobre o Profissional / Apresentação', desc: 'Foto de perfil, biografia institucional e credenciais.', icon: '👤' },
       { id: 'galeria', title: 'Galeria de Fotos', desc: 'Registros do consultório, instalações e espaço de atendimento com lightbox.', icon: '🖼️' },
       { id: 'depoimentos', title: 'Depoimentos de Clientes', desc: 'Cards de avaliações com fotos dos clientes, estrelas e depoimentos.', icon: '💬' },
+      { id: 'faq', title: 'Central de Dúvidas / FAQ', desc: 'Perguntas frequentes interativas para quebrar objeções de clientes.', icon: '❓' },
+      { id: 'simulador', title: 'Simulador de Atendimento Interativo', desc: 'Assistente para montagem de pré-orçamento com envio direto no WhatsApp.', icon: '🧮' },
+      { id: 'biolinks', title: 'Página de Bio Link (/links)', desc: 'Página estilo Linktree próprio com links para redes sociais e WhatsApp.', icon: '🔗' },
       { id: 'artigos', title: 'Artigos & Orientações', desc: 'Artigos técnicos e orientações com tempo de leitura estimado.', icon: '📰' },
       { id: 'contato', title: 'Formulário de Contato Direto', desc: 'Formulário completo para recebimento de mensagens e agendamentos.', icon: '📬' }
     ];
@@ -672,7 +1321,10 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
 
       let activeCount = 0;
       container.innerHTML = sectionMetadata.map(function(sec) {
-        const isActive = sectionsConfig[sec.id] !== false;
+        const isDefaultOff = defaultOffModules.includes(sec.id);
+        const isActive = isDefaultOff
+          ? sectionsConfig[sec.id] === true
+          : sectionsConfig[sec.id] !== false;
         if (isActive) activeCount++;
 
         return '<div class="p-5 rounded-2xl border ' + (isActive ? 'border-slate-300 bg-white' : 'border-slate-200 bg-slate-50 opacity-70') + ' transition flex items-center justify-between gap-4">' +
@@ -704,15 +1356,23 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     function toggleSection(secId, isChecked) {
       sectionsConfig[secId] = isChecked;
       renderSectionsConfigUI();
+      if (secId === 'catalogo') syncCatalogActivationUI();
+      if (secId === 'faq') syncFaqActivationUI();
+      if (secId === 'planos') syncPlansActivationUI();
+      if (secId === 'cases') syncCasesActivationUI();
+      if (secId === 'biolinks') syncBioLinksActivationUI();
+      if (secId === 'comunicado') syncAnnouncementActivationUI();
+      if (secId === 'parceiros') syncPartnersActivationUI();
+      if (secId === 'simulador') syncSimulatorActivationUI();
       saveSectionsConfig(false);
     }
 
     function saveSectionsConfig(showAlert = true) {
       localStorage.setItem('site_sections_config', JSON.stringify(sectionsConfig));
       const b = document.getElementById('saveBadge');
-      b.innerText = 'Salvando módulos...';
+      if (b) b.innerText = 'Salvando módulos...';
       setTimeout(() => {
-        b.innerText = '✓ Sincronizado';
+        if (b) b.innerText = '✓ Sincronizado';
         if (showAlert) {
           alert('Configuração de módulos salva! Ao abrir ou atualizar o site principal, as seções marcadas já estarão atualizadas.');
         }
@@ -720,6 +1380,947 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     }
 
     // ==========================================
+    // GERENCIAMENTO DO CATÁLOGO DE PRODUTOS (ATÉ 50 ITENS)
+    // ==========================================
+    function isCatalogActive() {
+      return sectionsConfig && sectionsConfig['catalogo'] === true;
+    }
+
+    function syncCatalogActivationUI() {
+      const active = isCatalogActive();
+      const sw = document.getElementById('catalogActivationSwitch');
+      if (sw) sw.checked = active;
+
+      const badge = document.getElementById('catalogStatusBadge');
+      if (badge) {
+        badge.innerText = active ? '● Ativo no Site' : '○ Desligado';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full ' + (active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700');
+      }
+
+      const notice = document.getElementById('catalogStatusNotice');
+      if (notice) {
+        notice.innerText = active
+          ? 'O catálogo de produtos está ATIVADO e visível para os visitantes no site público.'
+          : 'Esta opção inicia desligada. Ligue o interruptor ao lado para que a seção de produtos e o link apareçam no site público.';
+      }
+
+      const banner = document.getElementById('catalogStatusBanner');
+      if (banner) {
+        banner.className = 'p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ' +
+          (active ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200');
+      }
+
+      const metricStatus = document.getElementById('catalogMetricStatus');
+      if (metricStatus) {
+        metricStatus.innerText = active ? '● Ativo no site' : '○ Desligado no site';
+        metricStatus.className = 'text-xs font-semibold mt-1 ' + (active ? 'text-emerald-600' : 'text-slate-500');
+      }
+
+      const metricCount = document.getElementById('catalogCountMetric');
+      if (metricCount) {
+        metricCount.innerText = catalogProductsList.length + '/50';
+      }
+    }
+
+    function toggleCatalogActivationFromTab(isChecked) {
+      sectionsConfig['catalogo'] = isChecked;
+      renderSectionsConfigUI();
+      syncCatalogActivationUI();
+      saveSectionsConfig(false);
+      const b = document.getElementById('saveBadge');
+      if (b) {
+        b.innerText = isChecked ? 'Catálogo ativado!' : 'Catálogo desligado!';
+        setTimeout(() => { b.innerText = '✓ Sincronizado'; }, 800);
+      }
+    }
+
+    function renderCatalogUI() {
+      syncCatalogActivationUI();
+      const container = document.getElementById('catalogContainer');
+      const capacityBadge = document.getElementById('catalogCapacityBadge');
+      const capacityFooter = document.getElementById('catalogCapacityFooter');
+      const btnAdd = document.getElementById('btnAddProduct');
+      const count = catalogProductsList.length;
+
+      if (capacityBadge) {
+        capacityBadge.innerText = count + ' de 50 produtos cadastrados';
+        capacityBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full ' +
+          (count >= 50 ? 'bg-rose-100 text-rose-800 border border-rose-200' : 'bg-indigo-50 border border-indigo-200 text-indigo-700');
+      }
+
+      if (capacityFooter) {
+        capacityFooter.innerHTML = 'Capacidade: <strong>' + count + '/50 produtos</strong>' +
+          (count >= 50 ? ' <span class="text-rose-600 font-bold">(Limite máximo atingido)</span>' : '');
+      }
+
+      if (btnAdd) {
+        if (count >= 50) {
+          btnAdd.classList.add('opacity-50', 'cursor-not-allowed');
+          btnAdd.title = 'Limite máximo de 50 produtos atingido';
+        } else {
+          btnAdd.classList.remove('opacity-50', 'cursor-not-allowed');
+          btnAdd.title = '';
+        }
+      }
+
+      if (!container) return;
+
+      if (count === 0) {
+        container.innerHTML = '<div class="col-span-full py-12 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 space-y-3">' +
+          '<div class="text-4xl">🛍️</div>' +
+          '<h4 class="font-bold text-slate-800 text-sm">Nenhum produto cadastrado no catálogo</h4>' +
+          '<p class="text-xs text-slate-500 max-w-md mx-auto">Cadastre até 50 produtos com foto, título, descrição e preço opcional. Quando ativado, os visitantes poderão pedir diretamente no WhatsApp.</p>' +
+          '<button onclick="addProductCard()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition">' +
+            '+ Adicionar Primeiro Produto' +
+          '</button>' +
+        '</div>';
+        return;
+      }
+
+      container.innerHTML = catalogProductsList.map(function(p, idx) {
+        const img = p.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80';
+        return '<div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-3 relative group">' +
+          '<div class="flex items-center justify-between">' +
+            '<span class="text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">Produto #' + (idx + 1) + '</span>' +
+            '<button onclick="deleteProductCard(' + idx + ')" class="text-xs text-rose-600 hover:text-rose-800 font-bold flex items-center gap-1">' +
+              '🗑️ Excluir' +
+            '</button>' +
+          '</div>' +
+          '<div class="aspect-[4/3] rounded-xl overflow-hidden bg-slate-200 border border-slate-300 relative group/img">' +
+            '<img id="prodImgPreview_' + idx + '" src="' + img + '" class="w-full h-full object-cover">' +
+            '<label class="absolute inset-0 bg-black/40 text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition cursor-pointer text-xs font-bold">' +
+              '📷 Trocar Foto' +
+              '<input type="file" accept="image/*" class="hidden" onchange="handleProductPhotoUpload(event, ' + idx + ')">' +
+            '</label>' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Nome do Produto *</label>' +
+            '<input type="text" name="title" value="' + (p.title || '') + '" oninput="updateProductItem(' + idx + ', this.name, this.value)" placeholder="Ex: Planner Anual" class="w-full px-3 py-1.5 text-sm font-bold bg-white border border-slate-300 rounded-lg">' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Descrição</label>' +
+            '<textarea rows="2" name="description" oninput="updateProductItem(' + idx + ', this.name, this.value)" placeholder="Detalhes, diferenciais e materiais..." class="w-full px-3 py-1.5 text-xs text-slate-600 bg-white border border-slate-300 rounded-lg">' + (p.description || '') + '</textarea>' +
+          '</div>' +
+          '<div class="grid grid-cols-2 gap-2">' +
+            '<div>' +
+              '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Preço (Opcional)</label>' +
+              '<input type="text" name="price" value="' + (p.price || '') + '" oninput="updateProductItem(' + idx + ', this.name, this.value)" placeholder="Ex: R$ 99,00" class="w-full px-3 py-1.5 text-xs font-mono bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+            '<div>' +
+              '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Texto do Botão</label>' +
+              '<input type="text" name="ctaText" value="' + (p.ctaText || 'Pedir pelo WhatsApp') + '" oninput="updateProductItem(' + idx + ', this.name, this.value)" placeholder="Pedir pelo WhatsApp" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">URL da Foto</label>' +
+            '<input type="url" name="imageUrl" value="' + (p.imageUrl || '') + '" oninput="updateProductItem(' + idx + ', this.name, this.value); const el = document.getElementById(\\\'prodImgPreview_' + idx + '\\\'); if (el) el.src = this.value || \\\'' + img + '\\\';" placeholder="https://..." class="w-full px-2 py-1 text-[11px] font-mono bg-white border border-slate-300 rounded-lg">' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function addProductCard() {
+      if (catalogProductsList.length >= 50) {
+        alert('Limite máximo de 50 produtos atingido! Você não pode cadastrar mais de 50 produtos.');
+        return;
+      }
+      catalogProductsList.push({
+        title: 'Novo Produto ' + (catalogProductsList.length + 1),
+        description: 'Descrição detalhada com diferenciais e especificações de alta qualidade.',
+        price: 'R$ 99,00',
+        imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80',
+        ctaText: 'Pedir pelo WhatsApp'
+      });
+      renderCatalogUI();
+      saveCatalogData(false);
+    }
+
+    function deleteProductCard(idx) {
+      if (confirm('Deseja realmente excluir este produto do catálogo?')) {
+        catalogProductsList.splice(idx, 1);
+        renderCatalogUI();
+        saveCatalogData(false);
+      }
+    }
+
+    function updateProductItem(idx, field, value) {
+      if (catalogProductsList[idx]) {
+        catalogProductsList[idx][field] = value;
+      }
+    }
+
+    function handleProductPhotoUpload(event, idx) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        catalogProductsList[idx].imageUrl = dataUrl;
+        const imgEl = document.getElementById('prodImgPreview_' + idx);
+        if (imgEl) imgEl.src = dataUrl;
+        saveCatalogData(false);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveCatalogData(showAlert = true) {
+      localStorage.setItem('site_catalog_products', JSON.stringify(catalogProductsList));
+      const b = document.getElementById('saveBadge');
+      if (b) b.innerText = 'Salvando produtos...';
+      syncCatalogActivationUI();
+      setTimeout(() => {
+        if (b) b.innerText = '✓ Sincronizado';
+        if (showAlert) {
+          const isAct = isCatalogActive();
+          const avisoAtivacao = isAct
+            ? 'Os produtos estão ATIVOS e sincronizados no site público!'
+            : 'Os produtos foram salvos! Lembre-se de ativar o interruptor do Catálogo para que ele apareça no site.';
+          alert('Catálogo de produtos salvo com sucesso! ' + avisoAtivacao);
+        }
+      }, 300);
+    }
+
+    // ==========================================
+    // GERENCIAMENTO DA CENTRAL DE DÚVIDAS / FAQ
+    // ==========================================
+    function isFaqActive() {
+      return sectionsConfig && sectionsConfig['faq'] === true;
+    }
+
+    function syncFaqActivationUI() {
+      const active = isFaqActive();
+      const sw = document.getElementById('faqActivationSwitch');
+      if (sw) sw.checked = active;
+
+      const badge = document.getElementById('faqStatusBadge');
+      if (badge) {
+        badge.innerText = active ? '● Ativo no Site' : '○ Desligado';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full ' + (active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700');
+      }
+
+      const notice = document.getElementById('faqStatusNotice');
+      if (notice) {
+        notice.innerText = active
+          ? 'A Central de Dúvidas está ATIVADA e visível no site público.'
+          : 'Esta opção inicia desligada. Ligue o interruptor ao lado para que a seção de perguntas frequentes e o menu apareçam no site público.';
+      }
+
+      const banner = document.getElementById('faqStatusBanner');
+      if (banner) {
+        banner.className = 'p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ' +
+          (active ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200');
+      }
+    }
+
+    function toggleFaqActivationFromTab(isChecked) {
+      sectionsConfig['faq'] = isChecked;
+      renderSectionsConfigUI();
+      syncFaqActivationUI();
+      saveSectionsConfig(false);
+      const b = document.getElementById('saveBadge');
+      if (b) {
+        b.innerText = isChecked ? 'FAQ ativado!' : 'FAQ desligado!';
+        setTimeout(() => { b.innerText = '✓ Sincronizado'; }, 800);
+      }
+    }
+
+    function renderFaqUI() {
+      syncFaqActivationUI();
+      const container = document.getElementById('faqContainer');
+      if (!container) return;
+
+      if (!faqList || faqList.length === 0) {
+        container.innerHTML = '<div class="py-10 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 space-y-2">' +
+          '<div class="text-3xl">❓</div>' +
+          '<p class="text-xs text-slate-500">Nenhuma pergunta frequente cadastrada.</p>' +
+          '<button onclick="addFaqCard()" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl hover:bg-emerald-700 transition">+ Adicionar Pergunta</button>' +
+        '</div>';
+        return;
+      }
+
+      container.innerHTML = faqList.map(function(item, idx) {
+        return '<div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-3 relative group">' +
+          '<div class="flex items-center justify-between">' +
+            '<span class="text-xs font-bold text-slate-800 bg-slate-200 px-2 py-0.5 rounded">Pergunta #' + (idx + 1) + '</span>' +
+            '<button onclick="deleteFaqCard(' + idx + ')" class="text-xs text-rose-600 hover:text-rose-800 font-bold flex items-center gap-1">' +
+              '🗑️ Excluir' +
+            '</button>' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Pergunta *</label>' +
+            '<input type="text" value="' + (item.question || '') + '" oninput="updateFaqItem(' + idx + ', \\\'question\\\', this.value)" placeholder="Ex: Qual o valor e como funciona a consulta?" class="w-full px-3 py-2 text-sm font-bold bg-white border border-slate-300 rounded-lg">' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Resposta *</label>' +
+            '<textarea rows="3" oninput="updateFaqItem(' + idx + ', \\\'answer\\\', this.value)" placeholder="Explicação clara e objetiva para o cliente..." class="w-full px-3 py-2 text-xs text-slate-700 bg-white border border-slate-300 rounded-lg">' + (item.answer || '') + '</textarea>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function addFaqCard() {
+      faqList.push({
+        question: 'Nova pergunta frequente ' + (faqList.length + 1),
+        answer: 'Resposta detalhada explicando o procedimento, benefícios e formas de contato.'
+      });
+      renderFaqUI();
+      saveFaqData(false);
+    }
+
+    function deleteFaqCard(idx) {
+      if (confirm('Deseja excluir esta pergunta?')) {
+        faqList.splice(idx, 1);
+        renderFaqUI();
+        saveFaqData(false);
+      }
+    }
+
+    function updateFaqItem(idx, field, value) {
+      if (faqList[idx]) {
+        faqList[idx][field] = value;
+      }
+    }
+
+    function saveFaqData(showAlert = true) {
+      localStorage.setItem('site_faq', JSON.stringify(faqList));
+      const b = document.getElementById('saveBadge');
+      if (b) b.innerText = 'Salvando dúvidas...';
+      syncFaqActivationUI();
+      setTimeout(() => {
+        if (b) b.innerText = '✓ Sincronizado';
+        if (showAlert) alert('Central de Dúvidas / FAQ salva com sucesso!');
+      }, 300);
+    }
+
+    // ==========================================
+    // GERENCIAMENTO DE PLANOS & PREÇOS
+    // ==========================================
+    function isPlansActive() {
+      return sectionsConfig && sectionsConfig['planos'] === true;
+    }
+
+    function syncPlansActivationUI() {
+      const active = isPlansActive();
+      const sw = document.getElementById('plansActivationSwitch');
+      if (sw) sw.checked = active;
+
+      const badge = document.getElementById('plansStatusBadge');
+      if (badge) {
+        badge.innerText = active ? '● Ativo no Site' : '○ Desligado';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full ' + (active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700');
+      }
+
+      const banner = document.getElementById('plansStatusBanner');
+      if (banner) {
+        banner.className = 'p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ' +
+          (active ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200');
+      }
+    }
+
+    function togglePlansActivationFromTab(isChecked) {
+      sectionsConfig['planos'] = isChecked;
+      renderSectionsConfigUI();
+      syncPlansActivationUI();
+      saveSectionsConfig(false);
+      const b = document.getElementById('saveBadge');
+      if (b) {
+        b.innerText = isChecked ? 'Planos ativados!' : 'Planos desligados!';
+        setTimeout(() => { b.innerText = '✓ Sincronizado'; }, 800);
+      }
+    }
+
+    function renderPlansUI() {
+      syncPlansActivationUI();
+      const container = document.getElementById('plansContainer');
+      if (!container) return;
+
+      container.innerHTML = plansList.map(function(p, idx) {
+        const featuresText = Array.isArray(p.features) ? p.features.join('\\n') : '';
+        return '<div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-3 relative group">' +
+          '<div class="flex items-center justify-between">' +
+            '<span class="text-xs font-bold text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded">Plano #' + (idx + 1) + '</span>' +
+            '<button onclick="deletePlanCard(' + idx + ')" class="text-xs text-rose-600 hover:text-rose-800 font-bold flex items-center gap-1">' +
+              '🗑️ Excluir' +
+            '</button>' +
+          '</div>' +
+          '<div class="grid grid-cols-2 gap-2">' +
+            '<div>' +
+              '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Título *</label>' +
+              '<input type="text" value="' + (p.title || '') + '" oninput="updatePlanItem(' + idx + ', \\\'title\\\', this.value)" class="w-full px-3 py-1.5 text-sm font-bold bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+            '<div>' +
+              '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Badge (Ex: Mais Escolhido)</label>' +
+              '<input type="text" value="' + (p.badge || '') + '" oninput="updatePlanItem(' + idx + ', \\\'badge\\\', this.value)" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+          '</div>' +
+          '<div class="grid grid-cols-2 gap-2">' +
+            '<div>' +
+              '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Preço (Ex: R$ 250)</label>' +
+              '<input type="text" value="' + (p.price || '') + '" oninput="updatePlanItem(' + idx + ', \\\'price\\\', this.value)" class="w-full px-3 py-1.5 text-xs font-mono font-bold bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+            '<div>' +
+              '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Período (Ex: por mês)</label>' +
+              '<input type="text" value="' + (p.period || '') + '" oninput="updatePlanItem(' + idx + ', \\\'period\\\', this.value)" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Descrição Curta</label>' +
+            '<input type="text" value="' + (p.description || '') + '" oninput="updatePlanItem(' + idx + ', \\\'description\\\', this.value)" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Recursos Inclusos (1 por linha)</label>' +
+            '<textarea rows="3" oninput="updatePlanFeatures(' + idx + ', this.value)" placeholder="Recurso 1\\nRecurso 2\\nRecurso 3" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg font-mono">' + featuresText + '</textarea>' +
+          '</div>' +
+          '<div class="flex items-center justify-between pt-2 border-t border-slate-200">' +
+            '<label class="inline-flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">' +
+              '<input type="checkbox" ' + (p.highlight ? 'checked' : '') + ' onchange="updatePlanItem(' + idx + ', \\\'highlight\\\', this.checked)" class="rounded text-indigo-600">' +
+              'Destaque Visual (Recomendado)' +
+            '</label>' +
+            '<input type="text" value="' + (p.ctaText || 'Contratar') + '" oninput="updatePlanItem(' + idx + ', \\\'ctaText\\\', this.value)" placeholder="Texto Botão" class="w-28 px-2 py-1 text-xs bg-white border border-slate-300 rounded-lg text-right">' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function addPlanCard() {
+      plansList.push({
+        title: 'Novo Plano ' + (plansList.length + 1),
+        badge: 'Opcional',
+        price: 'R$ 350',
+        period: 'por atendimento',
+        description: 'Pacote completo de acompanhamento e suporte.',
+        features: ['Diagnóstico aprofundado', 'Suporte dedicado via WhatsApp', 'Retorno programado'],
+        ctaText: 'Escolher Plano',
+        highlight: false
+      });
+      renderPlansUI();
+      savePlansData(false);
+    }
+
+    function deletePlanCard(idx) {
+      if (confirm('Deseja excluir este plano?')) {
+        plansList.splice(idx, 1);
+        renderPlansUI();
+        savePlansData(false);
+      }
+    }
+
+    function updatePlanItem(idx, field, value) {
+      if (plansList[idx]) {
+        plansList[idx][field] = value;
+      }
+    }
+
+    function updatePlanFeatures(idx, rawText) {
+      if (plansList[idx]) {
+        plansList[idx].features = rawText.split('\\n').map(s => s.trim()).filter(Boolean);
+      }
+    }
+
+    function savePlansData(showAlert = true) {
+      localStorage.setItem('site_plans', JSON.stringify(plansList));
+      const b = document.getElementById('saveBadge');
+      if (b) b.innerText = 'Salvando planos...';
+      syncPlansActivationUI();
+      setTimeout(() => {
+        if (b) b.innerText = '✓ Sincronizado';
+        if (showAlert) alert('Planos e Preços salvos com sucesso!');
+      }, 300);
+    }
+
+    // ==========================================
+    // GERENCIAMENTO DE CASOS DE SUCESSO
+    // ==========================================
+    function isCasesActive() {
+      return sectionsConfig && sectionsConfig['cases'] === true;
+    }
+
+    function syncCasesActivationUI() {
+      const active = isCasesActive();
+      const sw = document.getElementById('casesActivationSwitch');
+      if (sw) sw.checked = active;
+
+      const badge = document.getElementById('casesStatusBadge');
+      if (badge) {
+        badge.innerText = active ? '● Ativo no Site' : '○ Desligado';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full ' + (active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700');
+      }
+
+      const banner = document.getElementById('casesStatusBanner');
+      if (banner) {
+        banner.className = 'p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ' +
+          (active ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200');
+      }
+    }
+
+    function toggleCasesActivationFromTab(isChecked) {
+      sectionsConfig['cases'] = isChecked;
+      renderSectionsConfigUI();
+      syncCasesActivationUI();
+      saveSectionsConfig(false);
+      const b = document.getElementById('saveBadge');
+      if (b) {
+        b.innerText = isChecked ? 'Cases ativados!' : 'Cases desligados!';
+        setTimeout(() => { b.innerText = '✓ Sincronizado'; }, 800);
+      }
+    }
+
+    function renderCasesUI() {
+      syncCasesActivationUI();
+      const container = document.getElementById('casesContainer');
+      if (!container) return;
+
+      container.innerHTML = casesList.map(function(c, idx) {
+        const img = c.imageUrl || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80';
+        return '<div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-3 relative group">' +
+          '<div class="flex items-center justify-between">' +
+            '<span class="text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">Caso #' + (idx + 1) + '</span>' +
+            '<button onclick="deleteCaseCard(' + idx + ')" class="text-xs text-rose-600 hover:text-rose-800 font-bold flex items-center gap-1">' +
+              '🗑️ Excluir' +
+            '</button>' +
+          '</div>' +
+          '<div class="aspect-[16/9] rounded-xl overflow-hidden bg-slate-200 border border-slate-300 relative group/img">' +
+            '<img id="caseImgPreview_' + idx + '" src="' + img + '" class="w-full h-full object-cover">' +
+            '<label class="absolute inset-0 bg-black/40 text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition cursor-pointer text-xs font-bold">' +
+              '📷 Trocar Foto' +
+              '<input type="file" accept="image/*" class="hidden" onchange="handleCasePhotoUpload(event, ' + idx + ')">' +
+            '</label>' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Título do Projeto *</label>' +
+            '<input type="text" value="' + (c.title || '') + '" oninput="updateCaseItem(' + idx + ', \\\'title\\\', this.value)" class="w-full px-3 py-1.5 text-sm font-bold bg-white border border-slate-300 rounded-lg">' +
+          '</div>' +
+          '<div class="grid grid-cols-2 gap-2">' +
+            '<div>' +
+              '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Categoria</label>' +
+              '<input type="text" value="' + (c.category || '') + '" oninput="updateCaseItem(' + idx + ', \\\'category\\\', this.value)" placeholder="Ex: Consultoria" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+            '<div>' +
+              '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Métrica / Resultado</label>' +
+              '<input type="text" value="' + (c.resultBadge || '') + '" oninput="updateCaseItem(' + idx + ', \\\'resultBadge\\\', this.value)" placeholder="Ex: +140% Resultados" class="w-full px-3 py-1.5 text-xs font-bold text-emerald-700 bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Descrição</label>' +
+            '<textarea rows="2" oninput="updateCaseItem(' + idx + ', \\\'description\\\', this.value)" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">' + (c.description || '') + '</textarea>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function addCaseCard() {
+      casesList.push({
+        title: 'Novo Caso de Sucesso ' + (casesList.length + 1),
+        category: 'Atendimento Especializado',
+        resultBadge: 'Alta Satisfação',
+        description: 'Mapeamento estratégico e acompanhamento dedicado gerando resultados comprovados.',
+        imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
+        ctaText: 'Ver Detalhes'
+      });
+      renderCasesUI();
+      saveCasesData(false);
+    }
+
+    function deleteCaseCard(idx) {
+      if (confirm('Deseja excluir este caso?')) {
+        casesList.splice(idx, 1);
+        renderCasesUI();
+        saveCasesData(false);
+      }
+    }
+
+    function updateCaseItem(idx, field, value) {
+      if (casesList[idx]) {
+        casesList[idx][field] = value;
+      }
+    }
+
+    function handleCasePhotoUpload(event, idx) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        casesList[idx].imageUrl = dataUrl;
+        const imgEl = document.getElementById('caseImgPreview_' + idx);
+        if (imgEl) imgEl.src = dataUrl;
+        saveCasesData(false);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveCasesData(showAlert = true) {
+      localStorage.setItem('site_cases', JSON.stringify(casesList));
+      const b = document.getElementById('saveBadge');
+      if (b) b.innerText = 'Salvando cases...';
+      syncCasesActivationUI();
+      setTimeout(() => {
+        if (b) b.innerText = '✓ Sincronizado';
+        if (showAlert) alert('Casos de sucesso salvos com sucesso!');
+      }, 300);
+    }
+
+    // ==========================================
+    // GERENCIAMENTO DE BIO LINKS (/links)
+    // ==========================================
+    function isBioLinksActive() {
+      return sectionsConfig && sectionsConfig['biolinks'] === true;
+    }
+
+    function syncBioLinksActivationUI() {
+      const active = isBioLinksActive();
+      const sw = document.getElementById('bioLinksActivationSwitch');
+      if (sw) sw.checked = active;
+
+      const badge = document.getElementById('bioLinksStatusBadge');
+      if (badge) {
+        badge.innerText = active ? '● Ativo no Site' : '○ Desligado';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full ' + (active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700');
+      }
+
+      const banner = document.getElementById('bioLinksStatusBanner');
+      if (banner) {
+        banner.className = 'p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ' +
+          (active ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200');
+      }
+    }
+
+    function toggleBioLinksActivationFromTab(isChecked) {
+      sectionsConfig['biolinks'] = isChecked;
+      renderSectionsConfigUI();
+      syncBioLinksActivationUI();
+      saveSectionsConfig(false);
+      const b = document.getElementById('saveBadge');
+      if (b) {
+        b.innerText = isChecked ? 'BioLink ativado!' : 'BioLink desligado!';
+        setTimeout(() => { b.innerText = '✓ Sincronizado'; }, 800);
+      }
+    }
+
+    function renderBioLinksUI() {
+      syncBioLinksActivationUI();
+      const container = document.getElementById('bioLinksContainer');
+      if (!container) return;
+
+      container.innerHTML = bioLinksList.map(function(link, idx) {
+        return '<div class="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">' +
+          '<div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">' +
+            '<div>' +
+              '<label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Texto do Botão *</label>' +
+              '<input type="text" value="' + (link.label || '') + '" oninput="updateBioLinkItem(' + idx + ', \\\'label\\\', this.value)" class="w-full px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+            '<div>' +
+              '<label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Destino (URL ou #ancora) *</label>' +
+              '<input type="text" value="' + (link.url || '') + '" oninput="updateBioLinkItem(' + idx + ', \\\'url\\\', this.value)" class="w-full px-3 py-1.5 text-xs font-mono bg-white border border-slate-300 rounded-lg">' +
+            '</div>' +
+          '</div>' +
+          '<div class="flex items-center gap-3 shrink-0">' +
+            '<label class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 cursor-pointer">' +
+              '<input type="checkbox" ' + (link.isHighlight ? 'checked' : '') + ' onchange="updateBioLinkItem(' + idx + ', \\\'isHighlight\\\', this.checked)" class="rounded text-emerald-600">' +
+              'Destaque' +
+            '</label>' +
+            '<button onclick="deleteBioLinkCard(' + idx + ')" class="text-xs text-rose-600 hover:text-rose-800 font-bold">' +
+              '🗑️' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function addBioLinkCard() {
+      bioLinksList.push({
+        label: 'Novo Link Importante',
+        url: '#contato',
+        icon: 'Link',
+        isHighlight: false
+      });
+      renderBioLinksUI();
+      saveBioLinksData(false);
+    }
+
+    function deleteBioLinkCard(idx) {
+      if (confirm('Deseja excluir este botão da Bio?')) {
+        bioLinksList.splice(idx, 1);
+        renderBioLinksUI();
+        saveBioLinksData(false);
+      }
+    }
+
+    function updateBioLinkItem(idx, field, value) {
+      if (bioLinksList[idx]) {
+        bioLinksList[idx][field] = value;
+      }
+    }
+
+    function saveBioLinksData(showAlert = true) {
+      localStorage.setItem('site_biolinks', JSON.stringify(bioLinksList));
+      const b = document.getElementById('saveBadge');
+      if (b) b.innerText = 'Salvando links da bio...';
+      syncBioLinksActivationUI();
+      setTimeout(() => {
+        if (b) b.innerText = '✓ Sincronizado';
+        if (showAlert) alert('Links da Bio salvos com sucesso!');
+      }, 300);
+    }
+
+    // ==========================================
+    // GERENCIAMENTO DA BARRA DE AVISOS DE TOPO
+    // ==========================================
+    function isAnnouncementActive() {
+      return sectionsConfig && sectionsConfig['comunicado'] === true;
+    }
+
+    function syncAnnouncementActivationUI() {
+      const active = isAnnouncementActive();
+      const sw = document.getElementById('announcementActivationSwitch');
+      if (sw) sw.checked = active;
+
+      const badge = document.getElementById('announcementStatusBadge');
+      if (badge) {
+        badge.innerText = active ? '● Ativo no Site' : '○ Desligado';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full ' + (active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700');
+      }
+
+      const banner = document.getElementById('announcementStatusBanner');
+      if (banner) {
+        banner.className = 'p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ' +
+          (active ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200');
+      }
+    }
+
+    function toggleAnnouncementActivationFromTab(isChecked) {
+      sectionsConfig['comunicado'] = isChecked;
+      announcementConfig.active = isChecked;
+      renderSectionsConfigUI();
+      syncAnnouncementActivationUI();
+      saveSectionsConfig(false);
+      saveAnnouncementData(false);
+      const b = document.getElementById('saveBadge');
+      if (b) {
+        b.innerText = isChecked ? 'Barra de avisos ativada!' : 'Barra de avisos desligada!';
+        setTimeout(() => { b.innerText = '✓ Sincronizado'; }, 800);
+      }
+    }
+
+    function renderAnnouncementUI() {
+      syncAnnouncementActivationUI();
+      const bInput = document.getElementById('announcementBadgeInput');
+      const tInput = document.getElementById('announcementTextInput');
+      const ltInput = document.getElementById('announcementLinkTextInput');
+      const luInput = document.getElementById('announcementLinkUrlInput');
+
+      if (bInput) bInput.value = announcementConfig.badge || 'COMUNICADO';
+      if (tInput) tInput.value = announcementConfig.text || '';
+      if (ltInput) ltInput.value = announcementConfig.linkText || 'Falar no WhatsApp';
+      if (luInput) luInput.value = announcementConfig.linkUrl || '';
+    }
+
+    function saveAnnouncementData(showAlert = true) {
+      const bInput = document.getElementById('announcementBadgeInput');
+      const tInput = document.getElementById('announcementTextInput');
+      const ltInput = document.getElementById('announcementLinkTextInput');
+      const luInput = document.getElementById('announcementLinkUrlInput');
+
+      if (bInput) announcementConfig.badge = bInput.value.trim();
+      if (tInput) announcementConfig.text = tInput.value.trim();
+      if (ltInput) announcementConfig.linkText = ltInput.value.trim();
+      if (luInput) announcementConfig.linkUrl = luInput.value.trim();
+      announcementConfig.active = isAnnouncementActive();
+
+      localStorage.setItem('site_announcement', JSON.stringify(announcementConfig));
+      const b = document.getElementById('saveBadge');
+      if (b) b.innerText = 'Salvando aviso...';
+      setTimeout(() => {
+        if (b) b.innerText = '✓ Sincronizado';
+        if (showAlert) alert('Barra de avisos salva com sucesso!');
+      }, 300);
+    }
+
+    // ==========================================
+    // GERENCIAMENTO DE PARCEIROS & CERTIFICAÇÕES
+    // ==========================================
+    function isPartnersActive() {
+      return sectionsConfig && sectionsConfig['parceiros'] === true;
+    }
+
+    function syncPartnersActivationUI() {
+      const active = isPartnersActive();
+      const sw = document.getElementById('partnersActivationSwitch');
+      if (sw) sw.checked = active;
+
+      const badge = document.getElementById('partnersStatusBadge');
+      if (badge) {
+        badge.innerText = active ? '● Ativo no Site' : '○ Desligado';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full ' + (active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700');
+      }
+
+      const banner = document.getElementById('partnersStatusBanner');
+      if (banner) {
+        banner.className = 'p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ' +
+          (active ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200');
+      }
+    }
+
+    function togglePartnersActivationFromTab(isChecked) {
+      sectionsConfig['parceiros'] = isChecked;
+      renderSectionsConfigUI();
+      syncPartnersActivationUI();
+      saveSectionsConfig(false);
+      const b = document.getElementById('saveBadge');
+      if (b) {
+        b.innerText = isChecked ? 'Parceiros ativados!' : 'Parceiros desligados!';
+        setTimeout(() => { b.innerText = '✓ Sincronizado'; }, 800);
+      }
+    }
+
+    function renderPartnersUI() {
+      syncPartnersActivationUI();
+      const container = document.getElementById('partnersContainer');
+      if (!container) return;
+
+      container.innerHTML = partnersList.map(function(item, idx) {
+        const logo = item.logoUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80';
+        return '<div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3 relative">' +
+          '<div class="flex items-center justify-between">' +
+            '<span class="text-xs font-bold text-slate-700 bg-slate-200 px-2 py-0.5 rounded">Marca #' + (idx + 1) + '</span>' +
+            '<button onclick="deletePartnerCard(' + idx + ')" class="text-xs text-rose-600 hover:text-rose-800 font-bold">' +
+              '🗑️' +
+            '</button>' +
+          '</div>' +
+          '<div class="flex items-center gap-3">' +
+            '<img id="partnerLogoPreview_' + idx + '" src="' + logo + '" class="w-12 h-12 rounded-lg object-cover border border-slate-300 bg-white p-1">' +
+            '<div class="flex-1">' +
+              '<input type="file" accept="image/*" onchange="handlePartnerLogoUpload(event, ' + idx + ')" class="text-[11px] text-slate-500 w-full file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:bg-slate-900 file:text-white">' +
+            '</div>' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Nome da Marca / Entidade</label>' +
+            '<input type="text" value="' + (item.name || '') + '" oninput="updatePartnerItem(' + idx + ', \\\'name\\\', this.value)" class="w-full px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 rounded-lg">' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Tipo (Cliente, Parceiro, Certificação)</label>' +
+            '<select onchange="updatePartnerItem(' + idx + ', \\\'type\\\', this.value)" class="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded-lg">' +
+              '<option value="Cliente" ' + (item.type === 'Cliente' ? 'selected' : '') + '>Cliente Corporativo</option>' +
+              '<option value="Parceiro" ' + (item.type === 'Parceiro' ? 'selected' : '') + '>Parceiro Estratégico</option>' +
+              '<option value="Certificação" ' + (item.type === 'Certificação' ? 'selected' : '') + '>Selo de Certificação</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function addPartnerCard() {
+      partnersList.push({
+        name: 'Nova Empresa Parceira',
+        logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80',
+        type: 'Cliente'
+      });
+      renderPartnersUI();
+      savePartnersData(false);
+    }
+
+    function deletePartnerCard(idx) {
+      if (confirm('Deseja excluir esta marca?')) {
+        partnersList.splice(idx, 1);
+        renderPartnersUI();
+        savePartnersData(false);
+      }
+    }
+
+    function updatePartnerItem(idx, field, value) {
+      if (partnersList[idx]) {
+        partnersList[idx][field] = value;
+      }
+    }
+
+    function handlePartnerLogoUpload(event, idx) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        partnersList[idx].logoUrl = dataUrl;
+        const imgEl = document.getElementById('partnerLogoPreview_' + idx);
+        if (imgEl) imgEl.src = dataUrl;
+        savePartnersData(false);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function savePartnersData(showAlert = true) {
+      localStorage.setItem('site_partners', JSON.stringify(partnersList));
+      const b = document.getElementById('saveBadge');
+      if (b) b.innerText = 'Salvando marcas...';
+      syncPartnersActivationUI();
+      setTimeout(() => {
+        if (b) b.innerText = '✓ Sincronizado';
+        if (showAlert) alert('Parceiros e certificações salvos com sucesso!');
+      }, 300);
+    }
+
+    // ==========================================
+    // GERENCIAMENTO DO SIMULADOR DE ATENDIMENTO
+    // ==========================================
+    function isSimulatorActive() {
+      return sectionsConfig && sectionsConfig['simulador'] === true;
+    }
+
+    function syncSimulatorActivationUI() {
+      const active = isSimulatorActive();
+      const sw = document.getElementById('simulatorActivationSwitch');
+      if (sw) sw.checked = active;
+
+      const badge = document.getElementById('simulatorStatusBadge');
+      if (badge) {
+        badge.innerText = active ? '● Ativo no Site' : '○ Desligado';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full ' + (active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700');
+      }
+
+      const banner = document.getElementById('simulatorStatusBanner');
+      if (banner) {
+        banner.className = 'p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ' +
+          (active ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200');
+      }
+    }
+
+    function toggleSimulatorActivationFromTab(isChecked) {
+      sectionsConfig['simulador'] = isChecked;
+      simulatorConfig.active = isChecked;
+      renderSectionsConfigUI();
+      syncSimulatorActivationUI();
+      saveSectionsConfig(false);
+      saveSimulatorData(false);
+      const b = document.getElementById('saveBadge');
+      if (b) {
+        b.innerText = isChecked ? 'Simulador ativado!' : 'Simulador desligado!';
+        setTimeout(() => { b.innerText = '✓ Sincronizado'; }, 800);
+      }
+    }
+
+    function renderSimulatorUI() {
+      syncSimulatorActivationUI();
+      const tInput = document.getElementById('simulatorTitleInput');
+      const sInput = document.getElementById('simulatorSubtitleInput');
+      if (tInput) tInput.value = simulatorConfig.title || 'Simulador de Atendimento Personalizado';
+      if (sInput) sInput.value = simulatorConfig.subtitle || 'Escolha suas preferências e envie uma solicitação pronta no WhatsApp com 1 clique';
+    }
+
+    function saveSimulatorData(showAlert = true) {
+      const tInput = document.getElementById('simulatorTitleInput');
+      const sInput = document.getElementById('simulatorSubtitleInput');
+      if (tInput) simulatorConfig.title = tInput.value.trim();
+      if (sInput) simulatorConfig.subtitle = sInput.value.trim();
+      simulatorConfig.active = isSimulatorActive();
+
+      localStorage.setItem('site_simulator', JSON.stringify(simulatorConfig));
+      const b = document.getElementById('saveBadge');
+      if (b) b.innerText = 'Salvando simulador...';
+      setTimeout(() => {
+        if (b) b.innerText = '✓ Sincronizado';
+        if (showAlert) alert('Simulador de atendimento salvo com sucesso!');
+      }, 300);
+    }
     // GERENCIAMENTO DE CARDS DE SERVIÇOS
     // ==========================================
     function renderServicesUI() {
@@ -1065,12 +2666,12 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       b.innerText = 'Salvando...';
       setTimeout(() => {
         b.innerText = '✓ Sincronizado';
-        alert(msg || 'Dados salvos com sucesso no Neon PostgreSQL!');
+        alert(msg || 'Dados salvos com sucesso no Shardcloud PostgreSQL!');
       }, 400);
     }
 
     // ==========================================
-    // DOMÍNIO & DNS (Vercel, Neon e Cloudflare)
+    // DOMÍNIO & DNS (Shardcloud e Cloudflare)
     // ==========================================
     const CURRENT_SITE_ID = '${siteId || ''}';
     let currentDomain = localStorage.getItem('site_custom_domain') || '${data.customDomainName || ''}';
@@ -1123,7 +2724,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         return;
       }
 
-      if (!confirm('Deseja realmente alterar o domínio para "' + val + '"?\\n\\nO sistema atualizará automaticamente a Vercel, o Neon e a zona DNS na Cloudflare.')) {
+      if (!confirm('Deseja realmente alterar o domínio para "' + val + '"?\\n\\nO sistema atualizará automaticamente o Shardcloud e a zona DNS na Cloudflare.')) {
         return;
       }
 
@@ -1131,7 +2732,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       btn.innerText = 'Migrando infraestrutura...';
       migrationBox.classList.remove('hidden');
       migrationBox.className = 'p-5 rounded-2xl border text-xs bg-slate-50 border-slate-200 text-slate-700';
-      migrationBox.innerHTML = '<div class="font-bold text-sm text-slate-900">Aplicando alterações...</div><p class="mt-1">Atualizando apontamentos na Vercel, projeto no Neon e gerando zona DNS no Cloudflare...</p>';
+      migrationBox.innerHTML = '<div class="font-bold text-sm text-slate-900">Aplicando alterações...</div><p class="mt-1">Atualizando apontamentos no Shardcloud e gerando zona DNS no Cloudflare...</p>';
 
       try {
         const res = await fetch('/api/sites/change-domain', {
@@ -1171,7 +2772,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
               '<a href="https://registro.br" target="_blank" class="inline-flex items-center px-4 py-2 bg-emerald-700 text-white font-bold text-xs rounded-xl hover:bg-emerald-800 transition">Acessar Registro.br para salvar DNS ↗</a>' +
             '</div>';
 
-          alert('Sucesso! O domínio foi atualizado na Vercel, Neon e Cloudflare.');
+          alert('Sucesso! O domínio foi atualizado no Shardcloud e Cloudflare.');
         } else {
           migrationBox.className = 'p-5 rounded-2xl border-2 border-rose-200 bg-rose-50 text-rose-950 space-y-2';
           migrationBox.innerHTML = '<div class="font-bold text-sm text-rose-900">Falha na migração</div><p>' + (data.error || 'Não foi possível atualizar o domínio.') + '</p>';
@@ -1190,6 +2791,14 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     // Inicializações
     initTemplateSelection();
     renderSectionsConfigUI();
+    renderCatalogUI();
+    renderFaqUI();
+    renderPlansUI();
+    renderCasesUI();
+    renderBioLinksUI();
+    renderAnnouncementUI();
+    renderPartnersUI();
+    renderSimulatorUI();
     renderServicesUI();
     renderTestimonialsUI();
     renderGalleryUI();

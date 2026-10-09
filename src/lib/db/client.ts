@@ -4,12 +4,14 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const neonDbUrl = process.env.DATABASE_URL || "postgresql://neondb_owner:npg_jz4DyXNBUF3V@ep-snowy-salad-ac3a3a73-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require";
+const dbUrl =
+  process.env.DATABASE_URL ||
+  "postgres://60d4a7692fa440479c2e50398b01f6e7:20d117ecb606fb826d068a2b855dcf864941335e324963fdea337c9d483ccb7c@postgres.shardatabases.app:5432/database?ssl=true";
 
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    datasourceUrl: neonDbUrl,
+    datasourceUrl: dbUrl,
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
   });
 

@@ -234,3 +234,39 @@ model RateLimit {
   @@index([expireAt])
   @@map("rate_limits")
 }
+
+enum VoucherRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model VoucherRequest {
+  id          String               @id @default(cuid())
+  name        String
+  email       String
+  siteType    String
+  message     String?
+  status      VoucherRequestStatus @default(PENDING)
+  voucherCode String?
+  sentAt      DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@map("voucher_requests")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  email     String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+  @@index([tokenHash])
+  @@map("password_reset_tokens")
+}

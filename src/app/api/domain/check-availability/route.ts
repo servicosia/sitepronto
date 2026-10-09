@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit } from '@/lib/rate-limit/limiter';
 
 export async function GET(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const limit = await checkRateLimit('domain_check', ip, 20, 60);
+    if (!limit.success) {
+      return NextResponse.json(
+        { error: 'Muitas consultas realizadas em sequência. Aguarde alguns segundos.' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfter || 10) } }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     let domain = searchParams.get('domain')?.trim().toLowerCase() || '';
 

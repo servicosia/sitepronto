@@ -96,6 +96,83 @@ export const TestimonialItemSchema = z.object({
   rating: z.number().min(1).max(5).default(5),
 });
 
+// Schema de Item do Catálogo de Produtos (Até 50 produtos)
+export const ProductItemSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(2, 'Nome do produto é obrigatório'),
+  description: z.string().min(2, 'Descrição do produto é obrigatória'),
+  price: z.string().optional(), // Preço opcional (ex: "R$ 150,00" ou vazio)
+  imageUrl: z.string().optional(),
+  ctaText: z.string().default('Pedir pelo WhatsApp'),
+  active: z.boolean().default(true),
+  order: z.number().default(0),
+});
+
+// 1. FAQ / Dúvidas Frequentes
+export const FaqItemSchema = z.object({
+  id: z.string().optional(),
+  question: z.string().min(3, 'Pergunta é obrigatória'),
+  answer: z.string().min(5, 'Resposta é obrigatória'),
+  order: z.number().default(0),
+});
+
+// 2. Planos / Pacotes de Serviços
+export const PricingPlanSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(2, 'Nome do plano é obrigatório'),
+  badge: z.string().optional(), // ex: "Mais Escolhido", "Econômico"
+  price: z.string().min(1, 'Preço é obrigatório'), // ex: "R$ 290" ou "Sob Consulta"
+  period: z.string().default('por mês'), // ex: "por mês", "por pacote", "sessão"
+  description: z.string().optional(),
+  features: z.array(z.string()).default([]),
+  ctaText: z.string().default('Contratar Plano'),
+  highlight: z.boolean().default(false),
+});
+
+// 3. Casos de Sucesso / Portfólio
+export const CaseItemSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(2, 'Título do caso/projeto é obrigatório'),
+  category: z.string().min(2, 'Categoria é obrigatória'),
+  description: z.string().min(5, 'Descrição do caso é obrigatória'),
+  resultBadge: z.string().optional(), // ex: "+85% de Eficiência", "Concluído em 30 dias"
+  imageUrl: z.string().optional(),
+  ctaText: z.string().default('Saber Mais sobre este Caso'),
+});
+
+// 4. Bio Links (/links - Linktree próprio)
+export const BioLinkItemSchema = z.object({
+  id: z.string().optional(),
+  label: z.string().min(2, 'Texto do link é obrigatório'),
+  url: z.string().min(1, 'URL ou destino é obrigatório'),
+  icon: z.string().default('Globe'), // WhatsApp, Instagram, Maps, FileText, Globe
+  isHighlight: z.boolean().default(false),
+});
+
+// 5. Barra de Comunicados / Avisos
+export const AnnouncementConfigSchema = z.object({
+  active: z.boolean().default(false),
+  text: z.string().default('Aviso: Atendimento com agenda aberta para novos clientes este mês!'),
+  badge: z.string().default('COMUNICADO'),
+  linkText: z.string().optional(),
+  linkUrl: z.string().optional(),
+});
+
+// 6. Parceiros, Clientes e Certificações
+export const PartnerItemSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(2, 'Nome do parceiro/cliente é obrigatório'),
+  logoUrl: z.string().min(1, 'Logo URL é obrigatória'),
+  type: z.string().default('Cliente'), // "Cliente", "Parceiro", "Certificação"
+});
+
+// 7. Simulador de Atendimento
+export const SimulatorConfigSchema = z.object({
+  active: z.boolean().default(false),
+  title: z.string().default('Simulador de Atendimento Personalizado'),
+  subtitle: z.string().default('Selecione suas preferências e receba uma orientação imediata no WhatsApp'),
+});
+
 // Schema de Configuração Modular das Seções do Site
 export const SectionsConfigSchema = z.object({
   inicio: z.boolean().default(true),
@@ -106,10 +183,27 @@ export const SectionsConfigSchema = z.object({
   depoimentos: z.boolean().default(true),
   artigos: z.boolean().default(true),
   contato: z.boolean().default(true),
+  // Módulos adicionais opcionais (iniciam desligados!)
+  catalogo: z.boolean().default(false),
+  faq: z.boolean().default(false),
+  planos: z.boolean().default(false),
+  cases: z.boolean().default(false),
+  biolinks: z.boolean().default(false),
+  comunicado: z.boolean().default(false),
+  parceiros: z.boolean().default(false),
+  simulador: z.boolean().default(false),
 });
 
 export type GalleryItem = z.infer<typeof GalleryItemSchema>;
 export type TestimonialItem = z.infer<typeof TestimonialItemSchema>;
+export type ProductItem = z.infer<typeof ProductItemSchema>;
+export type FaqItem = z.infer<typeof FaqItemSchema>;
+export type PricingPlan = z.infer<typeof PricingPlanSchema>;
+export type CaseItem = z.infer<typeof CaseItemSchema>;
+export type BioLinkItem = z.infer<typeof BioLinkItemSchema>;
+export type AnnouncementConfig = z.infer<typeof AnnouncementConfigSchema>;
+export type PartnerItem = z.infer<typeof PartnerItemSchema>;
+export type SimulatorConfig = z.infer<typeof SimulatorConfigSchema>;
 export type SectionsConfig = z.infer<typeof SectionsConfigSchema>;
 
 // Schema de Dados de Onboarding
@@ -187,9 +281,25 @@ export const OnboardingDataSchema = z.object({
   visualStyle: z.enum(VisualStyles).default('moderno'),
   themePreference: z.enum(ThemeTypes).default('claro'),
   
-  // Galeria, Depoimentos e Configuração Modular
+  // Galeria, Depoimentos, Catálogo e Módulos Adicionais
   gallery: z.array(GalleryItemSchema).default([]),
   testimonials: z.array(TestimonialItemSchema).default([]),
+  products: z.array(ProductItemSchema).max(50, 'Máximo de 50 produtos permitidos no catálogo').default([]),
+  faq: z.array(FaqItemSchema).default([]),
+  plans: z.array(PricingPlanSchema).default([]),
+  cases: z.array(CaseItemSchema).default([]),
+  bioLinks: z.array(BioLinkItemSchema).default([]),
+  announcement: AnnouncementConfigSchema.default({
+    active: false,
+    text: 'Aviso: Agenda aberta para novos atendimentos este mês!',
+    badge: 'COMUNICADO',
+  }),
+  partners: z.array(PartnerItemSchema).default([]),
+  simulator: SimulatorConfigSchema.default({
+    active: false,
+    title: 'Simulador de Atendimento Personalizado',
+    subtitle: 'Selecione suas preferências e receba uma orientação imediata no WhatsApp',
+  }),
   sectionsConfig: SectionsConfigSchema.default({
     inicio: true,
     servicos: true,
@@ -199,6 +309,14 @@ export const OnboardingDataSchema = z.object({
     depoimentos: true,
     artigos: true,
     contato: true,
+    catalogo: false,
+    faq: false,
+    planos: false,
+    cases: false,
+    biolinks: false,
+    comunicado: false,
+    parceiros: false,
+    simulador: false,
   }),
 
   // Domínio

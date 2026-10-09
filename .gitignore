@@ -36,3 +36,5 @@ Thumbs.db
 next-env.d.ts
 
 .vercel
+
+deploy.zip

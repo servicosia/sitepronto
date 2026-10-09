@@ -4,9 +4,14 @@ import { startProvisioningPipeline } from '@/lib/provisioning/pipeline';
 import { OnboardingDataSchema } from '@/lib/validation/onboarding';
 import { generateDesignSpecs } from '@/lib/design-system/specs';
 import { hashPassword, generateVoucherCode, sha256 } from '@/lib/security/crypto';
+import { isAuthorizedAdmin, validateSameOrigin } from '@/lib/security/auth';
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isAuthorizedAdmin(req) || !validateSameOrigin(req)) {
+      return NextResponse.json({ error: 'Não autorizado para executar esta ação.' }, { status: 401 });
+    }
+
     const body = await req.json();
     const { 
       profession = 'Churrasqueiro & Buffet', 
@@ -60,6 +65,14 @@ export async function POST(req: NextRequest) {
         depoimentos: true,
         artigos: true,
         contato: true,
+        catalogo: false,
+        faq: false,
+        planos: false,
+        cases: false,
+        biolinks: false,
+        comunicado: false,
+        parceiros: false,
+        simulador: false,
       },
       hasProfessionalCouncil: hasCouncil,
       councilType: hasCouncil ? `${analysis.suggestedCouncil.councilAcronym}/SP` : undefined,

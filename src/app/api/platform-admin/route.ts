@@ -1,20 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { createVoucher } from '@/lib/vouchers/service';
-import { sha256 } from '@/lib/security/crypto';
-
-function isAuthorized(req: NextRequest): boolean {
-  const secret = process.env.SESSION_SECRET || 'sitepronto-session-secret-salt';
-  const correctPassword = process.env.PLATFORM_ADMIN_PASSWORD || 'Ale281911S@@';
-  const expectedToken = sha256(`platform_admin_auth_${secret}_${correctPassword}`);
-
-  const cookie = req.cookies.get('platform_admin_session')?.value;
-  return cookie === expectedToken;
-}
+import { isAuthorizedAdmin, validateSameOrigin } from '@/lib/security/auth';
 
 export async function GET(req: NextRequest) {
   try {
-    if (!isAuthorized(req)) {
+    if (!isAuthorizedAdmin(req)) {
       return NextResponse.json({ authenticated: false, error: 'Não autorizado.' }, { status: 401 });
     }
 
@@ -37,6 +28,10 @@ export async function GET(req: NextRequest) {
       take: 20,
     });
 
+    const voucherRequests = await prisma.voucherRequest.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
     return NextResponse.json({
       authenticated: true,
       metrics: {
@@ -45,15 +40,18 @@ export async function GET(req: NextRequest) {
         vouchersCompleted: vouchers.filter((v) => v.status === 'COMPLETED').length,
         totalSites: sites.length,
         activeSites: sites.filter((s) => s.status === 'COMPLETED').length,
+        pendingRequests: voucherRequests.filter((r) => r.status === 'PENDING').length,
+        totalRequests: voucherRequests.length,
       },
       vouchers,
+      voucherRequests,
       sites,
       auditEvents,
       integrations: {
+        shardcloud: { configured: true, status: 'connected', region: 'sa-east-1', subdomaint: 'sitepronto' },
+        postgres: { configured: true, status: 'connected', host: 'postgres.shardatabases.app' },
         github: { configured: true, scope: 'servicosia' },
-        vercel: { configured: true, scope: 'contato-1577' },
-        neon: { configured: true, status: 'connected' },
-        resend: { configured: true },
+        resend: { configured: Boolean(process.env.RESEND_API_KEY) },
         gemini: { configured: true },
       },
     });
@@ -64,8 +62,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    if (!isAuthorized(req)) {
-      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
+    if (!isAuthorizedAdmin(req) || !validateSameOrigin(req)) {
+      return NextResponse.json({ error: 'Não autorizado ou origem inválida.' }, { status: 401 });
     }
 
     const body = await req.json();

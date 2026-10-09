@@ -25,9 +25,10 @@ import {
   Search,
   Star,
   ExternalLink,
-  Briefcase
+  Briefcase,
+  ShoppingBag
 } from 'lucide-react';
-import { OnboardingData, SectionsConfig, GalleryItem, TestimonialItem } from '@/lib/validation/onboarding';
+import { OnboardingData, SectionsConfig, GalleryItem, TestimonialItem, ProductItem } from '@/lib/validation/onboarding';
 import { analyzeProfessionContext } from '@/lib/design-system/profession-intelligence';
 
 const steps = [
@@ -164,6 +165,30 @@ function OnboardingContent() {
       depoimentos: true,
       artigos: true,
       contato: true,
+      catalogo: false,
+      faq: false,
+      planos: false,
+      cases: false,
+      biolinks: false,
+      comunicado: false,
+      parceiros: false,
+      simulador: false,
+    },
+    products: [],
+    faq: [],
+    plans: [],
+    cases: [],
+    bioLinks: [],
+    announcement: {
+      active: false,
+      text: 'Aviso: Agenda aberta para novos atendimentos este mês!',
+      badge: 'COMUNICADO',
+    },
+    partners: [],
+    simulator: {
+      active: false,
+      title: 'Simulador de Atendimento Personalizado',
+      subtitle: 'Selecione suas preferências e receba uma orientação imediata no WhatsApp',
     },
     gallery: [
       {
@@ -380,20 +405,68 @@ function OnboardingContent() {
   }
 
   function toggleSection(key: keyof SectionsConfig) {
+    setFormData((prev) => {
+      const currentVal = (prev.sectionsConfig as any)?.[key];
+      const defaultOffKeys = ['catalogo', 'faq', 'planos', 'cases', 'biolinks', 'comunicado', 'parceiros', 'simulador'];
+      const defaultVal = defaultOffKeys.includes(key as string) ? false : true;
+      const isCurrentlyActive = currentVal !== undefined ? Boolean(currentVal) : defaultVal;
+      return {
+        ...prev,
+        sectionsConfig: {
+          inicio: prev.sectionsConfig?.inicio ?? true,
+          servicos: prev.sectionsConfig?.servicos ?? true,
+          'como-funciona': prev.sectionsConfig?.['como-funciona'] ?? true,
+          sobre: prev.sectionsConfig?.sobre ?? true,
+          galeria: prev.sectionsConfig?.galeria ?? true,
+          depoimentos: prev.sectionsConfig?.depoimentos ?? true,
+          artigos: prev.sectionsConfig?.artigos ?? true,
+          contato: prev.sectionsConfig?.contato ?? true,
+          catalogo: prev.sectionsConfig?.catalogo ?? false,
+          faq: prev.sectionsConfig?.faq ?? false,
+          planos: prev.sectionsConfig?.planos ?? false,
+          cases: prev.sectionsConfig?.cases ?? false,
+          biolinks: prev.sectionsConfig?.biolinks ?? false,
+          comunicado: prev.sectionsConfig?.comunicado ?? false,
+          parceiros: prev.sectionsConfig?.parceiros ?? false,
+          simulador: prev.sectionsConfig?.simulador ?? false,
+          [key]: !isCurrentlyActive,
+        },
+      };
+    });
+  }
+
+  function addProduct() {
+    if ((formData.products || []).length >= 50) {
+      alert('Limite atingido: o catálogo permite cadastrar no máximo 50 produtos.');
+      return;
+    }
     setFormData((prev) => ({
       ...prev,
-      sectionsConfig: {
-        inicio: prev.sectionsConfig?.inicio ?? true,
-        servicos: prev.sectionsConfig?.servicos ?? true,
-        'como-funciona': prev.sectionsConfig?.['como-funciona'] ?? true,
-        sobre: prev.sectionsConfig?.sobre ?? true,
-        galeria: prev.sectionsConfig?.galeria ?? true,
-        depoimentos: prev.sectionsConfig?.depoimentos ?? true,
-        artigos: prev.sectionsConfig?.artigos ?? true,
-        contato: prev.sectionsConfig?.contato ?? true,
-        [key]: !((prev.sectionsConfig as any)?.[key] ?? true),
-      },
+      products: [
+        ...(prev.products || []),
+        {
+          id: String(Date.now()),
+          title: 'Novo Produto',
+          description: 'Descrição detalhada do produto, diferenciais e materiais.',
+          price: 'R$ 99,00',
+          imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80',
+          ctaText: 'Pedir pelo WhatsApp',
+          active: true,
+          order: (prev.products || []).length + 1,
+        }
+      ]
     }));
+  }
+
+  function updateProduct(index: number, field: string, value: any) {
+    const updated = [...(formData.products || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData((prev) => ({ ...prev, products: updated }));
+  }
+
+  function removeProduct(index: number) {
+    const updated = (formData.products || []).filter((_, i) => i !== index);
+    setFormData((prev) => ({ ...prev, products: updated }));
   }
 
   function addGalleryPhoto() {
@@ -761,14 +834,25 @@ function OnboardingContent() {
                   {[
                     { key: 'inicio', label: 'Início (Hero Banner)', desc: 'Apresentação principal e chamada de ação' },
                     { key: 'servicos', label: 'Áreas de Atuação', desc: 'Cards de serviços com botão WhatsApp' },
+                    { key: 'catalogo', label: '🛍️ Catálogo de Produtos', desc: 'Até 50 produtos com foto, descrição e preço opcional' },
+                    { key: 'faq', label: '❓ Central de Dúvidas / FAQ', desc: 'Accordion interativo com perguntas frequentes' },
+                    { key: 'planos', label: '💎 Tabela de Planos / Preços', desc: 'Cards comparativos de pacotes com botão WhatsApp' },
+                    { key: 'cases', label: '📂 Casos de Sucesso / Cases', desc: 'Portfólio de projetos, resultados e soluções' },
                     { key: 'como-funciona', label: 'Como Funciona', desc: 'Passo a passo do seu atendimento' },
                     { key: 'sobre', label: 'Sobre Nós', desc: 'Perfil profissional, história e horários' },
                     { key: 'galeria', label: '🖼️ Galeria de Fotos', desc: 'Fotos do espaço físico e instalações' },
                     { key: 'depoimentos', label: '💬 Depoimentos', desc: 'Avaliações reais de clientes com fotos' },
                     { key: 'artigos', label: 'Orientações / Artigos', desc: 'Conteúdo informativo e esclarecimentos' },
+                    { key: 'parceiros', label: '🤝 Parceiros & Clientes', desc: 'Logotipos de empresas e certificações' },
+                    { key: 'comunicado', label: '📢 Barra de Comunicado', desc: 'Aviso fixado no topo do site para anúncios' },
+                    { key: 'simulador', label: '🧮 Simulador de Atendimento', desc: 'Pré-orçamento interativo em passos' },
                     { key: 'contato', label: 'Contato & Local', desc: 'Formulário direto e botão WhatsApp' },
+                    { key: 'biolinks', label: '🔗 Bio Link (/links)', desc: 'Página estilo Linktree próprio com links verticais' },
                   ].map((sec) => {
-                    const isActive = (formData.sectionsConfig as any)?.[sec.key] !== false;
+                    const defaultOff = ['catalogo', 'faq', 'planos', 'cases', 'biolinks', 'comunicado', 'parceiros', 'simulador'];
+                    const isActive = defaultOff.includes(sec.key)
+                      ? (formData.sectionsConfig as any)?.[sec.key] === true
+                      : (formData.sectionsConfig as any)?.[sec.key] !== false;
                     return (
                       <div
                         key={sec.key}
@@ -1052,6 +1136,131 @@ function OnboardingContent() {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* 5. CATÁLOGO DE PRODUTOS (ATÉ 50 ITENS - OPÇÃO INICIA DESLIGADA) */}
+              {(formData.sectionsConfig as any)?.catalogo === true && (
+                <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div>
+                      <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                        <ShoppingBag className="w-5 h-5 text-slate-700" />
+                        Catálogo de Produtos & Serviços Comerciais
+                        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                          {(formData.products?.length || 0)}/50 produtos cadastrados
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Cadastre até 50 produtos com foto, descrição e preço (opcional). Os pedidos são direcionados para o seu WhatsApp.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addProduct}
+                      disabled={(formData.products?.length || 0) >= 50}
+                      className="px-3.5 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 self-start sm:self-auto shadow-sm"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Adicionar Produto ({(formData.products?.length || 0)}/50)
+                    </button>
+                  </div>
+
+                  {(formData.products || []).length === 0 ? (
+                    <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 space-y-3">
+                      <ShoppingBag className="w-10 h-10 text-slate-400 mx-auto" />
+                      <p className="text-xs font-semibold text-slate-600">Nenhum produto cadastrado ainda no catálogo.</p>
+                      <button
+                        type="button"
+                        onClick={addProduct}
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition"
+                      >
+                        + Cadastrar Primeiro Produto
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {(formData.products || []).map((prod, index) => (
+                        <div key={prod.id || index} className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col justify-between space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                              Produto #{index + 1}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeProduct(index)}
+                              className="text-slate-400 hover:text-red-600 p-1"
+                              title="Remover produto"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          <div className="aspect-[4/3] rounded-lg overflow-hidden bg-slate-200 border border-slate-300 relative">
+                            <img
+                              src={prod.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80'}
+                              alt={prod.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600">Nome do Produto *</label>
+                              <input
+                                type="text"
+                                value={prod.title}
+                                onChange={(e) => updateProduct(index, 'title', e.target.value)}
+                                placeholder="Ex: Planner Terapêutico Anual"
+                                className="mt-0.5 block w-full px-2.5 py-1.5 text-xs font-bold border border-slate-300 rounded-lg bg-white"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600">Descrição Detalhada</label>
+                              <textarea
+                                rows={2}
+                                value={prod.description}
+                                onChange={(e) => updateProduct(index, 'description', e.target.value)}
+                                placeholder="Descreva os materiais, diferenciais e benefícios..."
+                                className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[11px] font-semibold text-slate-600">Preço (Opcional)</label>
+                                <input
+                                  type="text"
+                                  value={prod.price || ''}
+                                  onChange={(e) => updateProduct(index, 'price', e.target.value)}
+                                  placeholder="Ex: R$ 89,90"
+                                  className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white font-mono"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[11px] font-semibold text-slate-600">Texto Botão</label>
+                                <input
+                                  type="text"
+                                  value={prod.ctaText || 'Pedir pelo WhatsApp'}
+                                  onChange={(e) => updateProduct(index, 'ctaText', e.target.value)}
+                                  placeholder="Ex: Pedir pelo WhatsApp"
+                                  className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600">Foto do Produto (URL)</label>
+                              <input
+                                type="text"
+                                value={prod.imageUrl || ''}
+                                onChange={(e) => updateProduct(index, 'imageUrl', e.target.value)}
+                                placeholder="https://..."
+                                className="mt-0.5 block w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

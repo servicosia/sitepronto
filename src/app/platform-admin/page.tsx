@@ -14,7 +14,12 @@ import {
   Layers,
   Zap,
   Sparkles,
-  X
+  X,
+  Mail,
+  Send,
+  Trash2,
+  Check,
+  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -23,6 +28,9 @@ import { useRouter } from 'next/navigation';
 export default function PlatformAdminPage() {
   const router = useRouter();
   const [data, setData] = useState<any>(null);
+  const [processingRequestId, setProcessingRequestId] = useState<string | null>(null);
+  const [resendingVoucherId, setResendingVoucherId] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
@@ -122,6 +130,88 @@ export default function PlatformAdminPage() {
       }
     } catch (err: any) {
       alert('Erro de conexão ao criar voucher: ' + err.message);
+    }
+  }
+
+  async function handleApproveAndSend(requestId: string) {
+    setProcessingRequestId(requestId);
+    setActionMessage(null);
+    try {
+      const res = await fetch('/api/platform-admin/voucher-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'approve_and_send', requestId }),
+      });
+      const resJson = await res.json();
+      if (res.ok && resJson.success) {
+        setActionMessage({ text: resJson.message || 'Voucher gerado e enviado com sucesso!', type: 'success' });
+        loadData();
+      } else {
+        setActionMessage({ text: resJson.error || 'Falha ao processar solicitação.', type: 'error' });
+      }
+    } catch (err: any) {
+      setActionMessage({ text: 'Erro de conexão: ' + err.message, type: 'error' });
+    } finally {
+      setProcessingRequestId(null);
+    }
+  }
+
+  async function handleResendRequest(requestId: string) {
+    setProcessingRequestId(requestId);
+    setActionMessage(null);
+    try {
+      const res = await fetch('/api/platform-admin/voucher-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'resend', requestId }),
+      });
+      const resJson = await res.json();
+      if (res.ok && resJson.success) {
+        setActionMessage({ text: resJson.message || 'Voucher reenviado com sucesso!', type: 'success' });
+        loadData();
+      } else {
+        setActionMessage({ text: resJson.error || 'Falha ao reenviar.', type: 'error' });
+      }
+    } catch (err: any) {
+      setActionMessage({ text: 'Erro de conexão: ' + err.message, type: 'error' });
+    } finally {
+      setProcessingRequestId(null);
+    }
+  }
+
+  async function handleDeleteRequest(requestId: string) {
+    if (!confirm('Deseja realmente remover esta solicitação de voucher?')) return;
+    try {
+      await fetch('/api/platform-admin/voucher-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', requestId }),
+      });
+      loadData();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleResendDirectVoucher(voucherId: string, clientEmail: string) {
+    setResendingVoucherId(voucherId);
+    setActionMessage(null);
+    try {
+      const res = await fetch('/api/platform-admin/voucher-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'resend_voucher', voucherId }),
+      });
+      const resJson = await res.json();
+      if (res.ok && resJson.success) {
+        setActionMessage({ text: resJson.message || `Voucher enviado para ${clientEmail}!`, type: 'success' });
+      } else {
+        setActionMessage({ text: resJson.error || 'Falha ao enviar e-mail.', type: 'error' });
+      }
+    } catch (err: any) {
+      setActionMessage({ text: 'Erro de conexão: ' + err.message, type: 'error' });
+    } finally {
+      setResendingVoucherId(null);
     }
   }
 
@@ -328,16 +418,16 @@ export default function PlatformAdminPage() {
           <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center space-x-3">
             <div className="w-3 h-3 rounded-full bg-emerald-500" />
             <div>
-              <div className="text-xs text-slate-500 font-semibold">Vercel</div>
-              <div className="text-sm font-bold text-slate-800">{data?.integrations?.vercel?.scope || 'Conectado'}</div>
+              <div className="text-xs text-slate-500 font-semibold">Shardcloud Engine</div>
+              <div className="text-sm font-bold text-slate-800">{data?.integrations?.shardcloud?.subdomaint ? `${data.integrations.shardcloud.subdomaint}.shardweb.app` : 'Ativo (Node 24)'}</div>
             </div>
           </div>
 
           <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center space-x-3">
             <div className="w-3 h-3 rounded-full bg-emerald-500" />
             <div>
-              <div className="text-xs text-slate-500 font-semibold">Neon PostgreSQL</div>
-              <div className="text-sm font-bold text-slate-800">Conectado</div>
+              <div className="text-xs text-slate-500 font-semibold">Shardcloud Database</div>
+              <div className="text-sm font-bold text-slate-800">PostgreSQL Ativo</div>
             </div>
           </div>
 
@@ -359,14 +449,27 @@ export default function PlatformAdminPage() {
         </div>
 
         {/* Métricas Gerais */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-8">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+            <div className="text-slate-500 text-xs font-semibold uppercase tracking-wider flex items-center justify-between">
+              <span>Solicitações (Home)</span>
+              {(data?.metrics?.pendingRequests || 0) > 0 && (
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+              )}
+            </div>
+            <div className="text-3xl font-extrabold text-amber-600 mt-2">
+              {data?.metrics?.pendingRequests || 0}
+              <span className="text-xs text-slate-400 font-normal ml-1">pendentes</span>
+            </div>
+          </div>
+
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Vouchers Emitidos</div>
             <div className="text-3xl font-extrabold text-slate-900 mt-2">{data?.metrics?.totalVouchers || 0}</div>
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Vouchers Ativos / Livres</div>
+            <div className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Vouchers Livres</div>
             <div className="text-3xl font-extrabold text-emerald-600 mt-2">{data?.metrics?.vouchersIssued || 0}</div>
           </div>
 
@@ -378,6 +481,161 @@ export default function PlatformAdminPage() {
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Sites Concluídos</div>
             <div className="text-3xl font-extrabold text-indigo-600 mt-2">{data?.metrics?.activeSites || 0}</div>
+          </div>
+        </div>
+
+        {actionMessage && (
+          <div className={`mb-6 p-4 rounded-xl border flex items-center justify-between ${
+            actionMessage.type === 'success' 
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+              : 'bg-red-50 border-red-200 text-red-800'
+          }`}>
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              {actionMessage.type === 'success' ? <Check className="w-4 h-4 text-emerald-600" /> : <AlertCircle className="w-4 h-4 text-red-600" />}
+              <span>{actionMessage.text}</span>
+            </div>
+            <button onClick={() => setActionMessage(null)} className="text-xs font-bold hover:underline">
+              ✕ Fechar
+            </button>
+          </div>
+        )}
+
+        {/* SEÇÃO: Solicitações de Voucher Recebidas da Home */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-bold text-slate-900">Solicitações de Voucher (Home)</h2>
+                {(data?.voucherRequests?.filter((r: any) => r.status === 'PENDING').length || 0) > 0 && (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                    {data.voucherRequests.filter((r: any) => r.status === 'PENDING').length} pendente(s)
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500">Pedidos recebidos diretamente pelo formulário da página principal.</p>
+            </div>
+            <button
+              onClick={loadData}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Atualizar Lista</span>
+            </button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-600">
+              <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200">
+                <tr>
+                  <th className="py-3 px-4">Solicitante</th>
+                  <th className="py-3 px-4">Tipo de Site</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">Voucher Gerado</th>
+                  <th className="py-3 px-4">Data / Envio</th>
+                  <th className="py-3 px-4 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {(!data?.voucherRequests || data.voucherRequests.length === 0) ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-slate-400">
+                      Nenhuma solicitação de voucher recebida ainda.
+                    </td>
+                  </tr>
+                ) : (
+                  data.voucherRequests.map((req: any) => (
+                    <tr key={req.id} className="hover:bg-slate-50/50">
+                      <td className="py-3 px-4">
+                        <div className="font-bold text-slate-900">{req.name}</div>
+                        <a href={`mailto:${req.email}`} className="text-xs text-blue-600 hover:underline">
+                          {req.email}
+                        </a>
+                        {req.message && (
+                          <div className="text-[11px] text-slate-400 italic mt-0.5">"{req.message}"</div>
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                          {req.siteType}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        {req.status === 'PENDING' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            Pendente
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            Atendido
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
+                        {req.voucherCode ? (
+                          <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-indigo-700">
+                            <Ticket className="w-3.5 h-3.5 text-indigo-500" />
+                            <Link
+                              href={`/iniciar?voucher=${encodeURIComponent(req.voucherCode)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="hover:underline flex items-center gap-1"
+                            >
+                              <span>{req.voucherCode}</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </Link>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-400 italic">Não gerado</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-xs text-slate-500">
+                        <div>Pedido: {new Date(req.createdAt).toLocaleDateString('pt-BR')} {new Date(req.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
+                        {req.sentAt && (
+                          <div className="text-[11px] text-emerald-600 font-medium">
+                            Enviado: {new Date(req.sentAt).toLocaleDateString('pt-BR')} {new Date(req.sentAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-right space-x-2">
+                        {req.status === 'PENDING' ? (
+                          <button
+                            type="button"
+                            disabled={processingRequestId === req.id}
+                            onClick={() => handleApproveAndSend(req.id)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition disabled:opacity-50"
+                            title="Gerar voucher e enviar por e-mail para o cliente"
+                          >
+                            <Send className="w-3 h-3" />
+                            <span>{processingRequestId === req.id ? 'Gerando...' : 'Gerar & Enviar'}</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={processingRequestId === req.id}
+                            onClick={() => handleResendRequest(req.id)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold transition disabled:opacity-50"
+                            title="Reenviar e-mail com voucher para o cliente"
+                          >
+                            <Mail className="w-3 h-3" />
+                            <span>{processingRequestId === req.id ? 'Enviando...' : 'Reenviar E-mail'}</span>
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteRequest(req.id)}
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                          title="Excluir Solicitação"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -505,7 +763,19 @@ export default function PlatformAdminPage() {
                       <td className="py-3 px-4 text-xs text-slate-400">
                         {new Date(v.createdAt).toLocaleDateString('pt-BR')}
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3 px-4 text-right space-x-2">
+                        {v.clientEmail && (
+                          <button
+                            type="button"
+                            disabled={resendingVoucherId === v.id}
+                            onClick={() => handleResendDirectVoucher(v.id, v.clientEmail)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors disabled:opacity-50"
+                            title={`Reenviar voucher por e-mail para ${v.clientEmail}`}
+                          >
+                            <Mail className="w-3 h-3" />
+                            <span>{resendingVoucherId === v.id ? 'Enviando...' : 'Reenviar E-mail'}</span>
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={async () => {

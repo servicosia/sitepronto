@@ -60,3 +60,26 @@ export function generateSafeSlug(name: string): string {
   const suffix = crypto.randomBytes(3).toString('hex');
   return `site-${base.slice(0, 20)}-${suffix}`;
 }
+
+/**
+ * Comparação em tempo constante entre strings arbitrárias (proteção contra Timing Attacks)
+ */
+export function timingSafeCompare(a: string, b: string): boolean {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const hashA = crypto.createHash('sha256').update(a).digest();
+  const hashB = crypto.createHash('sha256').update(b).digest();
+  return crypto.timingSafeEqual(hashA, hashB);
+}
+
+/**
+ * Escape rigoroso de strings para inserção segura em HTML (Prevenção contra XSS)
+ */
+export function escapeHtml(str: string | null | undefined): string {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}

@@ -1,0 +1,5 @@
+DISPLAY_NAME=sitepronto
+LANGUAGE=node
+VERSION=24.15.0
+SUBDOMAIN=sitepronto
+CUSTOM_COMMAND=npx prisma generate && npx next start -p 80

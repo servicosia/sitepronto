@@ -3,10 +3,15 @@ import { prisma } from '@/lib/db/client';
 import { VercelProvider } from '@/lib/providers/deployment/vercel';
 import { NeonProvider } from '@/lib/providers/database/neon';
 import { CloudflareProvider } from '@/lib/providers/domains/cloudflare';
+import { isAuthorizedAdmin, validateSameOrigin } from '@/lib/security/auth';
 
 // Excluir Projeto/Site da Plataforma, Vercel, Neon e Cloudflare
 export async function DELETE(req: NextRequest) {
   try {
+    if (!isAuthorizedAdmin(req) || !validateSameOrigin(req)) {
+      return NextResponse.json({ error: 'Não autorizado para executar esta ação.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url);
     const siteId = searchParams.get('id');
 

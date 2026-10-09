@@ -18,7 +18,16 @@ import {
   Phone, 
   MessageCircle,
   Eye,
-  Rocket
+  Rocket,
+  Ticket,
+  Mail,
+  User,
+  Briefcase,
+  Send,
+  AlertCircle,
+  Monitor,
+  Smartphone,
+  ExternalLink
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -31,6 +40,64 @@ export default function HomePage() {
 
   // Modal de Demonstração
   const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [demoNicho, setDemoNicho] = useState<'odonto' | 'oficina' | 'boutique'>('odonto');
+  const [demoModel, setDemoModel] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
+  const [demoViewport, setDemoViewport] = useState<'desktop' | 'mobile'>('desktop');
+
+  // Modal e Formulário de Solicitação de Voucher
+  const [voucherModalOpen, setVoucherModalOpen] = useState(false);
+  const [reqName, setReqName] = useState('');
+  const [reqEmail, setReqEmail] = useState('');
+  const [reqSiteType, setReqSiteType] = useState('Odontologia / Saúde');
+  const [reqCustomType, setReqCustomType] = useState('');
+  const [reqMessage, setReqMessage] = useState('');
+  const [reqSubmitting, setReqSubmitting] = useState(false);
+  const [reqSuccess, setReqSuccess] = useState(false);
+  const [reqError, setReqError] = useState('');
+
+  async function handleRequestVoucher(e: React.FormEvent) {
+    e.preventDefault();
+    setReqSubmitting(true);
+    setReqError('');
+    const finalSiteType = reqSiteType === 'Outro' ? reqCustomType : reqSiteType;
+    if (!finalSiteType || !finalSiteType.trim()) {
+      setReqError('Informe o tipo de site ou profissão.');
+      setReqSubmitting(false);
+      return;
+    }
+    try {
+      const res = await fetch('/api/vouchers/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: reqName,
+          email: reqEmail,
+          siteType: finalSiteType,
+          message: reqMessage,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setReqSuccess(true);
+      } else {
+        setReqError(data.error || 'Erro ao registrar solicitação.');
+      }
+    } catch (err: any) {
+      setReqError('Falha na conexão: ' + err.message);
+    } finally {
+      setReqSubmitting(false);
+    }
+  }
+
+  function resetVoucherForm() {
+    setReqName('');
+    setReqEmail('');
+    setReqSiteType('Odontologia / Saúde');
+    setReqCustomType('');
+    setReqMessage('');
+    setReqSuccess(false);
+    setReqError('');
+  }
 
   // FAQ Accordion
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -180,9 +247,17 @@ export default function HomePage() {
             <a href="#como-funciona" className="px-3.5 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition">
               Como Funciona
             </a>
-            <a href="#tabela-planos" className="px-3.5 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition">
-              Planos & Preços
+            <Link href="/demo" className="px-3.5 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition flex items-center gap-1">
+              <Eye className="w-3.5 h-3.5 text-blue-600" />
+              <span>Ver Demonstração</span>
+            </Link>
+            <a href="#solicitar-voucher" className="px-3.5 py-2 rounded-lg hover:bg-amber-50 hover:text-amber-700 text-amber-700 font-bold transition flex items-center gap-1">
+              <Ticket className="w-3.5 h-3.5" />
+              <span>Pedir Voucher</span>
             </a>
+            <Link href="/recuperar-senha" className="px-3.5 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition">
+              Lembrete de Senha
+            </Link>
             <a href="#acessibilidade" className="px-3.5 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition">
               Acessibilidade
             </a>
@@ -191,13 +266,21 @@ export default function HomePage() {
             </a>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/platform-admin"
               className="text-xs font-bold text-slate-700 hover:text-slate-900 px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 transition hidden sm:inline-flex"
             >
               Painel Admin
             </Link>
+            <button
+              type="button"
+              onClick={() => { resetVoucherForm(); setVoucherModalOpen(true); }}
+              className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-sm hover:shadow transition flex items-center gap-1.5"
+            >
+              <Ticket className="w-3.5 h-3.5" />
+              <span>Pedir Voucher</span>
+            </button>
             <Link
               href="/iniciar"
               className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition flex items-center gap-1.5"
@@ -213,33 +296,33 @@ export default function HomePage() {
       <main className="flex-1 pt-[124px]">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-8">
           
-          {/* Banner de Atendimento Humanizado */}
+          {/* Banner de Atendimento por E-mail */}
           <aside className="w-full bg-[#dce9ff] rounded-2xl p-4 sm:p-5 shadow-sm mb-10 border border-blue-200">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3 text-slate-900">
                 <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5" />
+                  <Mail className="w-5 h-5" />
                 </div>
                 <p className="font-semibold text-sm sm:text-base">
-                  Precisa de ajuda para começar? Fale com nossa equipe no WhatsApp.
+                  Precisa de suporte ou tem dúvidas? Fale conosco pelo e-mail <strong>contato@sitepronto.com.br</strong>.
                 </p>
               </div>
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <a
-                  href="https://wa.me/5511987654321"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-emerald-700 transition flex-1 sm:flex-initial"
+                  href="mailto:contato@sitepronto.com.br"
+                  className="px-4 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-blue-700 transition flex-1 sm:flex-initial"
                 >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>WhatsApp de Suporte</span>
+                  <Mail className="w-4 h-4" />
+                  <span>Falar por E-mail</span>
                 </a>
-                <Link
-                  href="/iniciar"
-                  className="px-4 py-2.5 bg-white text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-slate-50 transition border border-slate-200 flex-1 sm:flex-initial"
+                <button
+                  type="button"
+                  onClick={() => { resetVoucherForm(); setVoucherModalOpen(true); }}
+                  className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition flex-1 sm:flex-initial"
                 >
-                  <span>Ativar Meu Site</span>
-                </Link>
+                  <Ticket className="w-3.5 h-3.5" />
+                  <span>Solicitar Voucher</span>
+                </button>
               </div>
             </div>
           </aside>
@@ -260,32 +343,41 @@ export default function HomePage() {
                 <h1 className="text-4xl sm:text-5xl lg:text-[44px] font-extrabold text-slate-900 tracking-tight leading-[1.15]">
                   Tenha o site da sua empresa pronto, publicado e com{' '}
                   <span className="text-blue-600 underline decoration-emerald-500 decoration-4 underline-offset-8">
-                    domínio próprio
+                    subdomínio exclusivo
                   </span>{' '}
                   em 15 minutos.
                 </h1>
 
                 <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
-                  Sem precisar programar ou entender de tecnologia. Você responde perguntas simples sobre seu negócio e nossa inteligência monta tudo: visual moderno, textos profissionais, fotos e coloca seu site no ar.
+                  Sem precisar programar ou entender de tecnologia. Você responde perguntas simples sobre seu negócio e nossa inteligência monta tudo: visual moderno, textos profissionais, fotos e coloca seu site no ar com subdomínio imediato (com suporte opcional a domínio próprio .br).
                 </p>
 
                 {/* Botões de Ação */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                   <Link
                     href="/iniciar"
-                    className="min-h-[52px] px-8 bg-blue-600 text-white font-bold text-base rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition transform hover:-translate-y-0.5"
+                    className="min-h-[52px] px-7 bg-blue-600 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition transform hover:-translate-y-0.5"
                   >
-                    <span>Começar Agora com Voucher</span>
-                    <ArrowRight className="w-5 h-5" />
+                    <span>Começar com Voucher</span>
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
 
                   <button
                     type="button"
+                    onClick={() => { resetVoucherForm(); setVoucherModalOpen(true); }}
+                    className="min-h-[52px] px-6 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5"
+                  >
+                    <Ticket className="w-4 h-4 text-slate-950" />
+                    <span>Pedir Voucher</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => setDemoModalOpen(true)}
-                    className="min-h-[52px] px-6 bg-white text-slate-800 font-bold text-sm rounded-2xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm hover:bg-slate-50 transition"
+                    className="min-h-[52px] px-5 bg-white text-slate-800 font-bold text-sm rounded-2xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm hover:bg-slate-50 transition"
                   >
                     <Eye className="w-4 h-4 text-blue-600" />
-                    <span>Ver Demonstração ao Vivo</span>
+                    <span>Ver Demonstração</span>
                   </button>
                 </div>
 
@@ -293,11 +385,11 @@ export default function HomePage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 bg-[#eff4ff] p-4 rounded-2xl shadow-xs border border-blue-100">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                    <span className="text-xs text-slate-800 font-semibold leading-tight">+12.000 sites entregues</span>
+                    <span className="text-xs text-slate-800 font-semibold leading-tight">100% Personalizável</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Globe className="w-5 h-5 text-blue-600 shrink-0" />
-                    <span className="text-xs text-slate-800 font-semibold leading-tight">Domínio .com.br incluso</span>
+                    <span className="text-xs text-slate-800 font-semibold leading-tight">Subdomínio veloz incluso</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
@@ -539,106 +631,192 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* TABELA DE PLANOS E PREÇOS */}
-          <section id="tabela-planos" className="w-full mb-16 py-6">
-            <div className="text-center max-w-3xl mx-auto mb-12">
-              <span className="text-xs font-bold text-emerald-700 tracking-wider uppercase bg-emerald-50 border border-emerald-200 px-3.5 py-1 rounded-full">
-                Sem taxas ocultas ou fidelidade
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 mb-2">
-                Planos Claros e Acessíveis
-              </h2>
-              <p className="text-slate-600 text-sm sm:text-base">
-                Escolha o plano ideal para a fase atual da sua empresa. Ative com seu voucher ou contrate online.
-              </p>
-            </div>
+          {/* SEÇÃO DE SOLICITAÇÃO DIRETA DE VOUCHER */}
+          <section id="solicitar-voucher" className="w-full mb-16 py-8">
+            <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-8 sm:p-12 text-white shadow-2xl border border-blue-900/50 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-              {/* Plano Essencial */}
-              <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-extrabold text-xl text-slate-900">Plano Essencial</h3>
-                  <p className="text-xs text-slate-500 mt-1">Presença institucional ágil</p>
-                  
-                  <div className="my-6">
-                    <span className="text-3xl sm:text-4xl font-extrabold text-slate-900">R$ 39</span>
-                    <span className="text-xs text-slate-500 font-semibold"> / mês</span>
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                
+                {/* Lado Esquerdo: Chamada */}
+                <div className="lg:col-span-6 space-y-5">
+                  <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 border border-amber-400/30 px-3.5 py-1 rounded-full text-xs font-bold tracking-wider uppercase">
+                    <Ticket className="w-3.5 h-3.5" />
+                    <span>Acesso Facilitado • Solicitação Grátis</span>
                   </div>
 
-                  <ul className="space-y-3 text-xs text-slate-700">
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Site institucional modular</strong> (até 4 seções ativas)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Endereço próprio (.com.br)</strong> incluso e configurado</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Botão WhatsApp e chamada direta</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Cadeado de Segurança Incluso (Site Seguro)</span>
-                    </li>
-                  </ul>
-                </div>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                    Solicite seu Voucher para Criar o Site da Sua Empresa
+                  </h2>
 
-                <Link
-                  href="/iniciar"
-                  className="mt-8 w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl transition text-center block"
-                >
-                  Resgatar no Plano Essencial
-                </Link>
-              </div>
+                  <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+                    Ainda não possui um código de voucher? Preencha seus dados ao lado. Nossa equipe analisa e envia o seu voucher de ativação gratuito diretamente no seu e-mail para você colocar seu site no ar em minutos!
+                  </p>
 
-              {/* Plano Profissional (Destaque) */}
-              <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-blue-600 flex flex-col justify-between relative lg:-mt-3 bg-gradient-to-b from-blue-50/30 to-white">
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white font-bold text-[11px] uppercase tracking-wider px-4 py-1 rounded-full shadow-md flex items-center gap-1">
-                  <Star className="w-3.5 h-3.5 fill-current" />
-                  Mais Escolhido
-                </div>
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center gap-3 text-xs sm:text-sm text-slate-200">
+                      <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                        <Check className="w-3.5 h-3.5" />
+                      </div>
+                      <span>Envio direto para seu e-mail cadastrado</span>
+                    </div>
 
-                <div>
-                  <h3 className="font-extrabold text-xl text-blue-700">Plano Profissional</h3>
-                  <p className="text-xs text-slate-500 mt-1">Para prestadores de serviços e especialistas</p>
-                  
-                  <div className="my-6">
-                    <span className="text-3xl sm:text-4xl font-extrabold text-blue-700">R$ 69</span>
-                    <span className="text-xs text-slate-500 font-semibold"> / mês</span>
+                    <div className="flex items-center gap-3 text-xs sm:text-sm text-slate-200">
+                      <div className="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                        <Check className="w-3.5 h-3.5" />
+                      </div>
+                      <span>Estrutura personalizada para o seu ramo de atuação</span>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-xs sm:text-sm text-slate-200">
+                      <div className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                        <Check className="w-3.5 h-3.5" />
+                      </div>
+                      <span>Sem necessidade de cartão de crédito no pedido</span>
+                    </div>
                   </div>
-
-                  <ul className="space-y-3 text-xs text-slate-700">
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Todas as 8 seções modulares</strong> (Galeria, Depoimentos, etc.)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Itens e fotos ilimitados</strong> (adicione ou remova livremente)</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Endereço próprio (.com.br)</strong> incluso e ativo</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>Painel de controle fácil</strong> para editar seu site</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Otimizado para aparecer nas buscas do Google</span>
-                    </li>
-                  </ul>
                 </div>
 
-                <Link
-                  href="/iniciar"
-                  className="mt-8 w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition text-center block shadow-md"
-                >
-                  Resgatar no Plano Profissional
-                </Link>
+                {/* Lado Direito: Formulário */}
+                <div className="lg:col-span-6">
+                  <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                    {reqSuccess ? (
+                      <div className="text-center py-8 space-y-4">
+                        <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500 text-emerald-400 rounded-2xl mx-auto flex items-center justify-center shadow-lg">
+                          <CheckCircle2 className="w-8 h-8" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white">Solicitação Enviada com Sucesso!</h3>
+                        <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+                          Recebemos o seu pedido, <strong>{reqName}</strong>! Em instantes seu voucher será gerado e enviado para <strong>{reqEmail}</strong>.
+                        </p>
+                        <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
+                          <button
+                            type="button"
+                            onClick={resetVoucherForm}
+                            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition"
+                          >
+                            Nova Solicitação
+                          </button>
+                          <Link
+                            href="/iniciar"
+                            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md transition"
+                          >
+                            Ir para Página de Resgate
+                          </Link>
+                        </div>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleRequestVoucher} className="space-y-4">
+                        <div className="border-b border-slate-800 pb-3 mb-4">
+                          <h3 className="text-base font-bold text-white">Formulário de Solicitação</h3>
+                          <p className="text-xs text-slate-400">Informe seus dados para receber o voucher</p>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <User className="w-3.5 h-3.5 text-blue-400" />
+                            <span>Seu Nome Completo *</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={reqName}
+                            onChange={(e) => setReqName(e.target.value)}
+                            placeholder="Ex: Dra. Camila Rocha"
+                            className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <Mail className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Seu E-mail (Onde receberá o voucher) *</span>
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            value={reqEmail}
+                            onChange={(e) => setReqEmail(e.target.value)}
+                            placeholder="seuemail@exemplo.com.br"
+                            className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <Briefcase className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Tipo de Site / Ramo de Atividade *</span>
+                          </label>
+                          <select
+                            value={reqSiteType}
+                            onChange={(e) => setReqSiteType(e.target.value)}
+                            className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          >
+                            <option value="Odontologia / Saúde">Clínica Odontológica / Saúde</option>
+                            <option value="Oficina Mecânica / Automotivo">Oficina Mecânica / Auto Center</option>
+                            <option value="Advocacia & Serviços Jurídicos">Advocacia & Serviços Jurídicos</option>
+                            <option value="Gastronomia, Restaurante & Buffet">Gastronomia, Restaurante & Buffet</option>
+                            <option value="Estética, Beleza & Barbearia">Estética, Salão de Beleza & Barbearia</option>
+                            <option value="Personal Trainer & Fitness">Personal Trainer, Academia & Fitness</option>
+                            <option value="Arquitetura, Engenharia & Reformas">Arquitetura, Engenharia & Reformas</option>
+                            <option value="Comércio & Loja">Comércio Local & Varejo</option>
+                            <option value="Prestador de Serviços">Prestador de Serviços Gerais</option>
+                            <option value="Outro">Outro segmento...</option>
+                          </select>
+                        </div>
+
+                        {reqSiteType === 'Outro' && (
+                          <div>
+                            <input
+                              type="text"
+                              required
+                              value={reqCustomType}
+                              onChange={(e) => setReqCustomType(e.target.value)}
+                              placeholder="Digite sua atividade (Ex: Fotógrafo, Psicólogo, Contador...)"
+                              className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-500"
+                            />
+                          </div>
+                        )}
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                            Mensagem / Detalhes Adicionais (Opcional)
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={reqMessage}
+                            onChange={(e) => setReqMessage(e.target.value)}
+                            placeholder="Algum detalhe especial ou nome da sua empresa..."
+                            className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-500 resize-none"
+                          />
+                        </div>
+
+                        {reqError && (
+                          <div className="p-3 bg-red-950/60 border border-red-800 rounded-xl text-red-300 text-xs flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4 shrink-0" />
+                            <span>{reqError}</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={reqSubmitting}
+                          className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-amber-950 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          {reqSubmitting ? (
+                            <span>Enviando solicitação...</span>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4" />
+                              <span>Solicitar Meu Voucher Agora</span>
+                            </>
+                          )}
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -775,8 +953,8 @@ export default function HomePage() {
             <div className="space-y-3">
               {[
                 {
-                  q: 'O que é um endereço próprio (domínio) e eu preciso pagar algo a mais por ele?',
-                  a: 'O domínio é o endereço da sua empresa na internet (como www.suaempresa.com.br). Com o voucher e nos nossos planos, tudo é configurado automaticamente para o seu site funcionar sem complicações.'
+                  q: 'Como funciona o endereço do site (domínio ou subdomínio)?',
+                  a: 'Nós disponibilizamos gratuitamente um subdomínio veloz e seguro para o seu site entrar no ar imediatamente. Caso você queira vincular um domínio próprio (ex: suaempresa.com.br), nosso sistema oferece suporte e instruções para você conectar facilmente seu domínio registrado no Registro.br.'
                 },
                 {
                   q: 'Consigo ativar/desativar seções e alterar fotos e textos depois?',
@@ -831,13 +1009,11 @@ export default function HomePage() {
                 Resgatar Voucher Agora
               </Link>
               <a
-                href="https://wa.me/5511987654321"
-                target="_blank"
-                rel="noreferrer"
+                href="mailto:contato@sitepronto.com.br"
                 className="px-6 py-3.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-xl transition text-center flex items-center justify-center gap-1.5"
               >
-                <MessageCircle className="w-4 h-4" />
-                <span>Tirar Dúvidas</span>
+                <Mail className="w-4 h-4" />
+                <span>Tirar Dúvidas por E-mail</span>
               </a>
             </div>
           </section>
@@ -866,7 +1042,8 @@ export default function HomePage() {
               <ul className="space-y-1.5 text-slate-600">
                 <li><Link href="/" className="hover:text-blue-600">Início</Link></li>
                 <li><a href="#como-funciona" className="hover:text-blue-600">Como Funciona</a></li>
-                <li><a href="#tabela-planos" className="hover:text-blue-600">Planos & Preços</a></li>
+                <li><Link href="/demo" className="hover:text-blue-600">Demonstração ao Vivo</Link></li>
+                <li><Link href="/recuperar-senha" className="hover:text-blue-600">Lembrete de Senha</Link></li>
                 <li><Link href="/iniciar" className="hover:text-blue-600">Resgatar Voucher</Link></li>
                 <li><Link href="/platform-admin" className="hover:text-blue-600">Painel do Administrador</Link></li>
               </ul>
@@ -875,9 +1052,8 @@ export default function HomePage() {
             <div className="space-y-2">
               <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Contato & Suporte</h4>
               <div className="space-y-1.5 text-slate-600">
-                <p>📞 0800 900 8020</p>
-                <p>💬 WhatsApp: (11) 98765-4321</p>
-                <p>✉️ contato@sitepronto.com.br</p>
+                <p className="font-semibold text-slate-900">✉️ contato@sitepronto.com.br</p>
+                <p className="text-[11px] text-slate-500">Atendimento oficial exclusivamente por e-mail.</p>
               </div>
             </div>
 
@@ -907,55 +1083,315 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* MODAL DE DEMONSTRAÇÃO AO VIVO */}
+      {/* MODAL DE DEMONSTRAÇÃO AO VIVO COM SITE REAL INTERATIVO */}
       {demoModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white max-w-xl w-full rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="font-extrabold text-lg text-slate-900">Demonstração Interativa SitePronto</h3>
-              <button
-                type="button"
-                onClick={() => setDemoModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-slate-900 w-full max-w-6xl h-[92vh] rounded-3xl shadow-2xl border border-slate-700 flex flex-col overflow-hidden text-white">
+            
+            {/* Header da Barra de Ferramentas de Demonstração */}
+            <div className="bg-slate-950 px-4 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 rounded-xl bg-blue-600 text-white font-extrabold text-xs flex items-center justify-center">
+                  SP
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm sm:text-base text-white flex items-center gap-2">
+                    <span>Demonstração Interativa SitePronto</span>
+                    <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      100% Funcional
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400 hidden sm:block">
+                    Teste a navegação, responsividade e botões de um site real sem necessidade de voucher.
+                  </p>
+                </div>
+              </div>
+
+              {/* Controles de Nicho, Modelo e Viewport */}
+              <div className="flex items-center gap-2">
+                {/* Nichos */}
+                <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setDemoNicho('odonto')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
+                      demoNicho === 'odonto' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Odontologia
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoNicho('oficina')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
+                      demoNicho === 'oficina' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Auto Mecânica
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoNicho('boutique')}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
+                      demoNicho === 'boutique' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Moda & Ateliê
+                  </button>
+                </div>
+
+                {/* Viewport Desktop/Mobile */}
+                <div className="hidden sm:flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setDemoViewport('desktop')}
+                    className={`p-1.5 rounded-lg transition ${
+                      demoViewport === 'desktop' ? 'bg-slate-800 text-white' : 'text-slate-500 hover:text-white'
+                    }`}
+                    title="Modo Computador"
+                  >
+                    <Monitor className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoViewport('mobile')}
+                    className={`p-1.5 rounded-lg transition ${
+                      demoViewport === 'mobile' ? 'bg-slate-800 text-white' : 'text-slate-500 hover:text-white'
+                    }`}
+                    title="Modo Celular"
+                  >
+                    <Smartphone className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Abrir em Tela Cheia */}
+                <Link
+                  href="/demo"
+                  target="_blank"
+                  className="p-2 text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition hidden md:flex items-center gap-1 text-xs font-semibold"
+                  title="Abrir em Nova Aba"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Expandir</span>
+                </Link>
+
+                {/* Fechar */}
+                <button
+                  type="button"
+                  onClick={() => setDemoModalOpen(false)}
+                  className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+                  title="Fechar Demonstração"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Veja as métricas de excelência técnica garantidas em cada site entregue automaticamente pela plataforma:
-            </p>
-
-            <div className="space-y-2 text-xs">
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                <span className="font-semibold text-slate-700">Velocidade de Carregamento</span>
-                <span className="font-bold text-emerald-600">Nota Máxima (Abertura Instantânea)</span>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                <span className="font-semibold text-slate-700">Facilidade de Uso</span>
-                <span className="font-bold text-emerald-600">Acessível para Qualquer Pessoa</span>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                <span className="font-semibold text-slate-700">Tempo para Ficar Pronto</span>
-                <span className="font-bold text-blue-600">Menos de 15 minutos</span>
+            {/* Corpo do Iframe com Site Real */}
+            <div className="flex-1 bg-slate-950 p-2 sm:p-4 flex items-center justify-center overflow-hidden">
+              <div
+                className={`transition-all duration-300 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-white ${
+                  demoViewport === 'mobile'
+                    ? 'w-[390px] h-full max-h-[750px] border-4 border-slate-800'
+                    : 'w-full h-full'
+                }`}
+              >
+                <iframe
+                  key={`${demoNicho}-${demoModel}-${demoViewport}`}
+                  src={`/api/demo?nicho=${demoNicho}&model=${demoModel}`}
+                  title="Site de Demonstração em Tempo Real"
+                  className="w-full h-full border-0"
+                />
               </div>
             </div>
 
-            <div className="pt-3 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setDemoModalOpen(false)}
-                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl"
-              >
-                Fechar
-              </button>
-              <Link
-                href="/iniciar"
-                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md"
-              >
-                Criar Meu Site Agora
-              </Link>
+            {/* Rodapé do Modal com CTA de Voucher */}
+            <div className="bg-slate-900 border-t border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 shrink-0">
+              <p className="text-xs text-slate-400">
+                Gostou? Você pode criar seu próprio site exclusivo agora mesmo solicitando um voucher.
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDemoModalOpen(false)}
+                  className="px-3.5 py-1.5 text-xs text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition"
+                >
+                  Fechar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDemoModalOpen(false);
+                    resetVoucherForm();
+                    setVoucherModalOpen(true);
+                  }}
+                  className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+                >
+                  <Ticket className="w-3.5 h-3.5 text-slate-950" />
+                  <span>Pedir Meu Voucher Grátis</span>
+                </button>
+              </div>
             </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE SOLICITAÇÃO DE VOUCHER */}
+      {voucherModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-700 max-w-lg w-full rounded-3xl p-6 sm:p-8 shadow-2xl text-white relative my-8">
+            <button
+              type="button"
+              onClick={() => setVoucherModalOpen(false)}
+              className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {reqSuccess ? (
+              <div className="text-center py-6 space-y-4">
+                <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500 text-emerald-400 rounded-2xl mx-auto flex items-center justify-center shadow-lg">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-black text-white">Solicitação Recebida!</h3>
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  Obrigado, <strong>{reqName}</strong>! Em instantes nosso time processará e você receberá seu voucher no e-mail:
+                </p>
+                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-amber-400 font-mono text-sm font-bold">
+                  {reqEmail}
+                </div>
+                <div className="pt-3 flex gap-3 justify-center">
+                  <button
+                    type="button"
+                    onClick={() => { resetVoucherForm(); setVoucherModalOpen(false); }}
+                    className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition"
+                  >
+                    Fechar
+                  </button>
+                  <Link
+                    href="/iniciar"
+                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md transition"
+                  >
+                    Já Tenho um Voucher
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center gap-2 mb-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                  <Ticket className="w-4 h-4" />
+                  <span>Acesso Antecipado & Gratuito</span>
+                </div>
+                <h3 className="text-2xl font-black text-white mb-2">Solicitar Voucher de Criação</h3>
+                <p className="text-xs text-slate-400 mb-6 leading-relaxed">
+                  Preencha seus dados para receber o voucher de ativação diretamente no seu e-mail e publicar o site da sua empresa em 15 minutos.
+                </p>
+
+                <form onSubmit={handleRequestVoucher} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Nome Completo *</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={reqName}
+                      onChange={(e) => setReqName(e.target.value)}
+                      placeholder="Ex: Dra. Camila Rocha"
+                      className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>E-mail para Envio do Voucher *</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={reqEmail}
+                      onChange={(e) => setReqEmail(e.target.value)}
+                      placeholder="seuemail@exemplo.com.br"
+                      className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                      <Briefcase className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Tipo de Site / Sua Atividade *</span>
+                    </label>
+                    <select
+                      value={reqSiteType}
+                      onChange={(e) => setReqSiteType(e.target.value)}
+                      className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    >
+                      <option value="Odontologia / Saúde">Clínica Odontológica / Saúde</option>
+                      <option value="Oficina Mecânica / Automotivo">Oficina Mecânica / Auto Center</option>
+                      <option value="Advocacia & Serviços Jurídicos">Advocacia & Serviços Jurídicos</option>
+                      <option value="Gastronomia, Restaurante & Buffet">Gastronomia, Restaurante & Buffet</option>
+                      <option value="Estética, Beleza & Barbearia">Estética, Salão de Beleza & Barbearia</option>
+                      <option value="Personal Trainer & Fitness">Personal Trainer, Academia & Fitness</option>
+                      <option value="Arquitetura, Engenharia & Reformas">Arquitetura, Engenharia & Reformas</option>
+                      <option value="Comércio & Loja">Comércio Local & Varejo</option>
+                      <option value="Prestador de Serviços">Prestador de Serviços Gerais</option>
+                      <option value="Outro">Outro segmento...</option>
+                    </select>
+                  </div>
+
+                  {reqSiteType === 'Outro' && (
+                    <div>
+                      <input
+                        type="text"
+                        required
+                        value={reqCustomType}
+                        onChange={(e) => setReqCustomType(e.target.value)}
+                        placeholder="Digite sua atividade profissional..."
+                        className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder:text-slate-500"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                      Observação Adicional (Opcional)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={reqMessage}
+                      onChange={(e) => setReqMessage(e.target.value)}
+                      placeholder="Alguma informação importante sobre seu negócio..."
+                      className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none placeholder:text-slate-500 resize-none"
+                    />
+                  </div>
+
+                  {reqError && (
+                    <div className="p-3 bg-red-950/60 border border-red-800 rounded-xl text-red-300 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{reqError}</span>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={reqSubmitting}
+                    className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-amber-950 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mt-2"
+                  >
+                    {reqSubmitting ? (
+                      <span>Registrando solicitação...</span>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        <span>Confirmar e Enviar Pedido de Voucher</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
         </div>
       )}

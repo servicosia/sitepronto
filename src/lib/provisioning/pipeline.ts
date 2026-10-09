@@ -131,11 +131,12 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
     // ETAPA 5: CREATING_VERCEL & DEPLOYING (Deploy direto na Vercel com site institucional completo)
     await prisma.site.update({ where: { id: siteId }, data: { status: 'CREATING_VERCEL' } });
     
-    const { renderCompleteSiteHtml } = await import('../design-system/template-renderer');
+    const { renderCompleteSiteHtml, renderBioLinkHtml } = await import('../design-system/template-renderer');
     const { renderMasterDashboardHtml } = await import('../design-system/master-renderer');
     
     const fullSiteHtml = renderCompleteSiteHtml(params.data, params.designSpec);
     const masterHtml = renderMasterDashboardHtml(params.data, siteId);
+    const bioLinkHtml = renderBioLinkHtml(params.data);
 
     const vercelProject = await vercel.createProject({
       projectName: slug,
@@ -151,6 +152,14 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
         {
           file: 'master/index.html',
           data: masterHtml,
+        },
+        {
+          file: 'links.html',
+          data: bioLinkHtml,
+        },
+        {
+          file: 'links/index.html',
+          data: bioLinkHtml,
         },
       ],
     });
