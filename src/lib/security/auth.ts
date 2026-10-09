@@ -111,3 +111,20 @@ export function validateSameOrigin(req: NextRequest): boolean {
 
   return true;
 }
+
+/**
+ * Gera token seguro para aprovação de voucher em 1 clique por e-mail
+ */
+export function generateVoucherApprovalToken(requestId: string, email: string): string {
+  const secret = getSessionSecret();
+  return sha256(`quick_voucher_approval_${requestId}_${email.trim().toLowerCase()}_${secret}`);
+}
+
+/**
+ * Valida o token de aprovação de voucher em 1 clique
+ */
+export function verifyVoucherApprovalToken(requestId: string, email: string, token: string): boolean {
+  if (!token || typeof token !== 'string') return false;
+  const expected = generateVoucherApprovalToken(requestId, email);
+  return timingSafeCompare(token, expected);
+}

@@ -1,3 +1,5 @@
+import { generateVoucherApprovalToken } from '@/lib/security/auth';
+
 interface SendEmailParams {
   to: string | string[];
   subject: string;
@@ -59,6 +61,12 @@ export async function sendAdminVoucherRequestAlert(request: {
   const appUrl = (process.env.APP_URL || 'https://sitepronto.shardweb.app').replace(/\/$/, '');
   const adminPanelUrl = `${appUrl}/platform-admin`;
 
+  // Gera link seguro de aprovação direta em 1 clique
+  const approveToken = request.requestId ? generateVoucherApprovalToken(request.requestId, request.email) : '';
+  const approveUrl = request.requestId
+    ? `${appUrl}/api/vouchers/quick-approve?id=${encodeURIComponent(request.requestId)}&token=${encodeURIComponent(approveToken)}`
+    : adminPanelUrl;
+
   const subject = `🔔 Nova Solicitação de Voucher - ${request.name} (${request.siteType})`;
 
   const html = `
@@ -80,8 +88,9 @@ export async function sendAdminVoucherRequestAlert(request: {
     .info-table tr:not(:last-child) td { border-bottom: 1px solid #f1f5f9; }
     .info-label { width: 35%; padding: 14px 18px; font-size: 12px; font-weight: 700; color: #64748b; background-color: #f8fafc; text-transform: uppercase; letter-spacing: 0.5px; }
     .info-value { padding: 14px 18px; font-size: 14px; font-weight: 600; color: #1e293b; background-color: #ffffff; }
-    .btn-container { text-align: center; margin: 32px 0 16px 0; }
-    .btn { display: inline-block; background-color: #2563eb; color: #ffffff !important; text-decoration: none; font-weight: 700; font-size: 14px; padding: 14px 28px; border-radius: 12px; box-shadow: 0 4px 10px rgba(37,99,235,0.25); }
+    .btn-container { text-align: center; margin: 28px 0 12px 0; }
+    .btn-approve { display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff !important; text-decoration: none; font-weight: 800; font-size: 15px; padding: 16px 32px; border-radius: 14px; box-shadow: 0 4px 14px rgba(16,185,129,0.35); }
+    .btn-panel { color: #64748b; font-size: 13px; font-weight: 600; text-decoration: underline; }
     .footer { text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding: 20px; }
   </style>
 </head>
@@ -118,13 +127,21 @@ export async function sendAdminVoucherRequestAlert(request: {
         </tr>
       </table>
 
+      <!-- BOTÃO DE APROVAÇÃO RÁPIDA EM 1 CLIQUE -->
       <div class="btn-container">
-        <a href="${adminPanelUrl}" class="btn">
-          ⚡ Acessar Painel Master para Emitir Voucher
+        <a href="${approveUrl}" class="btn-approve">
+          ⚡ Aprovar e Enviar Voucher Imediatamente (1 Clique)
         </a>
       </div>
-      <p style="font-size: 12px; text-align: center; color: #64748b; margin-top: 12px;">
-        Você pode aprovar e disparar o voucher diretamente pelo painel administrativo em 1 clique.
+
+      <div style="text-align: center; margin-top: 14px;">
+        <a href="${adminPanelUrl}" class="btn-panel">
+          Ou gerenciar no Painel Administrativo ↗
+        </a>
+      </div>
+
+      <p style="font-size: 12px; text-align: center; color: #64748b; margin-top: 14px; line-height: 1.5;">
+        💡 <strong>Dica de Produtividade:</strong> Ao clicar no botão verde acima, o voucher exclusivo é gerado e o e-mail de boas-vindas com o link de ativação é enviado diretamente para ${request.name} em segundos, sem você precisar fazer login.
       </p>
     </div>
     <div class="footer">
