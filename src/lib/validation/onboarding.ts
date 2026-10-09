@@ -173,6 +173,19 @@ export const SimulatorConfigSchema = z.object({
   subtitle: z.string().default('Selecione suas preferências e receba uma orientação imediata no WhatsApp'),
 });
 
+// 8. Redes Sociais no Rodapé (Instagram, TikTok, Facebook, YouTube)
+export const SocialLinkItemSchema = z.object({
+  active: z.boolean().default(false),
+  url: z.string().default(''),
+});
+
+export const SocialLinksConfigSchema = z.object({
+  instagram: SocialLinkItemSchema.default({ active: false, url: '' }),
+  tiktok: SocialLinkItemSchema.default({ active: false, url: '' }),
+  facebook: SocialLinkItemSchema.default({ active: false, url: '' }),
+  youtube: SocialLinkItemSchema.default({ active: false, url: '' }),
+});
+
 // Schema de Configuração Modular das Seções do Site
 export const SectionsConfigSchema = z.object({
   inicio: z.boolean().default(true),
@@ -299,6 +312,12 @@ export const OnboardingDataSchema = z.object({
     active: false,
     title: 'Simulador de Atendimento Personalizado',
     subtitle: 'Selecione suas preferências e receba uma orientação imediata no WhatsApp',
+  }),
+  socialLinks: SocialLinksConfigSchema.default({
+    instagram: { active: false, url: '' },
+    tiktok: { active: false, url: '' },
+    facebook: { active: false, url: '' },
+    youtube: { active: false, url: '' },
   }),
   sectionsConfig: SectionsConfigSchema.default({
     inicio: true,

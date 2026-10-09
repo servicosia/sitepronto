@@ -190,6 +190,12 @@ function OnboardingContent() {
       title: 'Simulador de Atendimento Personalizado',
       subtitle: 'Selecione suas preferências e receba uma orientação imediata no WhatsApp',
     },
+    socialLinks: {
+      instagram: { active: false, url: '' },
+      tiktok: { active: false, url: '' },
+      facebook: { active: false, url: '' },
+      youtube: { active: false, url: '' },
+    },
     gallery: [
       {
         id: '1',

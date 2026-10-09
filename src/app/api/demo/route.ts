@@ -87,6 +87,12 @@ export async function GET(req: NextRequest) {
           parceiros: true,
           simulador: true,
         },
+        socialLinks: {
+          instagram: { active: true, url: 'https://instagram.com/juniorautocenter' },
+          tiktok: { active: true, url: 'https://tiktok.com/@juniorautocenter' },
+          facebook: { active: true, url: 'https://facebook.com/juniorautocenter' },
+          youtube: { active: true, url: 'https://youtube.com/@juniorautocenter' },
+        },
       };
     } else if (nicho === 'boutique') {
       demoData = {
@@ -159,6 +165,12 @@ export async function GET(req: NextRequest) {
           comunicado: true,
           parceiros: true,
           simulador: false,
+        },
+        socialLinks: {
+          instagram: { active: true, url: 'https://instagram.com/belladonnamoda' },
+          tiktok: { active: true, url: 'https://tiktok.com/@belladonnamoda' },
+          facebook: { active: false, url: '' },
+          youtube: { active: true, url: 'https://youtube.com/@belladonnamoda' },
         },
       };
     } else {
@@ -236,6 +248,12 @@ export async function GET(req: NextRequest) {
           comunicado: true,
           parceiros: true,
           simulador: true,
+        },
+        socialLinks: {
+          instagram: { active: true, url: 'https://instagram.com/drlucasmendes' },
+          tiktok: { active: false, url: '' },
+          facebook: { active: true, url: 'https://facebook.com/drlucasmendes' },
+          youtube: { active: true, url: 'https://youtube.com/@drlucasmendes' },
         },
       };
     }

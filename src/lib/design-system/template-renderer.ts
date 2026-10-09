@@ -17,6 +17,53 @@ export function getContextualImages(profession?: string, specialty?: string, com
 
 
 /**
+ * Renderiza os ícones SVG oficiais com links para as redes sociais ativas (Instagram, TikTok, Facebook, YouTube)
+ */
+export function renderSocialIconsHtml(socials?: {
+  instagram?: { active?: boolean; url?: string };
+  tiktok?: { active?: boolean; url?: string };
+  facebook?: { active?: boolean; url?: string };
+  youtube?: { active?: boolean; url?: string };
+}): string {
+  if (!socials) return '';
+  const items: string[] = [];
+
+  if (socials.instagram?.active && socials.instagram?.url) {
+    items.push(`
+      <a href="${socials.instagram.url}" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-gradient-to-tr hover:from-amber-500 hover:via-rose-500 hover:to-purple-600 text-white transition-all transform hover:scale-110 shadow-sm border border-white/15 group" title="Instagram">
+        <svg class="w-4 h-4 fill-current group-hover:drop-shadow" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+    `);
+  }
+
+  if (socials.tiktok?.active && socials.tiktok?.url) {
+    items.push(`
+      <a href="${socials.tiktok.url}" target="_blank" rel="noopener noreferrer" aria-label="TikTok" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-black hover:border-[#00f2fe] text-white transition-all transform hover:scale-110 shadow-sm border border-white/15 group" title="TikTok">
+        <svg class="w-4 h-4 fill-current group-hover:text-[#25f4ee]" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+      </a>
+    `);
+  }
+
+  if (socials.facebook?.active && socials.facebook?.url) {
+    items.push(`
+      <a href="${socials.facebook.url}" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-[#1877f2] hover:border-[#1877f2] text-white transition-all transform hover:scale-110 shadow-sm border border-white/15 group" title="Facebook">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+    `);
+  }
+
+  if (socials.youtube?.active && socials.youtube?.url) {
+    items.push(`
+      <a href="${socials.youtube.url}" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-[#ff0000] hover:border-[#ff0000] text-white transition-all transform hover:scale-110 shadow-sm border border-white/15 group" title="YouTube">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+    `);
+  }
+
+  return items.join('');
+}
+
+/**
  * Renderiza o corpo do site para uma variante específica (MODEL_A, MODEL_B, MODEL_C, MODEL_D)
  */
 export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D' = 'MODEL_A'): string {
@@ -194,6 +241,22 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
     }
     return (data.sectionsConfig as any)[sec] !== false;
   };
+
+  const defaultSocials = {
+    instagram: { active: Boolean(data.instagram), url: data.instagram || '' },
+    tiktok: { active: Boolean(data.tiktok), url: data.tiktok || '' },
+    facebook: { active: Boolean(data.facebook), url: data.facebook || '' },
+    youtube: { active: Boolean(data.youtube), url: data.youtube || '' },
+  };
+
+  const currentSocials = data.socialLinks ? {
+    instagram: data.socialLinks.instagram || defaultSocials.instagram,
+    tiktok: data.socialLinks.tiktok || defaultSocials.tiktok,
+    facebook: data.socialLinks.facebook || defaultSocials.facebook,
+    youtube: data.socialLinks.youtube || defaultSocials.youtube,
+  } : defaultSocials;
+
+  const socialIconsHtml = renderSocialIconsHtml(currentSocials);
 
   return `
 <div class="template-wrapper ${
@@ -1200,13 +1263,22 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   </section>
 
   <!-- ==================== FOOTER ==================== -->
-  <footer class="${isModelB ? 'bg-black text-white' : isModelA ? 'bg-[#17382d] text-white' : 'bg-[#1c1917] text-white'} py-16 border-t border-black/10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+  <footer class="${isModelB ? 'bg-black text-white' : isModelA ? 'bg-[#17382d] text-white' : 'bg-[#1c1917] text-white'} py-14 border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
       <div>
         <p class="font-bold text-lg font-serif" style="font-family: ${fontHeading}">${name}</p>
         <p class="text-xs text-stone-300 mt-1">${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}</p>
       </div>
-      <div class="text-xs text-stone-400 text-center sm:text-right space-y-1">
+
+      <!-- Redes Sociais no Rodapé -->
+      <div class="footer-social-container flex flex-col items-center gap-2">
+        <div class="footer-social-links flex items-center justify-center gap-2.5">
+          ${socialIconsHtml}
+        </div>
+        <span class="text-[10px] text-stone-400 tracking-wider uppercase font-medium footer-social-label ${socialIconsHtml ? '' : 'hidden'}">Siga nossas redes</span>
+      </div>
+
+      <div class="text-xs text-stone-400 text-center md:text-right space-y-1">
         <p>
           © ${new Date().getFullYear()} ${name}. Todos os direitos reservados.<br>
           Tecnologia e infraestrutura por <strong>SitePronto</strong>.
@@ -1729,9 +1801,70 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
       window.open(url, '_blank');
     };
 
+    // 7. Hidratação dinâmica das Redes Sociais no Rodapé
+    function applySocialLinks() {
+      try {
+        let raw = null;
+        try { raw = localStorage.getItem('site_socials'); } catch (e) {}
+        if (!raw) return;
+        const socials = JSON.parse(raw);
+        if (!socials || typeof socials !== 'object') return;
+
+        function buildSvgIcon(network, url) {
+          if (!url) return '';
+          if (network === 'instagram') {
+            return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-gradient-to-tr hover:from-amber-500 hover:via-rose-500 hover:to-purple-600 text-white transition-all transform hover:scale-110 shadow-sm border border-white/15 group" title="Instagram">' +
+              '<svg class="w-4 h-4 fill-current group-hover:drop-shadow" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>' +
+              '</a>';
+          }
+          if (network === 'tiktok') {
+            return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" aria-label="TikTok" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-black hover:border-white/40 text-white transition-all transform hover:scale-110 shadow-sm border border-white/15 group" title="TikTok">' +
+              '<svg class="w-4 h-4 fill-current group-hover:text-[#25f4ee]" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>' +
+            '</a>';
+          }
+          if (network === 'facebook') {
+            return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-[#1877f2] hover:border-[#1877f2] text-white transition-all transform hover:scale-110 shadow-sm border border-white/15 group" title="Facebook">' +
+              '<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>' +
+            '</a>';
+          }
+          if (network === 'youtube') {
+            return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-[#ff0000] hover:border-[#ff0000] text-white transition-all transform hover:scale-110 shadow-sm border border-white/15 group" title="YouTube">' +
+              '<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>' +
+            '</a>';
+          }
+          return '';
+        }
+
+        let html = '';
+        let count = 0;
+        ['instagram', 'tiktok', 'facebook', 'youtube'].forEach(function(k) {
+          const item = socials[k];
+          if (item && item.active && item.url) {
+            html += buildSvgIcon(k, item.url);
+            count++;
+          }
+        });
+
+        document.querySelectorAll('.footer-social-links').forEach(function(el) {
+          el.innerHTML = html;
+        });
+
+        document.querySelectorAll('.footer-social-label').forEach(function(lbl) {
+          if (count > 0) {
+            lbl.classList.remove('hidden');
+          } else {
+            lbl.classList.add('hidden');
+          }
+        });
+      } catch (err) {
+        console.error('Erro ao sincronizar redes sociais:', err);
+      }
+    }
+
     // Executa ao inicializar
     applySectionsConfig();
     applyCustomCards();
+    applySocialLinks();
   </script>
 
 </body>
