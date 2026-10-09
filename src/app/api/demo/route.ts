@@ -165,9 +165,9 @@ export async function GET(req: NextRequest) {
       // Default: Odontologia / Saúde
       demoData = {
         fullName: 'Dr. Lucas Mendes',
-        professionalName: 'Dr. Lucas Mendes - Odontologia Integrada',
+        professionalName: 'Dr. Lucas Mendes',
         companyName: 'Clínica Sorriso Real',
-        profession: 'Cirurgião-Dentista & Especialista em Estética Dental',
+        profession: 'Odontologia Integrada & Estética Dental',
         professionType: 'odontologia',
         activityType: 'autonomo',
         hasProfessionalCouncil: true,

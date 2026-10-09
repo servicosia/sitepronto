@@ -204,13 +204,13 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
   } antialiased min-h-screen flex flex-col selection:bg-emerald-500/20 selection:text-emerald-900" style="font-family: ${fontBody};">
 
   <!-- ==================== BARRA DE AVISOS / COMUNICADO ==================== -->
-  <div id="comunicado" data-section-id="comunicado" style="${!isSectionActive('comunicado') ? 'display: none !important;' : ''}" class="py-2.5 px-4 text-xs font-medium text-center transition-all flex items-center justify-center gap-3 relative z-50 ${
+  <div id="comunicado" data-section-id="comunicado" style="${!isSectionActive('comunicado') ? 'display: none !important;' : ''}" class="py-2.5 px-4 text-xs font-medium text-center transition-all flex items-center justify-center gap-3 relative z-50 overflow-hidden ${
     isModelB ? 'bg-sky-950 text-sky-200 border-b border-sky-800' : 
     isModelA ? 'bg-[#2e4f43] text-white' : 
     isModelC ? 'bg-stone-900 text-stone-100' : 
     'bg-slate-900 text-white'
   }">
-    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shrink-0 ${
       isModelB ? 'bg-sky-800 text-white' : 
       isModelA ? 'bg-[#c88770] text-white' : 
       isModelC ? 'bg-stone-700 text-white' : 
@@ -218,62 +218,62 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
     }">${announcementConfig.badge || 'COMUNICADO'}</span>
     <span class="truncate max-w-xl announcement-text-display">${announcementConfig.text || ''}</span>
     ${announcementConfig.linkText ? `
-      <a href="${announcementConfig.linkUrl || `https://wa.me/${whatsappDigits}`}" target="_blank" class="announcement-link-display underline font-bold hover:opacity-80 ml-1">
+      <a href="${announcementConfig.linkUrl || `https://wa.me/${whatsappDigits}`}" target="_blank" class="announcement-link-display underline font-bold hover:opacity-80 ml-1 shrink-0">
         ${announcementConfig.linkText} ↗
       </a>
     ` : ''}
   </div>
 
   <!-- ==================== HEADER / NAVEGAÇÃO ==================== -->
-  <header class="sticky top-0 z-50 ${
-    isModelA ? 'bg-[#fbf9f6]/90 border-[#e8e2d9]' : 
-    isModelB ? 'bg-[#090d16]/90 border-slate-800/80' : 
+  <header class="sticky top-0 z-40 ${
+    isModelA ? 'bg-[#fbf9f6]/95 border-[#e8e2d9]' : 
+    isModelB ? 'bg-[#090d16]/95 border-slate-800/80' : 
     isModelC ? 'bg-[#faf7f2]/95 border-stone-300' : 
-    'bg-white/90 border-slate-200/80 shadow-sm'
+    'bg-white/95 border-slate-200/80 shadow-sm'
   } backdrop-blur-md border-b transition-all">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
       
       <!-- Brand Logo / Badge -->
-      <a href="#inicio" class="flex items-center space-x-3 group">
+      <a href="#inicio" class="flex items-center space-x-3 group shrink-0 min-w-0 max-w-[240px] sm:max-w-[280px] xl:max-w-[320px]">
         <div class="w-11 h-11 ${isModelC ? 'rounded-none' : isModelD ? 'rounded-2xl' : 'rounded-2xl'} text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0 transition-transform group-hover:scale-105" style="background-color: ${primary}">
-          ${name.slice(0, 2).toUpperCase()}
+          ${(data.companyName || name).slice(0, 2).toUpperCase()}
         </div>
-        <div>
-          <span class="font-bold text-base sm:text-lg leading-tight block ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}">${name}</span>
-          <span class="text-xs font-medium block ${isModelB ? 'text-slate-400' : 'text-stone-500'}">
-            ${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}
+        <div class="min-w-0 overflow-hidden leading-tight">
+          <span class="font-bold text-sm sm:text-base block truncate ${isModelB ? 'text-white' : isModelA || isModelC ? 'font-serif text-stone-900' : 'text-slate-900'}">${data.companyName || name}</span>
+          <span class="text-[11px] font-medium block truncate ${isModelB ? 'text-slate-400' : 'text-stone-500'}">
+            ${data.companyName ? `${name} • ` : ''}${profession}${data.hasProfessionalCouncil && data.councilNumber ? ' • ' + councilBadge : ''}
           </span>
         </div>
       </a>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center space-x-5 lg:space-x-6 text-sm font-semibold ${isModelB ? 'text-slate-300' : isModelC ? 'text-stone-700 tracking-wider text-xs uppercase' : 'text-stone-600'}">
-        <a href="#inicio" data-nav-section="inicio" class="hover:opacity-80 transition py-1" style="${!isSectionActive('inicio') ? 'display: none !important;' : ''}">Início</a>
-        <a href="#parceiros" data-nav-section="parceiros" class="hover:opacity-80 transition py-1" style="${!isSectionActive('parceiros') ? 'display: none !important;' : ''}">Parceiros</a>
-        <a href="#servicos" data-nav-section="servicos" class="hover:opacity-80 transition py-1" style="${!isSectionActive('servicos') ? 'display: none !important;' : ''}">Atuação</a>
-        <a href="#catalogo" data-nav-section="catalogo" class="hover:opacity-80 transition py-1" style="${!isSectionActive('catalogo') ? 'display: none !important;' : ''}">Catálogo</a>
-        <a href="#planos" data-nav-section="planos" class="hover:opacity-80 transition py-1" style="${!isSectionActive('planos') ? 'display: none !important;' : ''}">Planos</a>
-        <a href="#cases" data-nav-section="cases" class="hover:opacity-80 transition py-1" style="${!isSectionActive('cases') ? 'display: none !important;' : ''}">Casos</a>
-        <a href="#como-funciona" data-nav-section="como-funciona" class="hover:opacity-80 transition py-1" style="${!isSectionActive('como-funciona') ? 'display: none !important;' : ''}">Como Funciona</a>
-        <a href="#sobre" data-nav-section="sobre" class="hover:opacity-80 transition py-1" style="${!isSectionActive('sobre') ? 'display: none !important;' : ''}">Sobre</a>
-        <a href="#galeria" data-nav-section="galeria" class="hover:opacity-80 transition py-1" style="${!isSectionActive('galeria') ? 'display: none !important;' : ''}">Galeria</a>
-        <a href="#depoimentos" data-nav-section="depoimentos" class="hover:opacity-80 transition py-1" style="${!isSectionActive('depoimentos') ? 'display: none !important;' : ''}">Depoimentos</a>
-        <a href="#faq" data-nav-section="faq" class="hover:opacity-80 transition py-1" style="${!isSectionActive('faq') ? 'display: none !important;' : ''}">Dúvidas</a>
-        <a href="#simulador" data-nav-section="simulador" class="hover:opacity-80 transition py-1" style="${!isSectionActive('simulador') ? 'display: none !important;' : ''}">Simulador</a>
-        <a href="#artigos" data-nav-section="artigos" class="hover:opacity-80 transition py-1" style="${!isSectionActive('artigos') ? 'display: none !important;' : ''}">Orientações</a>
-        <a href="#contato" data-nav-section="contato" class="hover:opacity-80 transition py-1" style="${!isSectionActive('contato') ? 'display: none !important;' : ''}">Contato</a>
+      <nav class="hidden xl:flex items-center space-x-3 2xl:space-x-5 text-xs 2xl:text-sm font-semibold shrink min-w-0 ${isModelB ? 'text-slate-300' : isModelC ? 'text-stone-700 tracking-wider text-xs uppercase' : 'text-stone-600'}">
+        <a href="#inicio" data-nav-section="inicio" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('inicio') ? 'display: none !important;' : ''}">Início</a>
+        <a href="#parceiros" data-nav-section="parceiros" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('parceiros') ? 'display: none !important;' : ''}">Parceiros</a>
+        <a href="#servicos" data-nav-section="servicos" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('servicos') ? 'display: none !important;' : ''}">Atuação</a>
+        <a href="#catalogo" data-nav-section="catalogo" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('catalogo') ? 'display: none !important;' : ''}">Catálogo</a>
+        <a href="#planos" data-nav-section="planos" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('planos') ? 'display: none !important;' : ''}">Planos</a>
+        <a href="#cases" data-nav-section="cases" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('cases') ? 'display: none !important;' : ''}">Casos</a>
+        <a href="#como-funciona" data-nav-section="como-funciona" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('como-funciona') ? 'display: none !important;' : ''}">Como Funciona</a>
+        <a href="#sobre" data-nav-section="sobre" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('sobre') ? 'display: none !important;' : ''}">Sobre</a>
+        <a href="#galeria" data-nav-section="galeria" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('galeria') ? 'display: none !important;' : ''}">Galeria</a>
+        <a href="#depoimentos" data-nav-section="depoimentos" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('depoimentos') ? 'display: none !important;' : ''}">Depoimentos</a>
+        <a href="#faq" data-nav-section="faq" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('faq') ? 'display: none !important;' : ''}">Dúvidas</a>
+        <a href="#simulador" data-nav-section="simulador" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('simulador') ? 'display: none !important;' : ''}">Simulador</a>
+        <a href="#artigos" data-nav-section="artigos" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('artigos') ? 'display: none !important;' : ''}">Orientações</a>
+        <a href="#contato" data-nav-section="contato" class="hover:opacity-80 transition py-1 shrink-0" style="${!isSectionActive('contato') ? 'display: none !important;' : ''}">Contato</a>
       </nav>
 
       <!-- CTA Action & Mobile Toggle -->
-      <div class="flex items-center space-x-3">
-        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="hidden sm:inline-flex px-6 py-2.5 text-white text-sm font-bold ${
+      <div class="flex items-center space-x-3 shrink-0">
+        <a href="https://wa.me/${whatsappDigits}" target="_blank" class="hidden sm:inline-flex px-5 2xl:px-6 py-2.5 text-white text-xs 2xl:text-sm font-bold ${
           isModelC ? 'rounded-none uppercase tracking-widest text-xs' : isModelA ? 'rounded-full' : isModelD ? 'rounded-2xl' : 'rounded-xl'
         } shadow-sm transition-all items-center hover:opacity-95 hover:shadow-md active:scale-95" style="background-color: ${primary}">
           ${isModelA ? 'Agendar Consulta' : isModelC ? 'CONSULTAR AGORA' : 'Agendar Atendimento'}
         </a>
         
         <!-- Mobile Menu Toggle -->
-        <button type="button" onclick="toggleMobileNav(this)" aria-label="Abrir Menu" class="md:hidden p-2 rounded-xl border ${isModelB ? 'border-slate-800 text-slate-200 hover:bg-slate-800' : 'border-stone-200 text-stone-700 hover:bg-stone-100'} transition flex items-center justify-center">
+        <button type="button" onclick="toggleMobileNav(this)" aria-label="Abrir Menu" class="xl:hidden p-2 rounded-xl border ${isModelB ? 'border-slate-800 text-slate-200 hover:bg-slate-800' : 'border-stone-200 text-stone-700 hover:bg-stone-100'} transition flex items-center justify-center">
           <svg class="w-6 h-6 hamburger-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
@@ -285,7 +285,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
     </div>
 
     <!-- Mobile Menu Dropdown -->
-    <div class="mobile-nav-menu hidden md:hidden border-t ${isModelB ? 'bg-[#090d16] border-slate-800' : isModelC ? 'bg-[#faf7f2] border-stone-300' : 'bg-white border-stone-200'} px-4 pt-3 pb-6 space-y-3 shadow-xl">
+    <div class="mobile-nav-menu hidden xl:hidden border-t ${isModelB ? 'bg-[#090d16] border-slate-800' : isModelC ? 'bg-[#faf7f2] border-stone-300' : 'bg-white border-stone-200'} px-4 pt-3 pb-6 space-y-3 shadow-xl">
       <div class="flex flex-col space-y-2 text-sm font-semibold ${isModelB ? 'text-slate-200' : 'text-stone-800'}">
         <a href="#inicio" data-nav-section="inicio" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('inicio') ? 'display: none !important;' : ''}">Início</a>
         <a href="#parceiros" data-nav-section="parceiros" onclick="closeMobileNav(this)" class="px-3 py-2 rounded-lg hover:bg-black/5 transition" style="${!isSectionActive('parceiros') ? 'display: none !important;' : ''}">Parceiros</a>
@@ -309,6 +309,7 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
       </div>
     </div>
   </header>
+
 
   <!-- ==================== HERO SECTION ==================== -->
   ${isModelA ? `
