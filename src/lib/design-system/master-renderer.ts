@@ -205,7 +205,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       <div class="flex items-center space-x-3">
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-400 text-xs font-semibold">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          Shardcloud Engine Ativo & Conectado
+          Site Online & Conectado
         </span>
         <a href="/" class="text-xs text-slate-300 hover:text-white bg-slate-800 px-3.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center font-medium">
           Ver Site Público ↗
@@ -1248,7 +1248,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         <div>
           <h3 class="font-bold text-base text-slate-900">Gerenciamento de Domínio Próprio & DNS</h3>
           <p class="text-xs text-slate-500 mt-1">
-            Altere ou vincule um novo domínio ao seu site. Ao salvar, nosso sistema atualiza automaticamente o roteamento no Shardcloud e a zona DNS na Cloudflare.
+            Altere ou vincule um novo domínio ao seu site. Ao salvar, nosso sistema atualiza automaticamente o roteamento e a zona de servidores DNS para o seu endereço próprio.
           </p>
         </div>
 
@@ -1257,7 +1257,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           <div>
             <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Domínio Atualmente Configurado</span>
             <span id="currentDomainDisplay" class="text-lg font-extrabold text-slate-900 font-mono block mt-1">
-              ${data.customDomainName || 'Subdomínio Shardcloud Padrão'}
+              ${data.customDomainName || 'Endereço Web Padrão'}
             </span>
           </div>
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
@@ -1310,7 +1310,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
   </main>
 
   <footer class="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
-    Painel /master • Isolamento criptográfico e infraestrutura de alta performance Shardcloud.
+    Painel /master • Ambiente seguro com criptografia de ponta a ponta e alta disponibilidade.
   </footer>
 
   <script>
@@ -2924,7 +2924,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       b.innerText = 'Salvando...';
       setTimeout(() => {
         b.innerText = '✓ Sincronizado';
-        alert(msg || 'Dados salvos com sucesso no Shardcloud PostgreSQL!');
+        alert(msg || 'Dados salvos com sucesso!');
       }, 400);
     }
 
@@ -2982,7 +2982,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         return;
       }
 
-      if (!confirm('Deseja realmente alterar o domínio para "' + val + '"?\\n\\nO sistema atualizará automaticamente o Shardcloud e a zona DNS na Cloudflare.')) {
+      if (!confirm('Deseja realmente alterar o domínio para "' + val + '"?\\n\\nO sistema atualizará automaticamente os servidores e a zona de DNS.')) {
         return;
       }
 
@@ -2990,7 +2990,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       btn.innerText = 'Migrando infraestrutura...';
       migrationBox.classList.remove('hidden');
       migrationBox.className = 'p-5 rounded-2xl border text-xs bg-slate-50 border-slate-200 text-slate-700';
-      migrationBox.innerHTML = '<div class="font-bold text-sm text-slate-900">Aplicando alterações...</div><p class="mt-1">Atualizando apontamentos no Shardcloud e gerando zona DNS no Cloudflare...</p>';
+      migrationBox.innerHTML = '<div class="font-bold text-sm text-slate-900">Aplicando alterações...</div><p class="mt-1">Atualizando apontamentos e gerando zona de servidores DNS...</p>';
 
       try {
         const res = await fetch('/api/sites/change-domain', {
@@ -3030,7 +3030,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
               '<a href="https://registro.br" target="_blank" class="inline-flex items-center px-4 py-2 bg-emerald-700 text-white font-bold text-xs rounded-xl hover:bg-emerald-800 transition">Acessar Registro.br para salvar DNS ↗</a>' +
             '</div>';
 
-          alert('Sucesso! O domínio foi atualizado no Shardcloud e Cloudflare.');
+          alert('Sucesso! O domínio foi atualizado.');
         } else {
           migrationBox.className = 'p-5 rounded-2xl border-2 border-rose-200 bg-rose-50 text-rose-950 space-y-2';
           migrationBox.innerHTML = '<div class="font-bold text-sm text-rose-900">Falha na migração</div><p>' + (data.error || 'Não foi possível atualizar o domínio.') + '</p>';

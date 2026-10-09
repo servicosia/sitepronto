@@ -1943,7 +1943,7 @@ export function renderBioLinkHtml(data: OnboardingData): string {
 
   <footer class="mt-12 text-center text-[11px] text-slate-500 space-y-1">
     <p>${name} • ${profession}</p>
-    <p class="text-[10px] text-slate-600">Desenvolvido com SitePronto • Shardcloud Engine</p>
+    <p class="text-[10px] text-slate-600">Desenvolvido com SitePronto</p>
   </footer>
 
   <script>

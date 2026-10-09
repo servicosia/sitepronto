@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Domínio atualizado com sucesso para ${rootDomain}. As alterações foram aplicadas na infraestrutura Shardcloud e Cloudflare.`,
+      message: `Domínio atualizado com sucesso para ${rootDomain}. As alterações foram aplicadas na infraestrutura e nos servidores de DNS.`,
       domain: rootDomain,
       oldDomain: oldDomain || null,
       nameServers: cfZone.nameServers,
