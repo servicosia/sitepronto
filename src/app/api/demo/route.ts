@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { OnboardingDataSchema } from '@/lib/validation/onboarding';
 import { getDesignSpecsWithProvider } from '@/lib/providers/design/stitch';
 import { renderCompleteSiteHtml } from '@/lib/design-system/template-renderer';
+import { renderMasterDashboardHtml } from '@/lib/design-system/master-renderer';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +11,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const nicho = searchParams.get('nicho') || 'odonto';
     const model = (searchParams.get('model') || 'MODEL_A') as 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D';
+    const view = searchParams.get('view') || 'site'; // 'site' ou 'admin'
 
     let demoData: any;
 
@@ -240,15 +242,21 @@ export async function GET(req: NextRequest) {
 
     const parseResult = OnboardingDataSchema.safeParse(demoData);
     const validData = parseResult.success ? parseResult.data : (demoData as any);
-    const { specs } = await getDesignSpecsWithProvider(validData);
-
-    const chosenSpec = specs[model] || specs.MODEL_A;
-    const html = renderCompleteSiteHtml(validData, chosenSpec);
+    
+    let html: string;
+    if (view === 'admin' || view === 'master') {
+      html = renderMasterDashboardHtml(validData, 'demo-preview-site');
+    } else {
+      const { specs } = await getDesignSpecsWithProvider(validData);
+      const chosenSpec = specs[model] || specs.MODEL_A;
+      html = renderCompleteSiteHtml(validData, chosenSpec);
+    }
 
     return new NextResponse(html, {
       status: 200,
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
+        'X-Frame-Options': 'SAMEORIGIN',
         'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
       },
     });

@@ -27,7 +27,8 @@ import {
   AlertCircle,
   Monitor,
   Smartphone,
-  ExternalLink
+  ExternalLink,
+  Settings
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -40,6 +41,7 @@ export default function HomePage() {
 
   // Modal de Demonstração
   const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [demoViewMode, setDemoViewMode] = useState<'site' | 'admin'>('site');
   const [demoNicho, setDemoNicho] = useState<'odonto' | 'oficina' | 'boutique'>('odonto');
   const [demoModel, setDemoModel] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
   const [demoViewport, setDemoViewport] = useState<'desktop' | 'mobile'>('desktop');
@@ -1107,15 +1109,40 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Controles de Nicho, Modelo e Viewport */}
-              <div className="flex items-center gap-2">
+              {/* Controles de Modo (Site vs Admin), Nicho, Modelo e Viewport */}
+              <div className="flex flex-wrap items-center gap-2">
+                
+                {/* Seletor de Modo: Site vs Admin */}
+                <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setDemoViewMode('site')}
+                    className={`px-3 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1.5 ${
+                      demoViewMode === 'site' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>Site Público</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoViewMode('admin')}
+                    className={`px-3 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1.5 ${
+                      demoViewMode === 'admin' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Settings className="w-3.5 h-3.5" />
+                    <span>Área Adm (Painel Master)</span>
+                  </button>
+                </div>
+
                 {/* Nichos */}
                 <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
                   <button
                     type="button"
                     onClick={() => setDemoNicho('odonto')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
-                      demoNicho === 'odonto' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                      demoNicho === 'odonto' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     Odontologia
@@ -1124,7 +1151,7 @@ export default function HomePage() {
                     type="button"
                     onClick={() => setDemoNicho('oficina')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
-                      demoNicho === 'oficina' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                      demoNicho === 'oficina' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     Auto Mecânica
@@ -1133,7 +1160,7 @@ export default function HomePage() {
                     type="button"
                     onClick={() => setDemoNicho('boutique')}
                     className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
-                      demoNicho === 'boutique' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                      demoNicho === 'boutique' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     Moda & Ateliê
@@ -1187,6 +1214,23 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Aviso quando no Modo Admin */}
+            {demoViewMode === 'admin' && (
+              <div className="bg-indigo-950/80 border-b border-indigo-800/60 px-4 py-2 text-xs text-indigo-200 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-indigo-400 shrink-0" />
+                  <span><strong>Visão da Área Administrativa (Painel Master do Cliente):</strong> Aqui o dono do site gerencia catálogo, dúvidas (FAQ), seções, links e fotos sem precisar de desenvolvedor!</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDemoViewMode('site')}
+                  className="text-[11px] font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded-lg shrink-0 ml-3"
+                >
+                  Ver Site Público ↗
+                </button>
+              </div>
+            )}
+
             {/* Corpo do Iframe com Site Real */}
             <div className="flex-1 bg-slate-950 p-2 sm:p-4 flex items-center justify-center overflow-hidden">
               <div
@@ -1197,9 +1241,9 @@ export default function HomePage() {
                 }`}
               >
                 <iframe
-                  key={`${demoNicho}-${demoModel}-${demoViewport}`}
-                  src={`/api/demo?nicho=${demoNicho}&model=${demoModel}`}
-                  title="Site de Demonstração em Tempo Real"
+                  key={`${demoViewMode}-${demoNicho}-${demoModel}-${demoViewport}`}
+                  src={`/api/demo?nicho=${demoNicho}&model=${demoModel}&view=${demoViewMode}`}
+                  title={demoViewMode === 'site' ? 'Site de Demonstração em Tempo Real' : 'Painel Master de Demonstração'}
                   className="w-full h-full border-0"
                 />
               </div>
