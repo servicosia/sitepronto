@@ -1243,7 +1243,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         </div>
       </div>
 
-      <!-- ABA 11: DOMÍNIO & DNS (Shardcloud e Cloudflare) -->
+      <!-- ABA: DOMÍNIO & DNS -->
       <div id="tab-domain" class="tab-content hidden p-6 sm:p-8 space-y-6">
         <div>
           <h3 class="font-bold text-base text-slate-900">Gerenciamento de Domínio Próprio & DNS</h3>
@@ -2929,7 +2929,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     }
 
     // ==========================================
-    // DOMÍNIO & DNS (Shardcloud e Cloudflare)
+    // DOMÍNIO & DNS
     // ==========================================
     const CURRENT_SITE_ID = '${siteId || ''}';
     let currentDomain = localStorage.getItem('site_custom_domain') || '${data.customDomainName || ''}';
