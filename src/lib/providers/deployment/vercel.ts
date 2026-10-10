@@ -63,9 +63,12 @@ export class VercelProvider implements DeploymentProvider {
       if (res.status === 200 || res.status === 201) {
         const data = await res.json();
         projectId = data.id;
+      } else if (res.status === 401 || res.status === 403) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(`Autenticação Vercel falhou (${res.status}): ${errData.error?.message || 'Token expirado ou inválido'}`);
       } else {
-        // Se já existir, aplica PATCH para garantir que o framework não force build Next.js com erro
-        await fetch(`https://api.vercel.com/v9/projects/${projectName}${teamQuery}`, {
+        // Se já existir (ex: 409), tenta patch para garantir configuração
+        const patchRes = await fetch(`https://api.vercel.com/v9/projects/${projectName}${teamQuery}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${this.token}`,
@@ -77,12 +80,20 @@ export class VercelProvider implements DeploymentProvider {
             outputDirectory: null,
             installCommand: null,
           }),
-        }).catch(() => {});
+        }).catch(() => null);
+
+        if (patchRes && (patchRes.status === 200 || patchRes.status === 201)) {
+          const patchData = await patchRes.json().catch(() => ({}));
+          if (patchData.id) projectId = patchData.id;
+        }
       }
 
       // 2. Se houver arquivos para deploy imediato, executa
       if (options.files && options.files.length > 0) {
-        await this.deploy({ projectName, files: options.files });
+        const deployResult = await this.deploy({ projectName, files: options.files });
+        if (!deployResult.ready) {
+          console.warn(`[VercelProvider] Deploy do projeto ${projectName} iniciado com pendências.`);
+        }
       }
 
       return {
@@ -92,11 +103,7 @@ export class VercelProvider implements DeploymentProvider {
       };
     } catch (error: any) {
       console.error(`[VercelProvider] Erro na API Vercel: ${error.message}`);
-      return {
-        id: `prj_${projectName}`,
-        name: projectName,
-        url: `https://${projectName}.vercel.app`,
-      };
+      throw error;
     }
   }
 

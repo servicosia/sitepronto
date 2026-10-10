@@ -45,8 +45,11 @@ export async function validateVercelProject(projectId: string, token: string | u
     };
   }
 
+  const teamId = process.env.VERCEL_TEAM_ID || 'team_3tLIgnGMZ5orYgHyKOIgxGZw';
+  const teamQuery = teamId ? `?teamId=${teamId}` : '';
+
   try {
-    const res = await fetch(`https://api.vercel.com/v9/projects/${projectId}`, {
+    const res = await fetch(`https://api.vercel.com/v9/projects/${projectId}${teamQuery}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -63,10 +66,11 @@ export async function validateVercelProject(projectId: string, token: string | u
       };
     }
 
+    const errData = await res.json().catch(() => ({}));
     return {
       service: 'VERCEL',
-      status: 'PASSED',
-      message: `Projeto Vercel registrado com ID '${projectId}'.`,
+      status: 'FAILED',
+      message: `Projeto Vercel '${projectId}' não pôde ser verificado (HTTP ${res.status}): ${errData.error?.message || 'Acesso negado ou projeto inexistente'}.`,
     };
   } catch (err: any) {
     return {
