@@ -186,6 +186,25 @@ export const SocialLinksConfigSchema = z.object({
   youtube: SocialLinkItemSchema.default({ active: false, url: '' }),
 });
 
+// 9. Botão Flutuante de WhatsApp
+export const WhatsAppWidgetConfigSchema = z.object({
+  active: z.boolean().default(true),
+  greetingText: z.string().default('Olá! Precisa de atendimento? Fale conosco no WhatsApp'),
+  customMessage: z.string().default('Olá! Gostaria de mais informações sobre seus serviços.'),
+});
+
+// 10. Tags de Rastreamento (Google Analytics & Meta Pixel)
+export const TrackingConfigSchema = z.object({
+  googleAnalyticsId: z.string().default(''),
+  metaPixelId: z.string().default(''),
+});
+
+// 11. Banner de LGPD e Cookies
+export const LgpdConfigSchema = z.object({
+  active: z.boolean().default(true),
+  message: z.string().default('Utilizamos cookies para oferecer a melhor experiência e garantir a segurança do seu atendimento.'),
+});
+
 // Schema de Configuração Modular das Seções do Site
 export const SectionsConfigSchema = z.object({
   inicio: z.boolean().default(true),
@@ -318,6 +337,19 @@ export const OnboardingDataSchema = z.object({
     tiktok: { active: false, url: '' },
     facebook: { active: false, url: '' },
     youtube: { active: false, url: '' },
+  }),
+  whatsappWidget: WhatsAppWidgetConfigSchema.default({
+    active: true,
+    greetingText: 'Olá! Precisa de atendimento? Fale conosco no WhatsApp',
+    customMessage: 'Olá! Gostaria de mais informações sobre seus serviços.',
+  }),
+  tracking: TrackingConfigSchema.default({
+    googleAnalyticsId: '',
+    metaPixelId: '',
+  }),
+  lgpd: LgpdConfigSchema.default({
+    active: true,
+    message: 'Utilizamos cookies para oferecer a melhor experiência e garantir a segurança do seu atendimento.',
   }),
   sectionsConfig: SectionsConfigSchema.default({
     inicio: true,

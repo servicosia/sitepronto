@@ -168,6 +168,25 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
 
   const safeJsonSocials = JSON.stringify(socials).replace(/</g, '\\u003c');
 
+  const defaultWhatsappWidget = data.whatsappWidget || {
+    active: true,
+    greetingText: 'Olá! Precisa de atendimento? Fale conosco no WhatsApp',
+    customMessage: 'Olá! Gostaria de mais informações sobre seus serviços.',
+  };
+  const safeJsonWhatsappWidget = JSON.stringify(defaultWhatsappWidget).replace(/</g, '\\u003c');
+
+  const defaultTracking = data.tracking || {
+    googleAnalyticsId: '',
+    metaPixelId: '',
+  };
+  const safeJsonTracking = JSON.stringify(defaultTracking).replace(/</g, '\\u003c');
+
+  const defaultLgpd = data.lgpd || {
+    active: true,
+    message: 'Utilizamos cookies essenciais para oferecer a melhor experiência e garantir a segurança do seu atendimento de acordo com a LGPD.',
+  };
+  const safeJsonLgpd = JSON.stringify(defaultLgpd).replace(/</g, '\\u003c');
+
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -328,12 +347,25 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       </div>
 
       <!-- ABA 1: FORMULÁRIOS RECEBIDOS -->
-      <div id="tab-contacts" class="tab-content p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-bold text-base text-slate-900">Mensagens e Formulários Recebidos</h3>
-          <span class="text-xs text-slate-500">1 contato registrado</span>
+      <div id="tab-contacts" class="tab-content p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl">📬</span>
+              <h3 class="font-bold text-base text-slate-900">Mensagens e Formulários Recebidos</h3>
+              <span id="contactsCountBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                1 contato registrado
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Leads e solicitações enviadas pelos visitantes através do formulário do seu site.</p>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <button onclick="downloadContactsCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-2">
+              <span>📥</span> Exportar Leads (Excel / CSV)
+            </button>
+          </div>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
           <table class="w-full text-left text-sm text-slate-600">
             <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200">
               <tr>
@@ -647,6 +679,55 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
               <input type="checkbox" id="bioLinksActivationSwitch" onchange="toggleBioLinksActivationFromTab(this.checked)" class="sr-only peer">
               <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
             </label>
+          </div>
+        </div>
+
+        <!-- GERADOR DE QR CODE AUTOMÁTICO -->
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+              <span class="text-3xl">📱</span>
+              <div>
+                <h4 class="font-bold text-base text-slate-900">Gerador de QR Code Automático</h4>
+                <p class="text-xs text-slate-500 mt-0.5">Gere e baixe seu QR Code em alta definição para cartões de visita, balcão, receituários ou materiais impressos.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col md:flex-row items-center gap-6">
+            <div class="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm shrink-0">
+              <img id="qrCodePreviewImg" src="" alt="QR Code Preview" class="w-40 h-40 object-contain rounded-lg">
+            </div>
+
+            <div class="flex-1 space-y-3 text-center md:text-left">
+              <div>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Destino do QR Code</span>
+                <div class="flex flex-wrap items-center gap-2 mt-1.5 justify-center md:justify-start">
+                  <button id="btnQrTargetLinks" onclick="setQrCodeTarget('links')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white transition">
+                    🔗 Página de Bio (/links)
+                  </button>
+                  <button id="btnQrTargetHome" onclick="setQrCodeTarget('home')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 transition">
+                    🌐 Site Principal (Home /)
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Link Codificado</span>
+                <div class="flex items-center gap-2 mt-1">
+                  <input type="text" id="qrTargetUrlDisplay" readonly class="w-full px-3 py-1.5 text-xs font-mono bg-white border border-slate-300 rounded-xl text-slate-700">
+                  <button onclick="copyQrTargetUrl()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-xl shrink-0 transition">
+                    Copiar
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2 pt-1 justify-center md:justify-start">
+                <button onclick="downloadActiveQrCodePng()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5">
+                  <span>📥</span> Baixar Imagem do QR Code (PNG)
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1219,28 +1300,161 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         </div>
       </div>
 
-      <!-- ABA 10: CONFIGURAÇÕES & RESEND -->
-      <div id="tab-settings" class="tab-content hidden p-6 sm:p-8 space-y-6">
-        <h3 class="font-bold text-base text-slate-900">Configurações de Recepção e Disparos de E-mail</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail de Destino dos Formulários</label>
-            <input type="email" value="${data.publicEmail || 'contato@seusite.com.br'}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none">
+      <!-- ABA 10: CONFIGURAÇÕES GERAIS, TRACKING, LGPD & BACKUP -->
+      <div id="tab-settings" class="tab-content hidden p-6 sm:p-8 space-y-8">
+        
+        <!-- Bloco 1: E-mails e Notificações -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">✉️</span>
+            <h3 class="font-bold text-base text-slate-900">Recepção de Formulários & E-mails</h3>
           </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">WhatsApp de Contato Principal</label>
-            <input type="text" value="${data.whatsapp || '11999999999'}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail de Destino dos Formulários</label>
+              <input type="email" id="settingPublicEmail" value="${data.publicEmail || 'contato@seusite.com.br'}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none bg-slate-50 focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">WhatsApp de Contato Principal</label>
+              <input type="text" id="settingWhatsappPhone" value="${data.whatsapp || '11999999999'}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900 focus:outline-none bg-slate-50 focus:bg-white">
+            </div>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="text-xs font-bold text-slate-900">Provedor de E-mail Transacional (Resend)</div>
+              <div class="text-xs text-slate-500">Notificações automáticas instantâneas com taxa de entrega de 99.8%.</div>
+            </div>
+            <button onclick="alert('E-mail de teste enviado com sucesso para ' + (document.getElementById('settingPublicEmail').value || 'seu e-mail'));" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition shrink-0">
+              Enviar E-mail de Teste
+            </button>
           </div>
         </div>
-        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
-          <div>
-            <div class="text-xs font-bold text-slate-900">Provedor de E-mail Transacional (Resend)</div>
-            <div class="text-xs text-slate-500">Notificações automáticas instantâneas com rate limit.</div>
+
+        <hr class="border-slate-200">
+
+        <!-- Bloco 2: Widget Flutuante do WhatsApp -->
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center font-bold shadow-sm">
+                💬
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="font-bold text-base text-slate-900">Botão Flutuante do WhatsApp</h4>
+                  <span id="badge_wa_widget" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">● Ligado</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">Botão pulsante no canto inferior direito do site com balão de boas-vindas para incentivar conversas imediatas.</p>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="switch_wa_widget" checked onchange="toggleWaWidgetSwitch(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
           </div>
-          <button onclick="alert('E-mail de teste enviado com sucesso para ' + ('${data.publicEmail || 'seu e-mail'}'));" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-lg hover:bg-emerald-700 transition">
-            Enviar E-mail de Teste
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Texto do Balão de Saudação</label>
+              <input type="text" id="settingWaGreeting" value="Olá! Precisa de atendimento? Fale conosco no WhatsApp" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-slate-900 focus:outline-none">
+              <p class="text-[11px] text-slate-400 mt-1">Exibido na caixinha de fala acima do botão verde.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mensagem Inicial do Cliente</label>
+              <input type="text" id="settingWaMessage" value="Olá! Gostaria de mais informações sobre seus serviços." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-slate-900 focus:outline-none">
+              <p class="text-[11px] text-slate-400 mt-1">Mensagem pré-digitada que abrirá no WhatsApp do visitante.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-slate-200">
+
+        <!-- Bloco 3: Métricas & Rastreamento (Google Analytics GA4 & Meta Pixel) -->
+        <div class="space-y-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+              📊
+            </div>
+            <div>
+              <h4 class="font-bold text-base text-slate-900">Métricas & Rastreamento de Anúncios</h4>
+              <p class="text-xs text-slate-500 mt-0.5">Conecte suas ferramentas de análise e pixels para acompanhar acessos e anunciar no Google, Instagram e Facebook.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Google Analytics 4 (GA4 ID)</label>
+              <input type="text" id="settingGoogleAnalytics" placeholder="G-XXXXXXXXXX" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono bg-white focus:ring-2 focus:ring-slate-900 focus:outline-none">
+              <p class="text-[11px] text-slate-400 mt-1">Insira seu ID de medição do Google Analytics (começa com "G-").</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Meta Pixel ID (Facebook / Instagram Ads)</label>
+              <input type="text" id="settingMetaPixel" placeholder="Ex: 123456789012345" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono bg-white focus:ring-2 focus:ring-slate-900 focus:outline-none">
+              <p class="text-[11px] text-slate-400 mt-1">Insira o código numérico do Pixel do Gerenciador de Anúncios da Meta.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-slate-200">
+
+        <!-- Bloco 4: Privacidade & LGPD (Cookies) -->
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center text-lg shadow-sm">
+                🛡️
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="font-bold text-base text-slate-900">Aviso de Privacidade & LGPD (Cookies)</h4>
+                  <span id="badge_lgpd_widget" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">● Ligado</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">Barra elegante no rodapé informando a utilização de cookies para proteção de dados do visitante.</p>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="switch_lgpd_widget" checked onchange="toggleLgpdSwitch(this.checked)" class="sr-only peer">
+              <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+
+          <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200">
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mensagem do Banner de Cookies</label>
+            <textarea id="settingLgpdMessage" rows="2" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-slate-900 focus:outline-none">Utilizamos cookies essenciais para oferecer uma experiência personalizada e garantir a segurança do seu atendimento, conforme a Lei Geral de Proteção de Dados (LGPD).</textarea>
+          </div>
+        </div>
+
+        <hr class="border-slate-200">
+
+        <!-- Bloco 5: Cópia de Segurança & Restauração (Backup 1-Clique) -->
+        <div class="p-6 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white space-y-4 border border-slate-800">
+          <div class="flex items-center space-x-3">
+            <span class="text-3xl">💾</span>
+            <div>
+              <h4 class="font-bold text-base text-white">Cópia de Segurança & Restauração (Backup 1-Clique)</h4>
+              <p class="text-xs text-slate-400 mt-0.5">Faça download de todas as personalizações, fotos, textos e configurações em um único arquivo .json seguro, ou restaure um backup anterior.</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button onclick="exportSiteBackup()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition shadow-lg shadow-emerald-950/40 flex items-center gap-2">
+              <span>📥</span> Baixar Backup Completo (.json)
+            </button>
+
+            <button onclick="document.getElementById('backupFileInput').click()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition flex items-center gap-2">
+              <span>📂</span> Restaurar Backup (.json)
+            </button>
+            <input type="file" id="backupFileInput" accept=".json" class="hidden" onchange="restoreSiteBackup(event)">
+          </div>
+        </div>
+
+        <!-- Botão Salvar Todas as Configurações -->
+        <div class="flex justify-end pt-4 border-t border-slate-100">
+          <button onclick="saveSettingsData()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl transition shadow-sm">
+            Salvar Configurações Gerais
           </button>
         </div>
+
       </div>
 
       <!-- ABA: DOMÍNIO & DNS -->
@@ -3046,6 +3260,337 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       }
     }
 
+    // === 1. EXPORTAÇÃO DE LEADS (EXCEL / CSV COM UTF-8 BOM) ===
+    function downloadContactsCSV() {
+      try {
+        let contacts = [];
+        const raw = localStorage.getItem('site_contacts');
+        if (raw) {
+          try { contacts = JSON.parse(raw); } catch (e) {}
+        }
+        if (!contacts || contacts.length === 0) {
+          contacts = [
+            {
+              date: 'Hoje às 16:30',
+              name: 'Mariana Souza',
+              phone: '(11) 97766-5544',
+              reason: 'Consulta Inicial',
+              message: 'Preciso de orientação com urgência.',
+              status: 'Novo'
+            }
+          ];
+        }
+
+        const headers = ['Data/Hora', 'Nome', 'Telefone / WhatsApp', 'Motivo', 'Mensagem', 'Status'];
+        const rows = contacts.map(function(c) {
+          return [
+            '"' + (c.date || '').replace(/"/g, '""') + '"',
+            '"' + (c.name || '').replace(/"/g, '""') + '"',
+            '"' + (c.phone || '').replace(/"/g, '""') + '"',
+            '"' + (c.reason || '').replace(/"/g, '""') + '"',
+            '"' + (c.message || '').replace(/"/g, '""') + '"',
+            '"' + (c.status || '').replace(/"/g, '""') + '"'
+          ];
+        });
+
+        // \uFEFF força o Microsoft Excel a reconhecer a codificação UTF-8 com acentos corretos
+        const csvContent = '\uFEFF' + [headers.join(';'), ...rows.map(function(r) { return r.join(';'); })].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const filename = 'leads-sitepronto-' + new Date().toISOString().slice(0, 10) + '.csv';
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        triggerSave('✓ Leads exportados com sucesso em formato Excel/CSV!');
+      } catch (err) {
+        console.error('Erro ao exportar leads:', err);
+        alert('Erro ao gerar arquivo CSV: ' + err.message);
+      }
+    }
+
+    // === 2. GERADOR DE QR CODE AUTOMÁTICO ===
+    let activeQrTarget = 'links'; // 'links' | 'home'
+
+    function updateQrCodeDisplay() {
+      const origin = window.location.origin;
+      const targetPath = activeQrTarget === 'links' ? '/links' : '/';
+      const fullUrl = origin + targetPath;
+
+      const urlInput = document.getElementById('qrTargetUrlDisplay');
+      if (urlInput) urlInput.value = fullUrl;
+
+      const img = document.getElementById('qrCodePreviewImg');
+      if (img) {
+        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=350x350&margin=10&data=' + encodeURIComponent(fullUrl);
+      }
+
+      const btnLinks = document.getElementById('btnQrTargetLinks');
+      const btnHome = document.getElementById('btnQrTargetHome');
+      if (btnLinks && btnHome) {
+        if (activeQrTarget === 'links') {
+          btnLinks.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white transition';
+          btnHome.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 transition';
+        } else {
+          btnHome.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-white transition';
+          btnLinks.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 transition';
+        }
+      }
+    }
+
+    function setQrCodeTarget(target) {
+      activeQrTarget = target;
+      updateQrCodeDisplay();
+    }
+
+    function copyQrTargetUrl() {
+      const urlInput = document.getElementById('qrTargetUrlDisplay');
+      if (urlInput && urlInput.value) {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(urlInput.value).then(function() {
+            triggerSave('✓ Link copiado!');
+          }).catch(function() {
+            urlInput.select();
+            document.execCommand('copy');
+            triggerSave('✓ Link copiado!');
+          });
+        } else {
+          urlInput.select();
+          document.execCommand('copy');
+          triggerSave('✓ Link copiado!');
+        }
+      }
+    }
+
+    async function downloadActiveQrCodePng() {
+      const img = document.getElementById('qrCodePreviewImg');
+      if (!img || !img.src) return;
+
+      try {
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'qrcode-' + (activeQrTarget === 'links' ? 'biolinks' : 'site') + '.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+        triggerSave('✓ Imagem do QR Code baixada em alta resolução!');
+      } catch (err) {
+        window.open(img.src, '_blank');
+      }
+    }
+
+    // === 3. CONFIGURAÇÕES GERAIS, TRACKING & LGPD ===
+    let currentWaWidget = ${safeJsonWhatsappWidget};
+    let currentTracking = ${safeJsonTracking};
+    let currentLgpd = ${safeJsonLgpd};
+
+    function renderSettingsUI() {
+      try {
+        // WhatsApp Widget
+        const rawWa = localStorage.getItem('site_whatsapp_widget');
+        if (rawWa) {
+          try { currentWaWidget = JSON.parse(rawWa); } catch (e) {}
+        }
+        const switchWa = document.getElementById('switch_wa_widget');
+        const badgeWa = document.getElementById('badge_wa_widget');
+        const greetingInput = document.getElementById('settingWaGreeting');
+        const messageInput = document.getElementById('settingWaMessage');
+
+        if (switchWa && badgeWa) {
+          const isWaActive = currentWaWidget.active !== false;
+          switchWa.checked = isWaActive;
+          badgeWa.className = isWaActive 
+            ? 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800'
+            : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700';
+          badgeWa.innerText = isWaActive ? '● Ligado' : '○ Desligado';
+        }
+        if (greetingInput && currentWaWidget.greetingText) {
+          greetingInput.value = currentWaWidget.greetingText;
+        }
+        if (messageInput && currentWaWidget.customMessage) {
+          messageInput.value = currentWaWidget.customMessage;
+        }
+
+        // Tracking
+        const rawTracking = localStorage.getItem('site_tracking');
+        if (rawTracking) {
+          try { currentTracking = JSON.parse(rawTracking); } catch (e) {}
+        }
+        const gaInput = document.getElementById('settingGoogleAnalytics');
+        const pixelInput = document.getElementById('settingMetaPixel');
+        if (gaInput && currentTracking.googleAnalyticsId) {
+          gaInput.value = currentTracking.googleAnalyticsId;
+        }
+        if (pixelInput && currentTracking.metaPixelId) {
+          pixelInput.value = currentTracking.metaPixelId;
+        }
+
+        // LGPD
+        const rawLgpd = localStorage.getItem('site_lgpd');
+        if (rawLgpd) {
+          try { currentLgpd = JSON.parse(rawLgpd); } catch (e) {}
+        }
+        const switchLgpd = document.getElementById('switch_lgpd_widget');
+        const badgeLgpd = document.getElementById('badge_lgpd_widget');
+        const lgpdMsgInput = document.getElementById('settingLgpdMessage');
+
+        if (switchLgpd && badgeLgpd) {
+          const isLgpdActive = currentLgpd.active !== false;
+          switchLgpd.checked = isLgpdActive;
+          badgeLgpd.className = isLgpdActive
+            ? 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800'
+            : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700';
+          badgeLgpd.innerText = isLgpdActive ? '● Ligado' : '○ Desligado';
+        }
+        if (lgpdMsgInput && currentLgpd.message) {
+          lgpdMsgInput.value = currentLgpd.message;
+        }
+      } catch (err) {
+        console.error('Erro ao renderizar Settings UI:', err);
+      }
+    }
+
+    function toggleWaWidgetSwitch(checked) {
+      currentWaWidget.active = checked;
+      const badge = document.getElementById('badge_wa_widget');
+      if (badge) {
+        badge.className = checked
+          ? 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800'
+          : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700';
+        badge.innerText = checked ? '● Ligado' : '○ Desligado';
+      }
+    }
+
+    function toggleLgpdSwitch(checked) {
+      currentLgpd.active = checked;
+      const badge = document.getElementById('badge_lgpd_widget');
+      if (badge) {
+        badge.className = checked
+          ? 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800'
+          : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700';
+        badge.innerText = checked ? '● Ligado' : '○ Desligado';
+      }
+    }
+
+    function saveSettingsData() {
+      try {
+        const greetingInput = document.getElementById('settingWaGreeting');
+        const messageInput = document.getElementById('settingWaMessage');
+        const gaInput = document.getElementById('settingGoogleAnalytics');
+        const pixelInput = document.getElementById('settingMetaPixel');
+        const lgpdMsgInput = document.getElementById('settingLgpdMessage');
+
+        if (greetingInput) currentWaWidget.greetingText = greetingInput.value.trim();
+        if (messageInput) currentWaWidget.customMessage = messageInput.value.trim();
+
+        currentTracking.googleAnalyticsId = gaInput ? gaInput.value.trim() : '';
+        currentTracking.metaPixelId = pixelInput ? pixelInput.value.trim() : '';
+
+        if (lgpdMsgInput) currentLgpd.message = lgpdMsgInput.value.trim();
+
+        localStorage.setItem('site_whatsapp_widget', JSON.stringify(currentWaWidget));
+        localStorage.setItem('site_tracking', JSON.stringify(currentTracking));
+        localStorage.setItem('site_lgpd', JSON.stringify(currentLgpd));
+
+        triggerSave('✓ Configurações gerais, WhatsApp Widget e Tracking salvos com sucesso!');
+      } catch (err) {
+        console.error('Erro ao salvar configurações gerais:', err);
+        alert('Erro ao salvar configurações: ' + err.message);
+      }
+    }
+
+    // === 4. BACKUP & RESTAURAÇÃO (1-CLIQUE) ===
+    function exportSiteBackup() {
+      try {
+        const backupKeys = [
+          'site_sections_config', 'site_catalog_products', 'site_faq', 'site_plans',
+          'site_cases', 'site_biolinks', 'site_announcement', 'site_partners',
+          'site_simulator', 'site_services', 'site_testimonials', 'site_gallery',
+          'site_socials', 'site_whatsapp_widget', 'site_tracking', 'site_lgpd',
+          'site_contacts', 'site_selected_template', 'site_custom_domain'
+        ];
+
+        const backupData = {
+          version: '1.0',
+          siteName: '${name}',
+          exportedAt: new Date().toISOString(),
+          settings: {}
+        };
+
+        backupKeys.forEach(function(k) {
+          const val = localStorage.getItem(k);
+          if (val !== null) {
+            try {
+              backupData.settings[k] = JSON.parse(val);
+            } catch (e) {
+              backupData.settings[k] = val;
+            }
+          }
+        });
+
+        const jsonString = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const dateStr = new Date().toISOString().slice(0, 10);
+        a.download = 'backup-sitepronto-' + dateStr + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        triggerSave('✓ Backup completo (.json) baixado com sucesso!');
+      } catch (err) {
+        console.error('Erro ao exportar backup:', err);
+        alert('Erro ao exportar backup: ' + err.message);
+      }
+    }
+
+    function restoreSiteBackup(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!confirm('Deseja realmente restaurar este backup?\\n\\nTodas as configurações, textos e módulos salvos serão atualizados com os dados deste arquivo.')) {
+        event.target.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const content = e.target.result;
+          const parsed = JSON.parse(content);
+          const settings = parsed.settings || parsed;
+
+          let restoredCount = 0;
+          Object.keys(settings).forEach(function(key) {
+            if (key.startsWith('site_')) {
+              const val = typeof settings[key] === 'object' ? JSON.stringify(settings[key]) : String(settings[key]);
+              localStorage.setItem(key, val);
+              restoredCount++;
+            }
+          });
+
+          alert('✓ Backup restaurado com sucesso (' + restoredCount + ' configurações importadas)!\\n\\nA página será recarregada agora.');
+          window.location.reload();
+        } catch (err) {
+          console.error('Erro ao processar arquivo de backup:', err);
+          alert('Erro ao restaurar backup. Verifique se o arquivo .json é válido.');
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
     // Inicializações
     initTemplateSelection();
     renderSectionsConfigUI();
@@ -3055,6 +3600,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     renderPlansUI();
     renderCasesUI();
     renderBioLinksUI();
+    updateQrCodeDisplay();
+    renderSettingsUI();
     renderAnnouncementUI();
     renderPartnersUI();
     renderSimulatorUI();

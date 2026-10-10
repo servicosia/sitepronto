@@ -196,6 +196,19 @@ function OnboardingContent() {
       facebook: { active: false, url: '' },
       youtube: { active: false, url: '' },
     },
+    whatsappWidget: {
+      active: true,
+      greetingText: 'Olá! Precisa de atendimento? Fale conosco no WhatsApp',
+      customMessage: 'Olá! Gostaria de mais informações sobre seus serviços.',
+    },
+    tracking: {
+      googleAnalyticsId: '',
+      metaPixelId: '',
+    },
+    lgpd: {
+      active: true,
+      message: 'Utilizamos cookies essenciais para oferecer a melhor experiência e garantir a segurança do seu atendimento de acordo com a LGPD.',
+    },
     gallery: [
       {
         id: '1',

@@ -1310,6 +1310,14 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
   const accent = data.accentColor || '#10b981';
   const whatsappDigits = (data.whatsapp || '').replace(/[^0-9]/g, '');
 
+  const gaId = (data.tracking?.googleAnalyticsId || '').trim();
+  const pixelId = (data.tracking?.metaPixelId || '').trim();
+  const waActive = data.whatsappWidget?.active !== false;
+  const waGreeting = data.whatsappWidget?.greetingText || 'Olá! Precisa de atendimento? Fale conosco no WhatsApp';
+  const waCustomMessage = data.whatsappWidget?.customMessage || 'Olá! Gostaria de mais informações sobre seus serviços.';
+  const lgpdActive = data.lgpd?.active !== false;
+  const lgpdMessage = data.lgpd?.message || 'Utilizamos cookies essenciais para oferecer a melhor experiência e garantir a segurança do seu atendimento de acordo com a LGPD.';
+
   const htmlA = renderSingleTemplateHtml(data, 'MODEL_A');
   const htmlB = renderSingleTemplateHtml(data, 'MODEL_B');
   const htmlC = renderSingleTemplateHtml(data, 'MODEL_C');
@@ -1345,6 +1353,33 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
     .template-container { display: none; }
     .template-container.active { display: block; }
   </style>
+
+  ${gaId ? `
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${gaId}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${gaId}');
+  </script>
+  ` : ''}
+
+  ${pixelId ? `
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '${pixelId}');
+    fbq('track', 'PageView');
+  </script>
+  ` : ''}
 </head>
 <body class="bg-slate-50 antialiased min-h-screen">
 
@@ -1377,6 +1412,46 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
       </div>
     </div>
   </div>
+
+  <!-- WIDGET FLUTUANTE DO WHATSAPP COM BALÃO DE SAUDAÇÃO -->
+  <aside id="waWidgetContainer" class="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 pointer-events-auto ${waActive ? '' : 'hidden'}">
+    <!-- Balão de conversa expandido -->
+    <div id="waWidgetBubble" class="relative max-w-xs bg-white text-slate-900 rounded-2xl p-3.5 shadow-2xl border border-slate-200 transition-all duration-300 transform origin-bottom-right flex items-start gap-2.5">
+      <button onclick="dismissWaBubble(event)" aria-label="Fechar balão" class="absolute -top-2 -left-2 w-5 h-5 bg-slate-900 text-white rounded-full text-[10px] font-bold flex items-center justify-center hover:bg-slate-700 shadow transition">✕</button>
+      <div class="relative w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center text-white shrink-0 shadow-sm">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-300 rounded-full ring-2 ring-white"></span>
+      </div>
+      <div class="cursor-pointer" onclick="openWaWidgetChat()">
+        <p class="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
+          Atendimento Direto <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        </p>
+        <p id="waWidgetGreetingText" class="text-xs text-slate-600 font-medium leading-relaxed mt-0.5">${waGreeting}</p>
+        <span class="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 mt-1 inline-flex items-center gap-0.5">Falar agora 💬</span>
+      </div>
+    </div>
+    <!-- Botão redondo com ícone e anel pulsante -->
+    <a id="waWidgetBtn" href="https://wa.me/${whatsappDigits}?text=${encodeURIComponent(waCustomMessage)}" target="_blank" rel="noopener noreferrer" aria-label="Fale Conosco no WhatsApp" class="relative group w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white flex items-center justify-center shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95" title="Fale Conosco no WhatsApp">
+      <span class="absolute inset-0 rounded-full bg-[#25D366] opacity-75 animate-ping group-hover:hidden"></span>
+      <svg class="w-7 h-7 fill-current relative z-10" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+    </a>
+  </aside>
+
+  <!-- BANNER DISCRETO DE PRIVACIDADE & LGPD -->
+  <aside id="lgpdCookieBanner" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 p-4 rounded-2xl shadow-2xl text-white flex flex-col gap-3 transition-all duration-300 transform translate-y-0 ${lgpdActive ? '' : 'hidden'}">
+    <div class="flex items-start gap-3">
+      <span class="text-xl">🍪</span>
+      <div class="flex-1 text-xs text-slate-300 leading-relaxed" id="lgpdMessageDisplay">
+        ${lgpdMessage}
+      </div>
+      <button onclick="dismissLgpdBanner()" aria-label="Fechar" class="text-slate-400 hover:text-white text-xs font-bold p-1">✕</button>
+    </div>
+    <div class="flex items-center justify-end gap-2.5 pt-1">
+      <button onclick="acceptLgpdCookies()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs rounded-xl transition shadow-sm">
+        Entendi e Aceitar
+      </button>
+    </div>
+  </aside>
 
   <!-- SCRIPT DE NAVEGAÇÃO SUAVE, MODULARIDADE E TROCA DE TEMPLATE -->
   <script>
@@ -1861,10 +1936,164 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
       }
     }
 
+    // 8. Hidratação e Interações do Widget Flutuante do WhatsApp
+    window.openWaWidgetChat = function() {
+      const btn = document.getElementById('waWidgetBtn');
+      if (btn && btn.href) {
+        window.open(btn.href, '_blank');
+      }
+    };
+
+    window.dismissWaBubble = function(e) {
+      if (e) e.stopPropagation();
+      const bubble = document.getElementById('waWidgetBubble');
+      if (bubble) {
+        bubble.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+        setTimeout(function() { bubble.style.display = 'none'; }, 300);
+      }
+      try { sessionStorage.setItem('site_wa_bubble_dismissed', '1'); } catch (err) {}
+    };
+
+    function applyWhatsAppWidget() {
+      try {
+        if (sessionStorage.getItem('site_wa_bubble_dismissed') === '1') {
+          const bubble = document.getElementById('waWidgetBubble');
+          if (bubble) bubble.style.display = 'none';
+        }
+
+        let raw = null;
+        try { raw = localStorage.getItem('site_whatsapp_widget'); } catch (e) {}
+        if (!raw) return;
+        const config = JSON.parse(raw);
+        if (!config || typeof config !== 'object') return;
+
+        const container = document.getElementById('waWidgetContainer');
+        if (container) {
+          if (config.active === false) {
+            container.classList.add('hidden');
+          } else {
+            container.classList.remove('hidden');
+          }
+        }
+
+        const greetingEl = document.getElementById('waWidgetGreetingText');
+        if (greetingEl && config.greetingText) {
+          greetingEl.innerText = config.greetingText;
+        }
+
+        const btn = document.getElementById('waWidgetBtn');
+        if (btn && config.customMessage) {
+          const currentHref = btn.href;
+          const phoneMatch = currentHref.match(/wa\.me\/([0-9]+)/);
+          const phone = phoneMatch ? phoneMatch[1] : '${whatsappDigits}';
+          btn.href = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(config.customMessage);
+        }
+      } catch (err) {
+        console.error('Erro ao hidratar widget do WhatsApp:', err);
+      }
+    }
+
+    // 9. Hidratação e Gerenciamento do Banner LGPD
+    window.acceptLgpdCookies = function() {
+      try { localStorage.setItem('site_lgpd_consent', 'accepted'); } catch (e) {}
+      const banner = document.getElementById('lgpdCookieBanner');
+      if (banner) {
+        banner.classList.add('translate-y-12', 'opacity-0');
+        setTimeout(function() { banner.style.display = 'none'; }, 300);
+      }
+    };
+
+    window.dismissLgpdBanner = function() {
+      const banner = document.getElementById('lgpdCookieBanner');
+      if (banner) {
+        banner.classList.add('translate-y-12', 'opacity-0');
+        setTimeout(function() { banner.style.display = 'none'; }, 300);
+      }
+    };
+
+    function applyLgpdBanner() {
+      try {
+        const consent = localStorage.getItem('site_lgpd_consent');
+        const banner = document.getElementById('lgpdCookieBanner');
+        if (consent === 'accepted') {
+          if (banner) banner.style.display = 'none';
+          return;
+        }
+
+        let raw = null;
+        try { raw = localStorage.getItem('site_lgpd'); } catch (e) {}
+        if (!raw) return;
+        const config = JSON.parse(raw);
+        if (!config || typeof config !== 'object') return;
+
+        if (banner) {
+          if (config.active === false) {
+            banner.style.display = 'none';
+          } else {
+            banner.style.display = '';
+          }
+        }
+
+        const msgEl = document.getElementById('lgpdMessageDisplay');
+        if (msgEl && config.message) {
+          msgEl.innerText = config.message;
+        }
+      } catch (err) {
+        console.error('Erro ao hidratar banner LGPD:', err);
+      }
+    }
+
+    // 10. Rastreamento Dinâmico (Google Analytics & Meta Pixel via localStorage)
+    function applyDynamicTracking() {
+      try {
+        let raw = null;
+        try { raw = localStorage.getItem('site_tracking'); } catch (e) {}
+        if (!raw) return;
+        const tracking = JSON.parse(raw);
+        if (!tracking || typeof tracking !== 'object') return;
+
+        // GA4
+        if (tracking.googleAnalyticsId && tracking.googleAnalyticsId.trim() && !window._gaInjected) {
+          const gaId = tracking.googleAnalyticsId.trim();
+          const s1 = document.createElement('script');
+          s1.async = true;
+          s1.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+          document.head.appendChild(s1);
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){ window.dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId);
+          window._gaInjected = true;
+        }
+
+        // Meta Pixel
+        if (tracking.metaPixelId && tracking.metaPixelId.trim() && !window._metaPixelInjected) {
+          const pixelId = tracking.metaPixelId.trim();
+          !function(f,b,e,v,n,t,s)
+          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+          n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', pixelId);
+          fbq('track', 'PageView');
+          window._metaPixelInjected = true;
+        }
+      } catch (err) {
+        console.error('Erro ao aplicar scripts de rastreamento:', err);
+      }
+    }
+
     // Executa ao inicializar
     applySectionsConfig();
     applyCustomCards();
     applySocialLinks();
+    applyWhatsAppWidget();
+    applyLgpdBanner();
+    applyDynamicTracking();
   </script>
 
 </body>
