@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "lastUpdated": "2026-10-10T19:22:08.558Z",
+  "users": [
+    {
+      "id": "usr_master_alemaia",
+      "email": "alemaia@alemaia.com.br",
+      "name": "Alessandro Maia",
+      "role": "CLIENT",
+      "passwordHash": "$2a$10$e8w8G8gZ5m6JkF8Y4F7D3eT5s4L3b1k0r7a9m6p4",
+      "createdAt": "2026-10-10T01:24:00.000Z",
+      "updatedAt": "2026-10-10T01:24:00.000Z"
+    }
+  ],
+  "vouchers": [
+    {
+      "id": "vch_7839_b7e2_6420",
+      "code": "SP-7839-B7E2-6420",
+      "codeHash": "e7d62b894d37b1538e2a111b48b07c120cd0a7c469f59b3a308a3fe3155f696d",
+      "clientName": "Alessandro maia",
+      "clientEmail": "alemaia@alemaia.com.br",
+      "plan": "STANDARD_PRO",
+      "allowedSites": 1,
+      "status": "ISSUED",
+      "description": "Voucher emitido via solicitação Marmitaria",
+      "createdAt": "2026-10-10T01:27:00.000Z",
+      "updatedAt": "2026-10-10T01:27:00.000Z"
+    }
+  ],
+  "voucherRequests": [
+    {
+      "id": "req_alemaia_marmitaria",
+      "name": "Alessandro maia",
+      "email": "alemaia@alemaia.com.br",
+      "siteType": "Gastronomia, Restaurante & Buffet",
+      "message": "Marmitaria",
+      "status": "APPROVED",
+      "voucherCode": "SP-7839-B7E2-6420",
+      "createdAt": "2026-10-10T01:24:00.000Z",
+      "sentAt": "2026-10-10T01:27:00.000Z",
+      "updatedAt": "2026-10-10T01:27:00.000Z"
+    }
+  ],
+  "sites": []
+}

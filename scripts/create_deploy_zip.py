@@ -23,6 +23,7 @@ def create_zip():
         "prisma",
         "src",
         ".next",
+        "data",
     ]
 
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:

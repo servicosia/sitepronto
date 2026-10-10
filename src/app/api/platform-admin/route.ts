@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { createVoucher } from '@/lib/vouchers/service';
 import { isAuthorizedAdmin, validateSameOrigin } from '@/lib/security/auth';
+import { reconcileDatabaseAndRegistry, readSystemRegistry } from '@/lib/db/consistency';
 
 export async function GET(req: NextRequest) {
   try {
     if (!isAuthorizedAdmin(req)) {
       return NextResponse.json({ authenticated: false, error: 'Não autorizado.' }, { status: 401 });
     }
+
+    // Auto-reconciliação de consistência: se o banco reiniciou ou perdeu registros, restaura automaticamente
+    await reconcileDatabaseAndRegistry();
 
     const vouchers = await prisma.voucher.findMany({
       orderBy: { createdAt: 'desc' },

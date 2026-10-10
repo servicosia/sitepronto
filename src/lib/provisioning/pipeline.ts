@@ -7,6 +7,7 @@ import { CloudflareProvider } from '../providers/domains/cloudflare';
 import { validateNeonProvisioning, validateVercelProject, validateSiteSecurity } from './validator';
 import { OnboardingData } from '../validation/onboarding';
 import { DesignSpec } from '../design-system/specs';
+import { persistSiteSnapshot, persistVoucherSnapshot } from '../db/consistency';
 import crypto from 'crypto';
 
 export interface ProvisionSiteParams {
@@ -65,6 +66,9 @@ export async function startProvisioningPipeline(params: ProvisionSiteParams) {
       },
     });
   }
+
+  // Persiste snapshot de consistência imediatamente
+  persistSiteSnapshot(site);
 
   // 2. Cria o Job de Provisionamento persistente
   const job = await prisma.provisioningJob.create({
@@ -236,15 +240,16 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
     });
 
     // Conclusão com sucesso real comprovado
-    await prisma.site.update({
+    const completedSite = await prisma.site.update({
       where: { id: siteId },
       data: {
         status: 'COMPLETED',
       },
     });
+    persistSiteSnapshot(completedSite);
 
     // Marca Voucher como COMPLETED
-    await prisma.voucher.update({
+    const completedVoucher = await prisma.voucher.update({
       where: { id: params.voucherId },
       data: {
         status: 'COMPLETED',
@@ -252,6 +257,7 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
         redeemedById: params.userId,
       },
     });
+    persistVoucherSnapshot(completedVoucher);
 
     await prisma.provisioningJob.update({
       where: { id: jobId },

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db/client';
 import { createVoucher } from '@/lib/vouchers/service';
 import { sendClientVoucherEmail } from '@/lib/email/service';
 import { isAuthorizedAdmin, validateSameOrigin } from '@/lib/security/auth';
+import { persistVoucherRequestSnapshot } from '@/lib/db/consistency';
 
 export async function GET(req: NextRequest) {
   try {
@@ -66,6 +67,9 @@ export async function POST(req: NextRequest) {
           sentAt: new Date(),
         },
       });
+
+      // Persiste no snapshot de consistência
+      persistVoucherRequestSnapshot(updated);
 
       return NextResponse.json({
         success: true,

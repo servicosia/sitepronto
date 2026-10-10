@@ -1,5 +1,6 @@
 import { prisma } from '../db/client';
 import { generateVoucherCode, sha256 } from '../security/crypto';
+import { persistVoucherSnapshot } from '../db/consistency';
 
 export interface CreateVoucherInput {
   clientName?: string;
@@ -34,6 +35,9 @@ export async function createVoucher(input: CreateVoucherInput) {
       status: 'ISSUED',
     },
   });
+
+  // Salva no registro de consistência
+  persistVoucherSnapshot(voucher);
 
   // Salva e pré-carrega o e-mail e nome no formulário de criação do site (OnboardingSession)
   if (input.clientEmail || input.clientName) {

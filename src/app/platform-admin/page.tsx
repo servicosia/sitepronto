@@ -21,11 +21,14 @@ import {
   Send,
   Trash2,
   Check,
-  AlertCircle,
   Lock,
   QrCode,
   Key,
-  ShieldAlert
+  ShieldAlert,
+  Database,
+  Download,
+  Upload,
+  HardDrive
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -53,6 +56,10 @@ export default function PlatformAdminPage() {
   const [admin2faModalOpen, setAdmin2faModalOpen] = useState(false);
   const [admin2faConfirmCode, setAdmin2faConfirmCode] = useState('');
   const [admin2faActionError, setAdmin2faActionError] = useState('');
+  
+  // Estados de Consistência & Backup do Sistema
+  const [syncingBackup, setSyncingBackup] = useState(false);
+  const [importingBackup, setImportingBackup] = useState(false);
   
   // Novo voucher
   const [clientName, setClientName] = useState('');
@@ -198,6 +205,83 @@ export default function PlatformAdminPage() {
     } finally {
       setAdmin2faLoading(false);
     }
+  }
+
+  async function handleDownloadBackup() {
+    try {
+      const res = await fetch('/api/platform-admin/backup');
+      if (!res.ok) throw new Error('Falha ao baixar backup');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const dateStr = new Date().toISOString().split('T')[0];
+      a.download = `sitepronto-backup-${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setActionMessage({ text: '✓ Backup completo exportado com sucesso! Arquivo JSON baixado.', type: 'success' });
+    } catch (err: any) {
+      alert('Erro ao baixar backup: ' + err.message);
+    }
+  }
+
+  async function handleSyncConsistency() {
+    setSyncingBackup(true);
+    try {
+      const res = await fetch('/api/platform-admin/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'sync' }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setActionMessage({ text: '✓ Reconciliação concluída: sites, vouchers e solicitações salvos e consistentes!', type: 'success' });
+        loadData();
+      } else {
+        alert(json.error || 'Erro ao sincronizar.');
+      }
+    } catch (err: any) {
+      alert('Erro de conexão ao sincronizar: ' + err.message);
+    } finally {
+      setSyncingBackup(false);
+    }
+  }
+
+  async function handleImportBackup(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportingBackup(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string;
+        const backupData = JSON.parse(text);
+        if (!confirm('Deseja restaurar este backup do SitePronto? Todos os sites e vouchers serão restaurados e reconciliados com segurança no sistema.')) {
+          setImportingBackup(false);
+          return;
+        }
+        const res = await fetch('/api/platform-admin/backup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'import', backupData }),
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          setActionMessage({ text: '✓ Backup restaurado com sucesso! ' + (json.message || ''), type: 'success' });
+          loadData();
+        } else {
+          alert(json.error || 'Erro ao importar backup.');
+        }
+      } catch (err: any) {
+        alert('Arquivo inválido ou erro ao processar: ' + err.message);
+      } finally {
+        setImportingBackup(false);
+        e.target.value = '';
+      }
+    };
+    reader.readAsText(file);
   }
 
   async function handleLogout() {
@@ -617,6 +701,64 @@ export default function PlatformAdminPage() {
                   <span>{admin2faLoading ? 'Processando...' : 'Desativar 2FA'}</span>
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+
+        {/* CARD: Consistência & Proteção de Dados (Anti-Perda em Atualizações) */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8 border-l-4 border-l-blue-600">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="p-3 rounded-xl shrink-0 bg-blue-100 text-blue-700">
+                <Database className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-base font-bold text-slate-950">Consistência & Proteção de Dados do Sistema</h2>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                    Auto-Sync Ativo (Persistência Dupla)
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mt-1 max-w-2xl">
+                  Seus sites cadastrados, vouchers e solicitações são protegidos contra reinicializações e atualizações do sistema por meio de persistência dupla (PostgreSQL + Registro Atômico no Disco). A cada carga, o sistema reconcilia e restaura automaticamente qualquer registro sem perda de dados.
+                </p>
+              </div>
+            </div>
+
+            <div className="shrink-0 flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+              <button
+                type="button"
+                onClick={handleDownloadBackup}
+                className="px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                title="Baixa cópia JSON com todos os sites e vouchers para guarda offline"
+              >
+                <Download className="w-4 h-4 text-emerald-400" />
+                <span>Exportar Backup (JSON)</span>
+              </button>
+
+              <label className="px-3.5 py-2.5 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs rounded-xl border border-slate-300 shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <Upload className="w-4 h-4 text-blue-600" />
+                <span>{importingBackup ? 'Restaurando...' : 'Restaurar Backup'}</span>
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImportBackup}
+                  disabled={importingBackup}
+                  className="hidden"
+                />
+              </label>
+
+              <button
+                type="button"
+                onClick={handleSyncConsistency}
+                disabled={syncingBackup}
+                className="px-3.5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs rounded-xl border border-blue-200 transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                title="Forçar reconciliação do banco de dados com o registro persistente"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${syncingBackup ? 'animate-spin' : ''}`} />
+                <span>{syncingBackup ? 'Reconciliando...' : 'Reconciliar Agora'}</span>
+              </button>
             </div>
           </div>
         </div>

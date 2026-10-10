@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { sendAdminVoucherRequestAlert } from '@/lib/email/service';
 import { checkRateLimit } from '@/lib/rate-limit/limiter';
+import { persistVoucherRequestSnapshot } from '@/lib/db/consistency';
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,6 +45,9 @@ export async function POST(req: NextRequest) {
         status: 'PENDING',
       },
     });
+
+    // Persiste no snapshot de consistência
+    persistVoucherRequestSnapshot(voucherRequest);
 
     // Registra evento de auditoria
     await prisma.auditEvent.create({
