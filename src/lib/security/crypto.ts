@@ -83,3 +83,21 @@ export function escapeHtml(str: string | null | undefined): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+/**
+ * Validação rigorosa de política de senha forte (mínimo 8 caracteres, letras e números)
+ */
+export function validatePasswordStrength(password: string): { valid: boolean; error?: string } {
+  if (!password || typeof password !== 'string') {
+    return { valid: false, error: 'A senha é obrigatória.' };
+  }
+  if (password.length < 8) {
+    return { valid: false, error: 'A senha deve conter no mínimo 8 caracteres.' };
+  }
+  const hasLetter = /[a-zA-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  if (!hasLetter || !hasNumber) {
+    return { valid: false, error: 'A senha deve conter pelo menos uma letra e um número.' };
+  }
+  return { valid: true };
+}

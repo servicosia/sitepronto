@@ -615,6 +615,11 @@ function OnboardingContent() {
       return;
     }
 
+    if (accountPassword.length < 8 || !/[a-zA-Z]/.test(accountPassword) || !/[0-9]/.test(accountPassword)) {
+      alert('A senha deve conter no mínimo 8 caracteres, incluindo letras e números para sua segurança.');
+      return;
+    }
+
     setProvisioning(true);
 
     try {

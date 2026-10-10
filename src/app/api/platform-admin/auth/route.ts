@@ -3,6 +3,7 @@ import { timingSafeCompare } from '@/lib/security/crypto';
 import { getAdminPassword, generateAdminSessionToken } from '@/lib/security/auth';
 import { checkRateLimit } from '@/lib/rate-limit/limiter';
 import { prisma } from '@/lib/db/client';
+import { sendSecurityAlertEmail } from '@/lib/email/service';
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +20,18 @@ export async function POST(req: NextRequest) {
           metadata: { ip, retryAfter: limit.retryAfter },
         },
       });
+
+      // Dispara alerta por e-mail em tempo real para o administrador
+      try {
+        await sendSecurityAlertEmail({
+          alertType: 'Força Bruta no Painel Master (Admin Login)',
+          ip,
+          userAgent: req.headers.get('user-agent'),
+          details: `Bloqueio temporário de 15 minutos aplicado após 5 tentativas incorretas consecutivas.`,
+        });
+      } catch (emailErr) {
+        console.error('[AdminAuth] Erro ao enviar alerta de segurança por e-mail:', emailErr);
+      }
 
       return NextResponse.json(
         { error: 'Muitas tentativas de acesso incorretas. Acesso temporariamente bloqueado. Tente novamente em alguns minutos.' },

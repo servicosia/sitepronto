@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
+import { checkRateLimit } from '@/lib/rate-limit/limiter';
 
 export async function GET(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const limit = await checkRateLimit('provision_status', ip, 60, 60);
+    if (!limit.success) {
+      return NextResponse.json(
+        { error: 'Muitas consultas simultâneas. Aguarde alguns instantes.' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfter || 10) } }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const siteId = searchParams.get('siteId');
 
-    if (!siteId) {
-      return NextResponse.json({ error: 'siteId é obrigatório' }, { status: 400 });
+    if (!siteId || typeof siteId !== 'string' || siteId.trim().length < 5) {
+      return NextResponse.json({ error: 'siteId inválido' }, { status: 400 });
     }
 
     const site = await prisma.site.findUnique({

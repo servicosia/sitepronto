@@ -3,15 +3,33 @@ import { prisma } from '@/lib/db/client';
 import { startProvisioningPipeline } from '@/lib/provisioning/pipeline';
 import { OnboardingDataSchema } from '@/lib/validation/onboarding';
 import { generateDesignSpecs } from '@/lib/design-system/specs';
-import { hashPassword } from '@/lib/security/crypto';
+import { hashPassword, validatePasswordStrength } from '@/lib/security/crypto';
+import { checkRateLimit } from '@/lib/rate-limit/limiter';
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+
+    // Rate Limiting: Máximo de 5 tentativas de provisionamento a cada 5 minutos por IP
+    const limit = await checkRateLimit('provisioning_start', ip, 5, 300);
+    if (!limit.success) {
+      return NextResponse.json(
+        { error: 'Muitas tentativas de inicialização. Aguarde alguns instantes antes de tentar novamente.' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfter || 60) } }
+      );
+    }
+
     const body = await req.json();
     const { voucherCode, clientEmail, clientPassword, clientName, selectedVariant } = body;
 
     if (!voucherCode || !clientEmail || !clientPassword) {
       return NextResponse.json({ error: 'Dados incompletos para inicializar o site.' }, { status: 400 });
+    }
+
+    // Validação da complexidade da senha do cliente
+    const passwordValidation = validatePasswordStrength(clientPassword);
+    if (!passwordValidation.valid) {
+      return NextResponse.json({ error: passwordValidation.error }, { status: 400 });
     }
 
     // Validação do Voucher

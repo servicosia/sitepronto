@@ -8,10 +8,7 @@ import { sha256, timingSafeCompare } from './crypto';
 export function getAdminPassword(): string {
   const password = process.env.PLATFORM_ADMIN_PASSWORD;
   if (!password) {
-    if (process.env.NODE_ENV === 'production') {
-      console.error('[Security ALERT] PLATFORM_ADMIN_PASSWORD não configurada em ambiente de produção!');
-    }
-    return process.env.PLATFORM_ADMIN_PASSWORD || 'Ale281911S@@';
+    throw new Error('[Security ALERT] PLATFORM_ADMIN_PASSWORD não configurada nas variáveis de ambiente!');
   }
   return password;
 }
@@ -21,10 +18,13 @@ export function getAdminPassword(): string {
  */
 export function getSessionSecret(): string {
   const secret = process.env.SESSION_SECRET;
-  if (!secret && process.env.NODE_ENV === 'production') {
-    console.error('[Security ALERT] SESSION_SECRET não configurada em ambiente de produção!');
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('[Security ALERT] SESSION_SECRET não configurada nas variáveis de ambiente de produção!');
+    }
+    return 'dev-ephemeral-session-secret-change-in-env';
   }
-  return secret || 'sitepronto-session-secret-salt-2025';
+  return secret;
 }
 
 /**

@@ -339,3 +339,85 @@ export async function sendPasswordResetEmail(params: {
     html,
   });
 }
+
+/**
+ * Dispara e-mail de alerta de segurança em tempo real para o administrador
+ */
+export async function sendSecurityAlertEmail(params: {
+  alertType: string;
+  ip: string;
+  userAgent?: string | null;
+  details?: string;
+}): Promise<{ success: boolean; id?: string; error?: string }> {
+  const adminEmail = process.env.ADMIN_ALERT_EMAIL || 'alemaia@alemaia.com.br';
+  const subject = `🚨 [Alerta de Segurança] Tentativa de Força Bruta Detectada (${params.alertType})`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; }
+    .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #fee2e2; overflow: hidden; }
+    .header { background: #dc2626; padding: 24px; color: #ffffff; }
+    .content { padding: 24px; color: #1e293b; }
+    .field { margin-bottom: 12px; }
+    .field-name { font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: bold; }
+    .field-val { font-size: 14px; font-weight: 600; color: #0f172a; word-break: break-all; }
+    .footer { background: #f8fafc; padding: 16px; font-size: 12px; color: #64748b; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h2 style="margin: 0; font-size: 18px;">⚠️ Alerta de Incidente de Segurança</h2>
+      <p style="margin: 4px 0 0; font-size: 13px; opacity: 0.9;">SitePronto Security Monitoring Engine</p>
+    </div>
+    <div class="content">
+      <p style="font-size: 14px; line-height: 1.5; color: #334155;">
+        O sistema de proteção de taxa (Rate Limiting) bloqueou um comportamento anômalo com suspeita de <strong>ataque de força bruta / dicionário</strong>.
+      </p>
+
+      <div class="field">
+        <div class="field-name">Tipo de Incidente</div>
+        <div class="field-val">${params.alertType}</div>
+      </div>
+
+      <div class="field">
+        <div class="field-name">Endereço IP de Origem</div>
+        <div class="field-val">${params.ip}</div>
+      </div>
+
+      ${params.userAgent ? `
+      <div class="field">
+        <div class="field-name">User-Agent</div>
+        <div class="field-val" style="font-size: 12px; font-weight: normal;">${params.userAgent}</div>
+      </div>
+      ` : ''}
+
+      ${params.details ? `
+      <div class="field">
+        <div class="field-name">Detalhes / Ação Automática</div>
+        <div class="field-val">${params.details}</div>
+      </div>
+      ` : ''}
+
+      <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px; margin-top: 16px; font-size: 12px; color: #991b1b;">
+        O IP foi temporariamente bloqueado para mitigar o ataque.
+      </div>
+    </div>
+    <div class="footer">
+      SitePronto Auditoria de Segurança Automática • ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}
+    </div>
+  </div>
+</body>
+</html>
+  `;
+
+  return sendEmail({
+    to: adminEmail,
+    subject,
+    html,
+  });
+}
