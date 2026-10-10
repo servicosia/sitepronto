@@ -21,6 +21,7 @@ import {
   Send,
   Trash2,
   Check,
+  AlertCircle,
   Lock,
   QrCode,
   Key,
