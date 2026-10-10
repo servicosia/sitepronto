@@ -3427,8 +3427,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           ];
         });
 
-        // \uFEFF força o Microsoft Excel a reconhecer a codificação UTF-8 com acentos corretos
-        const csvContent = '\uFEFF' + [headers.join(';'), ...rows.map(function(r) { return r.join(';'); })].join('\r\n');
+        // Usa charCode para garantir compatibilidade e evitar quebras no template literal
+        const csvContent = String.fromCharCode(0xFEFF) + [headers.join(';'), ...rows.map(function(r) { return r.join(';'); })].join(String.fromCharCode(13, 10));
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -3770,7 +3770,8 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       if (feedback) feedback.classList.add('hidden');
 
       try {
-        const res = await fetch('/api/auth/2fa?label=' + encodeURIComponent('${name}') + '&issuer=SitePronto');
+        const clientLabel = ${JSON.stringify(name || 'Cliente')};
+        const res = await fetch('/api/auth/2fa?label=' + encodeURIComponent(clientLabel) + '&issuer=SitePronto');
         const data = await res.json();
         if (data.secret && data.qrCodeUrl) {
           tempSetupSecret = data.secret;
@@ -3779,13 +3780,14 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           setupBox.classList.remove('hidden');
         } else {
           tempSetupSecret = 'JBSWY3DPEHPK3PXP';
-          qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/SitePronto:${encodeURIComponent(name)}?secret=JBSWY3DPEHPK3PXP';
+          qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent('otpauth://totp/SitePronto:' + clientLabel + '?secret=JBSWY3DPEHPK3PXP');
           secretText.innerText = 'JBSWY3DPEHPK3PXP';
           setupBox.classList.remove('hidden');
         }
       } catch (err) {
+        const clientLabel = ${JSON.stringify(name || 'Cliente')};
         tempSetupSecret = 'JBSWY3DPEHPK3PXP';
-        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/SitePronto:${encodeURIComponent(name)}?secret=JBSWY3DPEHPK3PXP';
+        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent('otpauth://totp/SitePronto:' + clientLabel + '?secret=JBSWY3DPEHPK3PXP');
         secretText.innerText = 'JBSWY3DPEHPK3PXP';
         setupBox.classList.remove('hidden');
       }
@@ -3798,7 +3800,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     async function confirmEnableClient2FA() {
       const codeInput = document.getElementById('client2faVerifyInput');
       const feedback = document.getElementById('client2faFeedback');
-      const code = codeInput.value.trim().replace(/\\D/g, '');
+      const code = codeInput.value.trim().replace(/[^0-9]/g, '');
 
       if (code.length !== 6) {
         feedback.className = 'text-xs mt-2 font-semibold text-red-600 block';
