@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { password } = await req.json();
+    const { password, totpCode } = await req.json();
     const correctPassword = getAdminPassword();
 
     // Comparação resistente a timing attacks
@@ -55,6 +55,37 @@ export async function POST(req: NextRequest) {
       });
 
       return NextResponse.json({ error: 'Senha incorreta.' }, { status: 401 });
+    }
+
+    // Checa se o 2FA está ativado para o Admin Master
+    const config = await prisma.platformSecurity.findUnique({
+      where: { id: 'singleton' },
+    });
+
+    if (config?.admin2faEnabled && config.admin2faSecret) {
+      const { verifyTotpCode } = await import('@/lib/security/totp');
+      
+      if (!totpCode || typeof totpCode !== 'string') {
+        return NextResponse.json({
+          requires2FA: true,
+          message: 'Autenticação em 2 Etapas ativa. Insira o código de 6 dígitos do seu autenticador.',
+        });
+      }
+
+      const isTotpValid = verifyTotpCode(totpCode, config.admin2faSecret);
+      if (!isTotpValid) {
+        await prisma.auditEvent.create({
+          data: {
+            eventType: 'ADMIN_2FA_FAILED',
+            ipHash: ip,
+            userAgent: req.headers.get('user-agent'),
+          },
+        });
+        return NextResponse.json(
+          { error: 'Código 2FA de 6 dígitos incorreto ou expirado. Tente novamente.', requires2FA: true },
+          { status: 401 }
+        );
+      }
     }
 
     // Sucesso na autenticação

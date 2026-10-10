@@ -19,7 +19,11 @@ import {
   Send,
   Trash2,
   Check,
-  AlertCircle
+  AlertCircle,
+  Lock,
+  QrCode,
+  Key,
+  ShieldAlert
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -37,6 +41,16 @@ export default function PlatformAdminPage() {
   const [authError, setAuthError] = useState('');
   const [authenticating, setAuthenticating] = useState(false);
   const [creatingVoucher, setCreatingVoucher] = useState(false);
+
+  // Estados de Autenticação em 2 Etapas (2FA) do Admin Master
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [twoFactorCodeInput, setTwoFactorCodeInput] = useState('');
+  const [admin2faEnabled, setAdmin2faEnabled] = useState(false);
+  const [admin2faLoading, setAdmin2faLoading] = useState(false);
+  const [admin2faSetupData, setAdmin2faSetupData] = useState<{ secret: string; qrCodeUrl: string; uri: string } | null>(null);
+  const [admin2faModalOpen, setAdmin2faModalOpen] = useState(false);
+  const [admin2faConfirmCode, setAdmin2faConfirmCode] = useState('');
+  const [admin2faActionError, setAdmin2faActionError] = useState('');
   
   // Novo voucher
   const [clientName, setClientName] = useState('');
@@ -54,6 +68,21 @@ export default function PlatformAdminPage() {
   const [generatingQuickSite, setGeneratingQuickSite] = useState(false);
   const [provisioningLiveSite, setProvisioningLiveSite] = useState(false);
 
+  async function load2faStatus() {
+    try {
+      const res = await fetch('/api/platform-admin/2fa');
+      const json = await res.json();
+      if (res.ok) {
+        setAdmin2faEnabled(Boolean(json.enabled));
+        if (!json.enabled && json.secret) {
+          setAdmin2faSetupData(json);
+        }
+      }
+    } catch (err) {
+      console.error('Erro ao verificar status 2FA:', err);
+    }
+  }
+
   async function loadData() {
     setLoading(true);
     try {
@@ -67,6 +96,7 @@ export default function PlatformAdminPage() {
       if (json.authenticated) {
         setAuthenticated(true);
         setData(json);
+        load2faStatus();
       }
     } catch (err) {
       console.error(err);
@@ -83,12 +113,22 @@ export default function PlatformAdminPage() {
       const res = await fetch('/api/platform-admin/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPasswordInput }),
+        body: JSON.stringify({ 
+          password: adminPasswordInput, 
+          totpCode: twoFactorCodeInput.trim() 
+        }),
       });
       const resJson = await res.json();
+      if (res.ok && resJson.requires2FA) {
+        setRequires2FA(true);
+        setAuthError('');
+        return;
+      }
       if (res.ok && resJson.success) {
         setAuthenticated(true);
+        setRequires2FA(false);
         setAdminPasswordInput('');
+        setTwoFactorCodeInput('');
         loadData();
       } else {
         setAuthError(resJson.error || 'Senha incorreta.');
@@ -100,9 +140,69 @@ export default function PlatformAdminPage() {
     }
   }
 
+  async function handleEnable2fa() {
+    if (!admin2faConfirmCode || admin2faConfirmCode.trim().length !== 6) {
+      setAdmin2faActionError('Digite o código de 6 dígitos gerado pelo seu app autenticador.');
+      return;
+    }
+    setAdmin2faLoading(true);
+    setAdmin2faActionError('');
+    try {
+      const res = await fetch('/api/platform-admin/2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'enable',
+          secret: admin2faSetupData?.secret,
+          code: admin2faConfirmCode.trim(),
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setAdmin2faEnabled(true);
+        setAdmin2faModalOpen(false);
+        setAdmin2faConfirmCode('');
+        setActionMessage({ text: '✓ Autenticação em 2 Etapas (2FA) ativada com sucesso para o Admin Master!', type: 'success' });
+        load2faStatus();
+      } else {
+        setAdmin2faActionError(json.error || 'Código incorreto.');
+      }
+    } catch (err: any) {
+      setAdmin2faActionError(err.message);
+    } finally {
+      setAdmin2faLoading(false);
+    }
+  }
+
+  async function handleDisable2fa() {
+    if (!confirm('Deseja realmente desativar a Autenticação em 2 Etapas (2FA) do Admin Master?')) return;
+    setAdmin2faLoading(true);
+    try {
+      const res = await fetch('/api/platform-admin/2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'disable' }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setAdmin2faEnabled(false);
+        setActionMessage({ text: 'Autenticação em 2 Etapas do Admin Master desativada.', type: 'success' });
+        load2faStatus();
+      } else {
+        alert(json.error || 'Erro ao desativar 2FA.');
+      }
+    } catch (err: any) {
+      alert('Erro: ' + err.message);
+    } finally {
+      setAdmin2faLoading(false);
+    }
+  }
+
   async function handleLogout() {
     await fetch('/api/platform-admin/auth', { method: 'DELETE' });
     setAuthenticated(false);
+    setRequires2FA(false);
+    setTwoFactorCodeInput('');
     setData(null);
   }
 
@@ -326,19 +426,50 @@ export default function PlatformAdminPage() {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                Senha Mestra de Acesso
-              </label>
-              <input
-                type="password"
-                required
-                value={adminPasswordInput}
-                onChange={(e) => setAdminPasswordInput(e.target.value)}
-                placeholder="Digite a senha mestra..."
-                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-              />
-            </div>
+            {!requires2FA ? (
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  Senha Mestra de Acesso
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={adminPasswordInput}
+                  onChange={(e) => setAdminPasswordInput(e.target.value)}
+                  placeholder="Digite a senha mestra..."
+                  className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+              </div>
+            ) : (
+              <div className="space-y-3 bg-emerald-950/40 p-4 rounded-xl border border-emerald-500/30">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5" />
+                    Código 2FA (6 Dígitos)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => { setRequires2FA(false); setTwoFactorCodeInput(''); }}
+                    className="text-[11px] text-slate-400 hover:text-white underline"
+                  >
+                    Trocar senha
+                  </button>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Insira o código de 6 dígitos gerado no <strong>Google Authenticator</strong> ou aplicativo compatível.
+                </p>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  maxLength={6}
+                  value={twoFactorCodeInput}
+                  onChange={(e) => setTwoFactorCodeInput(e.target.value.replace(/\D/g, ''))}
+                  placeholder="000000"
+                  className="w-full px-4 py-3 bg-slate-950 border border-emerald-500 rounded-xl text-white text-center text-xl font-mono tracking-widest focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                />
+              </div>
+            )}
 
             {authError && (
               <div className="p-3 bg-red-950/60 border border-red-800/80 rounded-xl text-red-300 text-xs text-center font-semibold">
@@ -349,9 +480,9 @@ export default function PlatformAdminPage() {
             <button
               type="submit"
               disabled={authenticating}
-              className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-emerald-950 transition disabled:opacity-50 flex items-center justify-center"
+              className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-emerald-950 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {authenticating ? 'Verificando...' : 'Acessar Painel Admin'}
+              {authenticating ? 'Verificando...' : (requires2FA ? 'Confirmar Código & Acessar' : 'Acessar Painel Admin')}
             </button>
           </form>
 
@@ -497,6 +628,150 @@ export default function PlatformAdminPage() {
             <button onClick={() => setActionMessage(null)} className="text-xs font-bold hover:underline">
               ✕ Fechar
             </button>
+          </div>
+        )}
+
+        {/* CARD: Autenticação em 2 Etapas (2FA) do Admin Master */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className={`p-3 rounded-xl shrink-0 ${
+                admin2faEnabled ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
+              }`}>
+                <Lock className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-slate-950">Autenticação em 2 Etapas (2FA) do Admin Master</h2>
+                  {admin2faEnabled ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Ativado & Protegido
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-300">
+                      Desativado
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-600 mt-1 max-w-2xl">
+                  {admin2faEnabled
+                    ? 'O acesso master à plataforma exige autenticação por senha e o código temporário de 6 dígitos gerado pelo Google Authenticator / Authy.'
+                    : 'Aumente a segurança do painel master ativando o 2FA. Inicialmente está desativado para conveniência, mas você pode ativá-lo a qualquer momento.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="shrink-0 flex items-center gap-2 w-full sm:w-auto">
+              {!admin2faEnabled ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdmin2faActionError('');
+                    setAdmin2faConfirmCode('');
+                    setAdmin2faModalOpen(true);
+                    load2faStatus();
+                  }}
+                  className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Configurar & Ativar 2FA</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={admin2faLoading}
+                  onClick={handleDisable2fa}
+                  className="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-700 font-bold text-xs rounded-xl border border-slate-300 hover:border-red-300 transition flex items-center justify-center gap-1.5"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>{admin2faLoading ? 'Processando...' : 'Desativar 2FA'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* MODAL: Configurar e Ativar 2FA do Admin Master */}
+        {admin2faModalOpen && (
+          <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2 text-slate-900 font-bold">
+                  <Lock className="w-5 h-5 text-emerald-600" />
+                  <span>Ativar 2FA no Admin Master</span>
+                </div>
+                <button
+                  onClick={() => setAdmin2faModalOpen(false)}
+                  className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4 text-xs text-slate-600">
+                <p>
+                  <strong>Passo 1:</strong> Abra o <strong>Google Authenticator</strong>, <strong>Authy</strong> ou app compatível no seu celular.
+                </p>
+
+                <p>
+                  <strong>Passo 2:</strong> Escaneie o QR Code abaixo com a câmera do aplicativo:
+                </p>
+
+                {admin2faSetupData?.qrCodeUrl && (
+                  <div className="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <img 
+                      src={admin2faSetupData.qrCodeUrl} 
+                      alt="QR Code 2FA" 
+                      className="w-48 h-48 rounded-lg shadow-xs bg-white p-2"
+                    />
+                    <div className="mt-3 text-center">
+                      <span className="text-[11px] text-slate-500 block mb-1">Chave Manual (se preferir digitar):</span>
+                      <code className="px-2.5 py-1 bg-white border border-slate-300 rounded font-mono text-xs font-bold text-slate-900 select-all">
+                        {admin2faSetupData.secret}
+                      </code>
+                    </div>
+                  </div>
+                )}
+
+                <p>
+                  <strong>Passo 3:</strong> Digite o código de 6 dígitos gerado no app para confirmar a sincronização:
+                </p>
+
+                <div>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={admin2faConfirmCode}
+                    onChange={(e) => setAdmin2faConfirmCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="000000"
+                    className="w-full text-center text-xl font-mono tracking-widest px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  />
+                  {admin2faActionError && (
+                    <p className="text-red-600 text-xs mt-1.5 font-semibold text-center">{admin2faActionError}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setAdmin2faModalOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  disabled={admin2faLoading || admin2faConfirmCode.length !== 6}
+                  onClick={handleEnable2fa}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>{admin2faLoading ? 'Validando...' : 'Confirmar & Ativar 2FA'}</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

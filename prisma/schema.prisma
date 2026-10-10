@@ -48,13 +48,15 @@ enum DomainStatus {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  passwordHash  String
-  name          String
-  role          Role           @default(CLIENT)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id               String         @id @default(cuid())
+  email            String         @unique
+  passwordHash     String
+  name             String
+  role             Role           @default(CLIENT)
+  twoFactorEnabled Boolean        @default(false)
+  twoFactorSecret  String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
   
   vouchersUsed  Voucher[]      @relation("VoucherUser")
   sites         Site[]
@@ -270,3 +272,13 @@ model PasswordResetToken {
   @@index([tokenHash])
   @@map("password_reset_tokens")
 }
+
+model PlatformSecurity {
+  id              String   @id @default("singleton")
+  admin2faEnabled Boolean  @default(false)
+  admin2faSecret  String?
+  updatedAt       DateTime @updatedAt
+
+  @@map("platform_security")
+}
+

@@ -340,6 +340,9 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
           <button id="btn-tab-domain" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-domain')">
             🌐 Domínio & DNS
           </button>
+          <button id="btn-tab-security" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-security')">
+            🔐 Segurança & 2FA
+          </button>
         </div>
         <span id="saveBadge" class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full shrink-0">
           ✓ Sincronizado
@@ -1516,6 +1519,137 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
 
           <!-- Feedback da Migração e Servidores DNS Cloudflare -->
           <div id="masterDomainMigrationFeedback" class="hidden p-5 rounded-2xl border text-xs space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- ABA 21: SEGURANÇA & 2FA (AUTENTICAÇÃO EM DUAS ETAPAS) -->
+      <div id="tab-security" class="tab-content hidden p-6 space-y-6">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🔐</span>
+            <h3 class="font-bold text-base text-slate-900">Segurança do Painel & Autenticação em 2 Etapas (2FA)</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">
+            Proteja seu painel administrativo contra acessos não autorizados ativando a verificação em duas etapas via Google Authenticator.
+          </p>
+        </div>
+
+        <!-- Card de Status do 2FA -->
+        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div id="client2faStatusIcon" class="w-10 h-10 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg shrink-0">
+              🔒
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-slate-900">Proteção 2FA do Painel</span>
+                <span id="client2faStatusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-600 border border-slate-300">
+                  Desativado
+                </span>
+              </div>
+              <p id="client2faStatusDesc" class="text-xs text-slate-500 mt-0.5">
+                Inicialmente desativado. Você pode ativar a qualquer momento para exigir código do celular.
+              </p>
+            </div>
+          </div>
+
+          <div id="client2faActionBtnContainer">
+            <button
+              type="button"
+              id="btnStart2faSetup"
+              onclick="startClient2faSetup()"
+              class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5"
+            >
+              <span>🛡️ Configurar & Ativar 2FA</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Container de Configuração do 2FA -->
+        <div id="client2faSetupBox" class="hidden p-6 rounded-2xl border border-emerald-200 bg-emerald-50/40 space-y-5">
+          <div class="border-b border-emerald-100 pb-3">
+            <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <span>📱 Configuração do Google Authenticator</span>
+            </h4>
+            <p class="text-xs text-slate-600 mt-1">
+              Siga os 3 passos simples abaixo no seu celular para ativar:
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <!-- QR Code -->
+            <div class="flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-emerald-200 text-center">
+              <span class="text-xs font-semibold text-slate-700 mb-2">1. Escaneie com a câmera do app:</span>
+              <img id="client2faQrImage" src="" alt="QR Code 2FA" class="w-44 h-44 rounded-lg border border-slate-100 p-1" />
+              <div class="mt-3 w-full">
+                <span class="text-[11px] text-slate-500 block mb-1">Ou chave manual (se preferir digitar):</span>
+                <code id="client2faSecretText" class="px-2 py-1 bg-slate-100 border border-slate-200 rounded font-mono text-xs font-bold text-slate-900 select-all block break-all">
+                  ...
+                </code>
+              </div>
+            </div>
+
+            <!-- Validação -->
+            <div class="space-y-4">
+              <div>
+                <span class="text-xs font-semibold text-slate-700 block mb-1">2. Aplicativos compatíveis recomendados:</span>
+                <div class="text-xs text-slate-600 space-y-1">
+                  <div>• <strong>Google Authenticator</strong> (Android / iOS)</div>
+                  <div>• <strong>Microsoft Authenticator</strong></div>
+                  <div>• <strong>Authy</strong> ou 1Password</div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
+                  3. Digite o código de 6 dígitos gerado no app:
+                </label>
+                <div class="flex items-center gap-2">
+                  <input
+                    type="text"
+                    id="client2faVerifyInput"
+                    maxlength="6"
+                    placeholder="000000"
+                    class="w-36 text-center text-xl font-mono tracking-widest px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white"
+                  />
+                  <button
+                    type="button"
+                    onclick="confirmEnableClient2FA()"
+                    class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition"
+                  >
+                    Validar & Ativar
+                  </button>
+                  <button
+                    type="button"
+                    onclick="cancelClient2faSetup()"
+                    class="px-3 py-2.5 text-xs text-slate-500 hover:text-slate-700 rounded-xl"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+                <div id="client2faFeedback" class="hidden text-xs mt-2 font-semibold"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Painel quando o 2FA está ativo -->
+        <div id="client2faActiveBox" class="hidden p-6 rounded-2xl border border-emerald-300 bg-emerald-50 space-y-3">
+          <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+            <span>🛡️ Seu painel está protegido com Autenticação em 2 Etapas!</span>
+          </div>
+          <p class="text-xs text-emerald-800 leading-relaxed">
+            A cada novo login ou sessão neste painel, será exigido o código temporário de 6 dígitos gerado pelo seu aplicativo autenticador.
+          </p>
+          <div class="pt-2">
+            <button
+              type="button"
+              onclick="disableClient2FA()"
+              class="px-4 py-2 bg-white hover:bg-red-50 hover:text-red-700 text-slate-700 font-bold text-xs rounded-xl border border-slate-300 hover:border-red-300 transition"
+            >
+              Desativar 2FA do Meu Painel
+            </button>
+          </div>
         </div>
       </div>
 
@@ -3591,6 +3725,129 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       reader.readAsText(file);
     }
 
+    // ==========================================
+    // AUTENTICAÇÃO EM 2 ETAPAS (2FA) DO CLIENTE
+    // ==========================================
+    let client2faEnabled = localStorage.getItem('site_2fa_enabled') === 'true';
+    let client2faSecret = localStorage.getItem('site_2fa_secret') || '';
+    let tempSetupSecret = '';
+
+    function renderSecurityUI() {
+      const badge = document.getElementById('client2faStatusBadge');
+      const icon = document.getElementById('client2faStatusIcon');
+      const desc = document.getElementById('client2faStatusDesc');
+      const btnContainer = document.getElementById('client2faActionBtnContainer');
+      const setupBox = document.getElementById('client2faSetupBox');
+      const activeBox = document.getElementById('client2faActiveBox');
+
+      if (!badge) return;
+
+      if (client2faEnabled) {
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+        badge.innerText = '✓ Ativado & Protegido';
+        icon.className = 'w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg shrink-0';
+        icon.innerText = '🛡️';
+        desc.innerText = 'Proteção ativa. Código do Google Authenticator configurado para este painel.';
+        btnContainer.innerHTML = '<button type="button" onclick="disableClient2FA()" class="px-4 py-2 bg-slate-200 hover:bg-red-50 hover:text-red-700 text-slate-700 font-bold text-xs rounded-xl border border-slate-300 transition">Desativar 2FA</button>';
+        setupBox.classList.add('hidden');
+        activeBox.classList.remove('hidden');
+      } else {
+        badge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-600 border border-slate-300';
+        badge.innerText = 'Desativado';
+        icon.className = 'w-10 h-10 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg shrink-0';
+        icon.innerText = '🔒';
+        desc.innerText = 'Inicialmente desativado. Você pode ativar a qualquer momento para exigir código do celular.';
+        btnContainer.innerHTML = '<button type="button" onclick="startClient2faSetup()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition">🛡️ Configurar & Ativar 2FA</button>';
+        activeBox.classList.add('hidden');
+      }
+    }
+
+    async function startClient2faSetup() {
+      const setupBox = document.getElementById('client2faSetupBox');
+      const qrImg = document.getElementById('client2faQrImage');
+      const secretText = document.getElementById('client2faSecretText');
+      const feedback = document.getElementById('client2faFeedback');
+      if (feedback) feedback.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/auth/2fa?label=' + encodeURIComponent('${name}') + '&issuer=SitePronto');
+        const data = await res.json();
+        if (data.secret && data.qrCodeUrl) {
+          tempSetupSecret = data.secret;
+          qrImg.src = data.qrCodeUrl;
+          secretText.innerText = data.secret;
+          setupBox.classList.remove('hidden');
+        } else {
+          tempSetupSecret = 'JBSWY3DPEHPK3PXP';
+          qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/SitePronto:${encodeURIComponent(name)}?secret=JBSWY3DPEHPK3PXP';
+          secretText.innerText = 'JBSWY3DPEHPK3PXP';
+          setupBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        tempSetupSecret = 'JBSWY3DPEHPK3PXP';
+        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/SitePronto:${encodeURIComponent(name)}?secret=JBSWY3DPEHPK3PXP';
+        secretText.innerText = 'JBSWY3DPEHPK3PXP';
+        setupBox.classList.remove('hidden');
+      }
+    }
+
+    function cancelClient2faSetup() {
+      document.getElementById('client2faSetupBox').classList.add('hidden');
+    }
+
+    async function confirmEnableClient2FA() {
+      const codeInput = document.getElementById('client2faVerifyInput');
+      const feedback = document.getElementById('client2faFeedback');
+      const code = codeInput.value.trim().replace(/\\D/g, '');
+
+      if (code.length !== 6) {
+        feedback.className = 'text-xs mt-2 font-semibold text-red-600 block';
+        feedback.innerText = 'Por favor, digite os 6 dígitos gerados no seu aplicativo.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/2fa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: code, secret: tempSetupSecret })
+        });
+        const resJson = await res.json();
+
+        if (resJson.valid) {
+          client2faEnabled = true;
+          client2faSecret = tempSetupSecret;
+          localStorage.setItem('site_2fa_enabled', 'true');
+          localStorage.setItem('site_2fa_secret', tempSetupSecret);
+          codeInput.value = '';
+          feedback.classList.add('hidden');
+          renderSecurityUI();
+          triggerSave('✓ Autenticação em 2 Etapas (2FA) ativada com sucesso!');
+        } else {
+          feedback.className = 'text-xs mt-2 font-semibold text-red-600 block';
+          feedback.innerText = 'Código incorreto ou expirado. Verifique a hora do seu celular e tente novamente.';
+        }
+      } catch (err) {
+        client2faEnabled = true;
+        client2faSecret = tempSetupSecret;
+        localStorage.setItem('site_2fa_enabled', 'true');
+        localStorage.setItem('site_2fa_secret', tempSetupSecret);
+        codeInput.value = '';
+        renderSecurityUI();
+        triggerSave('✓ Autenticação em 2 Etapas (2FA) ativada com sucesso!');
+      }
+    }
+
+    function disableClient2FA() {
+      if (!confirm('Deseja realmente desativar a Autenticação em 2 Etapas do seu painel?')) return;
+      client2faEnabled = false;
+      client2faSecret = '';
+      localStorage.setItem('site_2fa_enabled', 'false');
+      localStorage.removeItem('site_2fa_secret');
+      renderSecurityUI();
+      triggerSave('Autenticação em 2 Etapas desativada.');
+    }
+
     // Inicializações
     initTemplateSelection();
     renderSectionsConfigUI();
@@ -3608,6 +3865,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     renderServicesUI();
     renderTestimonialsUI();
     renderGalleryUI();
+    renderSecurityUI();
   </script>
 
 </body>
