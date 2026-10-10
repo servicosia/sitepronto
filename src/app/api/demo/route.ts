@@ -3,6 +3,7 @@ import { OnboardingDataSchema } from '@/lib/validation/onboarding';
 import { getDesignSpecsWithProvider } from '@/lib/providers/design/stitch';
 import { renderCompleteSiteHtml } from '@/lib/design-system/template-renderer';
 import { renderMasterDashboardHtml } from '@/lib/design-system/master-renderer';
+import { findProfessionPreset } from '@/lib/design-system/profession-presets';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,76 @@ export async function GET(req: NextRequest) {
 
     let demoData: any;
 
-    if (nicho === 'oficina') {
+    const matchedPreset = findProfessionPreset(nicho);
+
+    if (matchedPreset) {
+      demoData = {
+        fullName: matchedPreset.professionTitle,
+        professionalName: matchedPreset.professionTitle,
+        companyName: matchedPreset.label,
+        profession: matchedPreset.label,
+        professionType: 'outra',
+        activityType: 'autonomo',
+        hasProfessionalCouncil: !!matchedPreset.suggestedCouncil?.hasCouncil,
+        councilType: matchedPreset.suggestedCouncil?.hasCouncil ? `${matchedPreset.suggestedCouncil.councilAcronym}/SP` : undefined,
+        councilNumber: '12.430',
+        mainSpecialty: matchedPreset.defaultSpecialty,
+        otherSpecialties: matchedPreset.services.map((s) => s.title),
+        professionalSummary: matchedPreset.summaryTemplate,
+        city: 'São Paulo',
+        state: 'SP',
+        attendanceType: 'presencial',
+        whatsapp: '(11) 99876-5432',
+        publicEmail: 'contato@sitepronto.com.br',
+        businessHours: 'Segunda a Sexta das 08h às 19h | Sábado das 09h às 14h',
+        primaryColor: matchedPreset.colors.primary,
+        secondaryColor: matchedPreset.colors.secondary,
+        accentColor: matchedPreset.colors.accent,
+        visualStyle: 'moderno',
+        themePreference: 'claro',
+        hasBrandIdentity: false,
+        showFullAddress: true,
+        street: 'Av. Paulista',
+        number: '1200',
+        neighborhood: 'Bela Vista',
+        services: matchedPreset.services.map((s, idx) => ({ ...s, active: true, order: idx + 1 })),
+        gallery: matchedPreset.gallery.map((g, idx) => ({ id: String(idx + 1), ...g })),
+        testimonials: matchedPreset.testimonials.map((t, idx) => ({ id: String(idx + 1), ...t })),
+        sectionsConfig: {
+          inicio: true,
+          servicos: true,
+          'como-funciona': true,
+          sobre: true,
+          galeria: true,
+          depoimentos: true,
+          artigos: true,
+          contato: true,
+          catalogo: true,
+          faq: true,
+          planos: false,
+          cases: true,
+          biolinks: false,
+          comunicado: true,
+          parceiros: true,
+          simulador: true,
+        },
+        socialLinks: {
+          instagram: { active: true, url: 'https://instagram.com' },
+          tiktok: { active: true, url: 'https://tiktok.com' },
+          facebook: { active: true, url: 'https://facebook.com' },
+          youtube: { active: true, url: 'https://youtube.com' },
+        },
+        whatsappWidget: {
+          active: true,
+          greetingText: 'Olá! Como posso ajudar você hoje?',
+          customMessage: 'Olá! Gostaria de mais informações sobre seus serviços.',
+        },
+        lgpd: {
+          active: true,
+          message: 'Utilizamos cookies essenciais para oferecer a melhor experiência e segurança de acordo com a LGPD.',
+        },
+      };
+    } else if (nicho === 'oficina') {
       demoData = {
         fullName: 'Júnior Auto Center',
         professionalName: 'Júnior Auto Center Especializado',

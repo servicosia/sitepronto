@@ -13,10 +13,11 @@ import {
   Globe,
   RefreshCw
 } from 'lucide-react';
+import { PRESET_PROFESSIONS } from '@/lib/design-system/profession-presets';
 
 export default function DemoPage() {
   const [viewMode, setViewMode] = useState<'site' | 'admin'>('site');
-  const [nicho, setNicho] = useState<'odonto' | 'oficina' | 'boutique'>('odonto');
+  const [nicho, setNicho] = useState<string>('odonto');
   const [model, setModel] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
   const [key, setKey] = useState(0);
@@ -85,36 +86,28 @@ export default function DemoPage() {
             </button>
           </div>
 
-          {/* Seletor de Nicho */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-            <span className="text-[10px] text-slate-500 uppercase font-bold px-2 hidden sm:inline">Nicho:</span>
-            <button
-              type="button"
-              onClick={() => { setNicho('odonto'); refreshIframe(); }}
-              className={`px-2.5 py-1.5 rounded-lg font-bold transition text-xs ${
-                nicho === 'odonto' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
-              }`}
+          {/* Seletor de Nicho / Profissão */}
+          <div className="flex items-center bg-slate-950 px-2.5 py-1.5 rounded-xl border border-slate-800 text-xs gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+            <span className="text-[10px] text-slate-400 uppercase font-bold hidden sm:inline">Profissão / Nicho:</span>
+            <select
+              value={nicho}
+              onChange={(e) => { setNicho(e.target.value); refreshIframe(); }}
+              className="bg-slate-900 text-slate-100 font-semibold rounded-lg px-2.5 py-1 text-xs border border-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer max-w-[220px] sm:max-w-[280px]"
             >
-              Odontologia
-            </button>
-            <button
-              type="button"
-              onClick={() => { setNicho('oficina'); refreshIframe(); }}
-              className={`px-2.5 py-1.5 rounded-lg font-bold transition text-xs ${
-                nicho === 'oficina' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Auto Mecânica
-            </button>
-            <button
-              type="button"
-              onClick={() => { setNicho('boutique'); refreshIframe(); }}
-              className={`px-2.5 py-1.5 rounded-lg font-bold transition text-xs ${
-                nicho === 'boutique' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Moda & Ateliê
-            </button>
+              <option value="odonto">Odontologia (Clínica Sorriso Real)</option>
+              <option value="oficina">Auto Mecânica (Júnior Auto Center)</option>
+              <option value="boutique">Moda & Ateliê (Bella Donna)</option>
+              {Array.from(new Set(PRESET_PROFESSIONS.map((p) => p.category))).map((cat) => (
+                <optgroup key={cat} label={`── ${cat} ──`}>
+                  {PRESET_PROFESSIONS.filter((p) => p.category === cat).map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
           </div>
 
           {/* Seletor de Modelo de Design (Apenas no Modo Site) */}

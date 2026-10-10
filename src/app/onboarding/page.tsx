@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { OnboardingData, SectionsConfig, GalleryItem, TestimonialItem, ProductItem } from '@/lib/validation/onboarding';
 import { analyzeProfessionContext } from '@/lib/design-system/profession-intelligence';
+import { PRESET_PROFESSIONS, findProfessionPreset } from '@/lib/design-system/profession-presets';
 
 const steps = [
   { id: 1, name: 'Identificação', desc: 'Nome e Atividade' },
@@ -63,6 +64,7 @@ function OnboardingContent() {
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string>('Alterações salvas');
   const [selectedModel, setSelectedModel] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
+  const [selectedPresetId, setSelectedPresetId] = useState<string>('');
   const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop');
 
   // Conta do cliente para provisionamento
@@ -292,6 +294,14 @@ function OnboardingContent() {
           }));
           if (data.session.step) setCurrentStep(data.session.step);
           if (data.session.selectedDesign) setSelectedModel(data.session.selectedDesign);
+          if (sessionData.profession) {
+            const matched = findProfessionPreset(sessionData.profession);
+            if (matched) {
+              setSelectedPresetId(matched.id);
+            } else {
+              setSelectedPresetId('outra');
+            }
+          }
         } else if (voucherEmail) {
           setFormData((prev) => ({
             ...prev,
@@ -377,6 +387,63 @@ function OnboardingContent() {
     formData.secondaryColor, 
     formData.accentColor
   ]);
+
+  function handleSelectProfessionPreset(presetId: string) {
+    setSelectedPresetId(presetId);
+    if (!presetId || presetId === 'outra') {
+      return;
+    }
+
+    const preset = PRESET_PROFESSIONS.find((p) => p.id === presetId);
+    if (!preset) return;
+
+    setFormData((prev) => {
+      const newServices = preset.services.map((s, idx) => ({
+        title: s.title,
+        shortDescription: s.shortDescription,
+        icon: s.icon,
+        ctaText: s.ctaText,
+        active: true,
+        order: idx + 1,
+      }));
+
+      const newGallery = preset.gallery.map((g, idx) => ({
+        id: String(idx + 1),
+        url: g.url,
+        title: g.title,
+        caption: g.caption,
+      }));
+
+      const newTestimonials = preset.testimonials.map((t, idx) => ({
+        id: String(idx + 1),
+        clientName: t.clientName,
+        role: t.role,
+        content: t.content,
+        photoUrl: t.photoUrl,
+        rating: t.rating,
+      }));
+
+      const hasCouncil = !!preset.suggestedCouncil?.hasCouncil;
+      const councilType = hasCouncil
+        ? `${preset.suggestedCouncil?.councilAcronym}/${prev.state || 'SP'}`
+        : '';
+
+      return {
+        ...prev,
+        profession: preset.label,
+        mainSpecialty: preset.defaultSpecialty,
+        professionalSummary: preset.summaryTemplate,
+        primaryColor: preset.colors.primary,
+        secondaryColor: preset.colors.secondary,
+        accentColor: preset.colors.accent,
+        hasProfessionalCouncil: hasCouncil || prev.hasProfessionalCouncil,
+        councilType: councilType || prev.councilType,
+        services: newServices,
+        gallery: newGallery,
+        testimonials: newTestimonials,
+      };
+    });
+  }
 
   function handleInputChange(field: keyof OnboardingData, value: any) {
     if (field === 'profession') {
@@ -697,15 +764,78 @@ function OnboardingContent() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700">Sua Profissão *</label>
-                  <input
-                    type="text"
-                    value={formData.profession || ''}
-                    onChange={(e) => handleInputChange('profession', e.target.value)}
-                    placeholder="Ex: Fisioterapeuta, Advogado, Psicólogo..."
-                    className="mt-1 block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-none"
-                  />
+                {/* Caixa de seleção de Profissão & Modelo Pronto */}
+                <div className="sm:col-span-2 bg-gradient-to-br from-blue-50/70 to-indigo-50/40 p-5 rounded-2xl border border-blue-200/80 shadow-xs space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-900 flex flex-wrap items-center justify-between gap-2">
+                      <span className="flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+                        Profissão / Ramo de Atuação (Modelo Pronto) *
+                      </span>
+                      <span className="text-[11px] font-semibold text-blue-700 bg-blue-100/90 px-2.5 py-0.5 rounded-full">
+                        Carrega cores, fotos e 4 serviços sob medida
+                      </span>
+                    </label>
+                    <p className="text-xs text-slate-600 mt-1">
+                      Selecione sua profissão para pré-configurar imagens em alta definição, paleta de cores e serviços especializados.
+                    </p>
+                    <select
+                      value={selectedPresetId}
+                      onChange={(e) => handleSelectProfessionPreset(e.target.value)}
+                      className="mt-2 block w-full px-4 py-3 border border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:outline-none bg-white text-slate-900 font-medium shadow-xs text-sm"
+                    >
+                      <option value="">Selecione sua profissão ou nicho...</option>
+                      {Array.from(new Set(PRESET_PROFESSIONS.map((p) => p.category))).map((cat) => (
+                        <optgroup key={cat} label={`── ${cat} ──`}>
+                          {PRESET_PROFESSIONS.filter((p) => p.category === cat).map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.label}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                      <optgroup label="── Outra Opção ──">
+                        <option value="outra">Outra Profissão (Digitar manualmente)</option>
+                      </optgroup>
+                    </select>
+                  </div>
+
+                  {/* Detalhes do Título e Especialidade */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-blue-200/60">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700">
+                        Como sua profissão aparecerá no site *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.profession || ''}
+                        onChange={(e) => handleInputChange('profession', e.target.value)}
+                        placeholder="Ex: Cabeleireiro(a) & Visagista, Eletricista..."
+                        className="mt-1 block w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:outline-none bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700">
+                        Especialidade Principal Inicial
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.mainSpecialty || ''}
+                        onChange={(e) => handleInputChange('mainSpecialty', e.target.value)}
+                        placeholder="Ex: Corte, escova e mechas / Instalações residenciais"
+                        className="mt-1 block w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:outline-none bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  {selectedPresetId && selectedPresetId !== 'outra' && (
+                    <div className="flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3.5 py-2.5 rounded-xl">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>
+                        <strong>Modelo aplicado com sucesso!</strong> Cores personalizadas ({formData.primaryColor}), 4 serviços do seu ramo, galeria e depoimentos reais foram carregados no seu projeto.
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div>

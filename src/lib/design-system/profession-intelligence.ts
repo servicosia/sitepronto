@@ -3,6 +3,8 @@
  * Analisa e enriquece a profissão antes de renderizar imagens ou gerar o site.
  */
 
+import { findProfessionPreset } from './profession-presets';
+
 export interface ProfessionAnalysis {
   category: string;
   normalizedProfession: string;
@@ -165,6 +167,28 @@ export function analyzeProfessionContext(
       matchedCouncil = council;
       break;
     }
+  }
+
+  // 2. Prioridade de busca no catálogo rico de Presets para Pequenos Negócios & Liberais
+  const preset = findProfessionPreset(combined);
+  if (preset) {
+    return {
+      category: preset.category,
+      normalizedProfession: profession || preset.professionTitle,
+      suggestedCouncil: preset.suggestedCouncil ? {
+        hasCouncil: preset.suggestedCouncil.hasCouncil,
+        councilAcronym: preset.suggestedCouncil.councilAcronym,
+        councilFullName: preset.suggestedCouncil.councilFullName,
+        exampleNumber: preset.suggestedCouncil.exampleNumber || preset.suggestedCouncil.exampleFormat || '',
+      } : (matchedCouncil ? {
+        hasCouncil: true,
+        councilAcronym: matchedCouncil.acronym,
+        councilFullName: matchedCouncil.fullName,
+        exampleNumber: matchedCouncil.exampleFormat,
+      } : { hasCouncil: false, councilAcronym: '', councilFullName: '', exampleNumber: '' }),
+      keywords: [preset.id, preset.category, preset.professionTitle],
+      images: preset.images,
+    };
   }
 
   // 2. Curadoria Visual Inteligente por Categoria Semântica
@@ -661,7 +685,13 @@ export interface TestimonialSuggestion {
  * Curadoria inteligente de fotos contextuais para a Galeria de Fotos
  */
 export function getContextualGallery(profession?: string, specialty?: string, companyName?: string): GalleryImageSuggestion[] {
-  const norm = normalizeText(`${profession || ''} ${specialty || ''} ${companyName || ''}`);
+  const combined = `${profession || ''} ${specialty || ''} ${companyName || ''}`;
+  const preset = findProfessionPreset(combined);
+  if (preset && preset.gallery && preset.gallery.length > 0) {
+    return preset.gallery;
+  }
+
+  const norm = normalizeText(combined);
 
   if (norm.includes('psico') || norm.includes('terap') || norm.includes('saude mental')) {
     return [
@@ -712,6 +742,12 @@ export function getContextualGallery(profession?: string, specialty?: string, co
  * Curadoria de Depoimentos Realistas e Humanizados
  */
 export function getContextualTestimonials(profession?: string, specialty?: string, companyName?: string): TestimonialSuggestion[] {
+  const combined = `${profession || ''} ${specialty || ''} ${companyName || ''}`;
+  const preset = findProfessionPreset(combined);
+  if (preset && preset.testimonials && preset.testimonials.length > 0) {
+    return preset.testimonials;
+  }
+
   return [
     {
       clientName: 'Mariana Souza',
