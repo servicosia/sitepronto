@@ -4,6 +4,10 @@ import {
   getContextualGallery, 
   getContextualTestimonials 
 } from './profession-intelligence';
+import { 
+  renderCrmTabHtml, 
+  renderCrmScripts 
+} from './crm-renderer';
 
 export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string): string {
   const name = data.professionalName || data.fullName || 'Profissional / Empresa';
@@ -21,6 +25,22 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
   const images = getContextualImages(profession, data.mainSpecialty, data.companyName);
   const heroImage = data.coverPhotoUrl || images.hero;
   const aboutImage = data.profilePhotoUrl || images.about;
+
+  const detectedInitialNiche = (function() {
+    const p = (profession || '').toLowerCase();
+    const s = (data.mainSpecialty || '').toLowerCase();
+    const c = (data.companyName || '').toLowerCase();
+    const all = `${p} ${s} ${c}`;
+    if (all.includes('barb') || all.includes('cabel') || all.includes('navalha')) return 'barbearia';
+    if (all.includes('medic') || all.includes('clinic') || all.includes('saud') || all.includes('doutor') || all.includes('psic') || all.includes('odonto') || all.includes('dentist')) return 'clinica';
+    if (all.includes('imob') || all.includes('corret') || all.includes('imove') || all.includes('apartam')) return 'imobiliaria';
+    if (all.includes('acad') || all.includes('fit') || all.includes('personal') || all.includes('trein') || all.includes('cross')) return 'academia';
+    if (all.includes('pet') || all.includes('veterin') || all.includes('tosa') || all.includes('banho') || all.includes('anim')) return 'petshop';
+    return 'barbearia';
+  })();
+
+  const crmTabHtml = renderCrmTabHtml(detectedInitialNiche, profession, data.companyName || name);
+  const crmScripts = renderCrmScripts(detectedInitialNiche);
 
   const gallery = data.gallery && data.gallery.length > 0
     ? data.gallery
@@ -237,7 +257,16 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
     
     <!-- METRICS OVERVIEW -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3.5">
+      <div class="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 text-white p-5 rounded-2xl border border-indigo-700/60 shadow-md cursor-pointer hover:shadow-xl hover:scale-[1.02] transition duration-200" onclick="switchTab('tab-crm')">
+        <div class="flex items-center justify-between">
+          <div class="text-[10px] font-black uppercase tracking-wider text-indigo-300">Micro-SaaS & CRM</div>
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40">● Ao Vivo</span>
+        </div>
+        <div class="text-2xl font-black mt-2 text-white">💼 Gestão</div>
+        <div class="text-[11px] text-indigo-200 font-semibold mt-1">Clientes, Agenda & Funil ➔</div>
+      </div>
+
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="switchTab('tab-contacts')">
         <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Atendimentos / Leads</div>
         <div class="text-3xl font-extrabold text-slate-900 mt-2">1</div>
@@ -280,7 +309,11 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       <!-- TAB NAVIGATION -->
       <div class="border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
         <div class="flex space-x-3 sm:space-x-6 overflow-x-auto pb-1">
-          <button id="btn-tab-contacts" class="tab-btn active text-sm pb-2 border-b-2 border-slate-900 transition whitespace-nowrap" onclick="switchTab('tab-contacts')">
+          <button id="btn-tab-crm" class="tab-btn active text-sm pb-2 border-b-2 border-indigo-600 font-black text-indigo-700 transition whitespace-nowrap flex items-center gap-1.5" onclick="switchTab('tab-crm')">
+            <span class="text-base">💼</span> CRM & Operação
+            <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-sm">SaaS PRO</span>
+          </button>
+          <button id="btn-tab-contacts" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-contacts')">
             📬 Contatos
           </button>
           <button id="btn-tab-sections" class="tab-btn text-sm text-slate-500 hover:text-slate-900 pb-2 border-b-2 border-transparent transition whitespace-nowrap" onclick="switchTab('tab-sections')">
@@ -349,8 +382,11 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
         </span>
       </div>
 
+      <!-- ABA CRM: GESTÃO OPERACIONAL & SAAS -->
+      ${crmTabHtml}
+
       <!-- ABA 1: FORMULÁRIOS RECEBIDOS -->
-      <div id="tab-contacts" class="tab-content p-6 space-y-4">
+      <div id="tab-contacts" class="tab-content hidden p-6 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2">
@@ -3850,6 +3886,9 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
       triggerSave('Autenticação em 2 Etapas desativada.');
     }
 
+    // Scripts do CRM Operacional & Micro-SaaS
+    ${crmScripts}
+
     // Inicializações
     initTemplateSelection();
     renderSectionsConfigUI();
@@ -3868,6 +3907,7 @@ export function renderMasterDashboardHtml(data: OnboardingData, siteId?: string)
     renderTestimonialsUI();
     renderGalleryUI();
     renderSecurityUI();
+    renderCrmUI();
   </script>
 
 </body>

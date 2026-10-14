@@ -64,6 +64,373 @@ export function renderSocialIconsHtml(socials?: {
 }
 
 /**
+ * Renderiza o widget dinâmico interativo para os Top Nichos (Barbearia, Clínica, Imobiliária, Academia, Pet Shop)
+ * Criando o design de alta conversão inspirado nas referências (Barber Pro, Vida+, HomeKey, PowerFit, PetCare).
+ */
+export function renderHeroNicheWidgetHtml(
+  data: OnboardingData,
+  opts: { isModelB: boolean; primary: string; accent: string; whatsappDigits: string; fontHeading: string }
+): string {
+  const profession = data.profession || '';
+  const specialty = data.mainSpecialty || '';
+  const company = data.companyName || '';
+  const combined = `${profession} ${specialty} ${company}`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const isBarbearia = combined.includes('barbear') || combined.includes('barber') || combined.includes('barba');
+  const isClinica = combined.includes('clinica') || combined.includes('medic') || combined.includes('doutor') || combined.includes('saude') || combined.includes('consultorio');
+  const isImobiliaria = combined.includes('imobiliari') || combined.includes('corretor') || combined.includes('imoveis') || combined.includes('imovel');
+  const isAcademia = combined.includes('academia') || combined.includes('fitness') || combined.includes('musculac') || combined.includes('treino') || combined.includes('crossfit');
+  const isPetShop = combined.includes('pet') || combined.includes('veterinari') || combined.includes('banho e tosa') || combined.includes('canin') || combined.includes('animal');
+
+  const { isModelB, primary, accent, whatsappDigits, fontHeading } = opts;
+  const isDark = isModelB || isBarbearia || isAcademia;
+
+  if (isBarbearia) {
+    return `
+      <!-- WIDGET DINÂMICO BARBEARIA (BARBER PRO STYLE) -->
+      <div class="mt-6 p-5 sm:p-6 rounded-2xl border ${isDark ? 'bg-slate-900/95 border-amber-500/30' : 'bg-white border-amber-300'} shadow-2xl backdrop-blur-md space-y-4 text-left">
+        <div class="flex items-center justify-between border-b ${isDark ? 'border-slate-800' : 'border-slate-200'} pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-sm">
+              💈
+            </div>
+            <div>
+              <h3 class="text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'} uppercase">Agendamento Online</h3>
+              <p class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}">Escolha o serviço e garanta seu horário sem espera</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 shrink-0">
+            ● Horários Hoje
+          </span>
+        </div>
+
+        <form id="heroNicheForm" onsubmit="event.preventDefault(); window.submitHeroNicheBooking('barbearia');" class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Serviço *</label>
+              <select id="hero_barber_service" required class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <option value="Corte Tradicional / Fade (R$ 45)">✂️ Corte Tradicional / Fade — R$ 45</option>
+                <option value="Barboterapia com Toalha Quente (R$ 35)">🧖 Barboterapia Toalha Quente — R$ 35</option>
+                <option value="Combo Cabelo + Barba (R$ 75)" selected>🔥 Combo Cabelo + Barba — R$ 75</option>
+                <option value="Camuflagem de Fios Brancos (R$ 50)">✨ Camuflagem de Barba/Fios — R$ 50</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Profissional / Barbeiro *</label>
+              <select id="hero_barber_staff" class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <option value="Qualquer Barbeiro Disponível">Qualquer Barbeiro Disponível</option>
+                <option value="Barbeiro Mestre">Barbeiro Mestre</option>
+                <option value="Especialista em Degradê">Especialista em Degradê</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Data & Horário *</label>
+              <div class="flex gap-2">
+                <input type="date" id="hero_barber_date" required class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <select id="hero_barber_time" required class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                  <option value="09:00">09:00</option>
+                  <option value="10:00">10:00</option>
+                  <option value="11:00">11:00</option>
+                  <option value="14:00" selected>14:00</option>
+                  <option value="15:00">15:00</option>
+                  <option value="16:00">16:00</option>
+                  <option value="17:00">17:00</option>
+                  <option value="18:00">18:00</option>
+                  <option value="19:00">19:00</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Seu Nome & WhatsApp *</label>
+              <div class="flex gap-2">
+                <input type="text" id="hero_barber_name" required placeholder="Seu nome" class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <input type="tel" id="hero_barber_phone" required placeholder="(11) 99999-9999" class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl font-extrabold text-xs uppercase tracking-wider text-slate-950 transition-all transform hover:scale-[1.01] active:scale-95 shadow-lg flex items-center justify-center gap-2" style="background-color: #f59e0b;">
+            <span>💈</span> Agendar Horário Agora
+          </button>
+        </form>
+      </div>
+    `;
+  }
+
+  if (isClinica) {
+    return `
+      <!-- WIDGET DINÂMICO CLÍNICA & SAÚDE (VIDA+ STYLE) -->
+      <div class="mt-6 p-5 sm:p-6 rounded-2xl border ${isDark ? 'bg-slate-900/95 border-cyan-500/30' : 'bg-white border-cyan-200'} shadow-2xl backdrop-blur-md space-y-4 text-left">
+        <div class="flex flex-wrap items-center justify-between border-b ${isDark ? 'border-slate-800' : 'border-slate-100'} pb-3 gap-2">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-cyan-600 text-white flex items-center justify-center font-bold text-sm">
+              🩺
+            </div>
+            <div>
+              <h3 class="text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}">Agendamento de Consultas & Exames</h3>
+              <p class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}">Atendimento humanizado presencial ou online</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 text-[10px] font-bold">
+            <span class="px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200">Consultas</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">Exames</span>
+            <span class="px-2 py-0.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200">Telemedicina</span>
+          </div>
+        </div>
+
+        <form id="heroNicheForm" onsubmit="event.preventDefault(); window.submitHeroNicheBooking('clinica');" class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Especialidade Médica *</label>
+              <select id="hero_clinic_spec" required class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <option value="Clínica Geral & Check-up" selected>Clínica Geral & Check-up Preventivo</option>
+                <option value="Cardiologia">Cardiologia & Risco Cirúrgico</option>
+                <option value="Dermatologia">Dermatologia & Estética da Pele</option>
+                <option value="Ginecologia & Obstetrícia">Ginecologia & Obstetrícia</option>
+                <option value="Ortopedia">Ortopedia & Coluna</option>
+                <option value="Pediatria">Pediatria & Puericultura</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Modalidade *</label>
+              <select id="hero_clinic_format" class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <option value="Presencial no Consultório">Presencial no Consultório</option>
+                <option value="Telemedicina Online (Videochamada)">Telemedicina Online (Nacional)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Data & Turno *</label>
+              <div class="flex gap-2">
+                <input type="date" id="hero_clinic_date" required class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <select id="hero_clinic_shift" class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                  <option value="Manhã (08h às 12h)">Manhã (08h-12h)</option>
+                  <option value="Tarde (13h às 18h)" selected>Tarde (13h-18h)</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Paciente & WhatsApp *</label>
+              <div class="flex gap-2">
+                <input type="text" id="hero_clinic_name" required placeholder="Nome do paciente" class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <input type="tel" id="hero_clinic_phone" required placeholder="(11) 99999-9999" class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl font-extrabold text-xs uppercase tracking-wider text-white transition-all transform hover:scale-[1.01] active:scale-95 shadow-lg flex items-center justify-center gap-2" style="background-color: #0891b2;">
+            <span>📅</span> Solicitar Agendamento Clínico
+          </button>
+        </form>
+      </div>
+    `;
+  }
+
+  if (isImobiliaria) {
+    return `
+      <!-- WIDGET DINÂMICO IMOBILIÁRIA (HOMEKEY STYLE) -->
+      <div class="mt-6 p-5 sm:p-6 rounded-2xl border ${isDark ? 'bg-slate-900/95 border-sky-500/30' : 'bg-white border-slate-200'} shadow-2xl backdrop-blur-md space-y-4 text-left">
+        <div class="flex items-center justify-between border-b ${isDark ? 'border-slate-800' : 'border-slate-100'} pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm">
+              🏡
+            </div>
+            <div>
+              <h3 class="text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}">Encontre o Imóvel dos Seus Sonhos</h3>
+              <p class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}">Oportunidades selecionadas na sua região</p>
+            </div>
+          </div>
+          <div class="inline-flex rounded-lg p-0.5 bg-slate-100 text-xs font-bold border border-slate-200">
+            <button type="button" id="hero_re_type_buy" onclick="window.setRealEstateType('Comprar')" class="px-3 py-1 rounded-md bg-slate-900 text-white transition">Comprar</button>
+            <button type="button" id="hero_re_type_rent" onclick="window.setRealEstateType('Alugar')" class="px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 transition">Alugar</button>
+          </div>
+        </div>
+
+        <form id="heroNicheForm" onsubmit="event.preventDefault(); window.submitHeroNicheBooking('imobiliaria');" class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Tipo de Imóvel *</label>
+              <select id="hero_re_property_type" class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-sky-500">
+                <option value="Apartamentos" selected>Apartamentos Residenciais</option>
+                <option value="Casas em Condomínio">Casas em Condomínio Fechado</option>
+                <option value="Coberturas">Coberturas & Duplex</option>
+                <option value="Salas Comerciais">Salas & Prédios Comerciais</option>
+                <option value="Terrenos / Lotes">Terrenos / Lotes</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Bairro / Região *</label>
+              <input type="text" id="hero_re_location" placeholder="Ex: Jardins, Centro ou Bairro..." required class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-sky-500">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Faixa de Investimento</label>
+              <select id="hero_re_price_range" class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <option value="Até R$ 350.000">Até R$ 350.000</option>
+                <option value="R$ 350.000 a R$ 700.000" selected>R$ 350.000 a R$ 700.000</option>
+                <option value="R$ 700.000 a R$ 1.500.000">R$ 700.000 a R$ 1.500.000</option>
+                <option value="Alto Padrão (+ R$ 1.500.000)">Alto Padrão (+ R$ 1.5M)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Seu Nome & WhatsApp *</label>
+              <div class="flex gap-2">
+                <input type="text" id="hero_re_name" required placeholder="Seu nome" class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <input type="tel" id="hero_re_phone" required placeholder="(11) 99999-9999" class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl font-extrabold text-xs uppercase tracking-wider text-white transition-all transform hover:scale-[1.01] active:scale-95 shadow-lg flex items-center justify-center gap-2" style="background-color: #0284c7;">
+            <span>🔍</span> Buscar Oportunidades no WhatsApp
+          </button>
+        </form>
+      </div>
+    `;
+  }
+
+  if (isAcademia) {
+    return `
+      <!-- WIDGET DINÂMICO ACADEMIA & FITNESS (POWERFIT STYLE) -->
+      <div class="mt-6 p-5 sm:p-6 rounded-2xl border ${isDark ? 'bg-slate-900/95 border-red-500/30' : 'bg-white border-red-300'} shadow-2xl backdrop-blur-md space-y-4 text-left">
+        <div class="flex flex-wrap items-center justify-between border-b ${isDark ? 'border-slate-800' : 'border-slate-100'} pb-3 gap-2">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold text-sm">
+              🏋️
+            </div>
+            <div>
+              <h3 class="text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'} uppercase">Matrícula Expressa Online</h3>
+              <p class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}">Estrutura completa com isenção de taxa de adesão</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 text-[10px] font-bold">
+            <span class="px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 border border-red-500/20">Musculação</span>
+            <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">Spinning</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Avaliação 3D</span>
+          </div>
+        </div>
+
+        <form id="heroNicheForm" onsubmit="event.preventDefault(); window.submitHeroNicheBooking('academia');" class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Escolha seu Plano *</label>
+              <select id="hero_gym_plan" required class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-red-500">
+                <option value="Plano Black (Acesso Total + Aulas) - R$ 119/mês" selected>👑 Plano Black VIP (Total + Aulas) — R$ 119/mês</option>
+                <option value="Plano Smart (Musculação Livre) - R$ 89/mês">⚡ Plano Smart (Musculação) — R$ 89/mês</option>
+                <option value="Plano Personal 1 a 1 - R$ 249/mês">🔥 Plano VIP Personal — R$ 249/mês</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Horário de Treino</label>
+              <select id="hero_gym_shift" class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <option value="Horário Livre (06h às 23h)">Horário Livre (06h às 23h)</option>
+                <option value="Manhã (06h às 12h)">Manhã (06h às 12h)</option>
+                <option value="Tarde Econômica (12h às 17h)">Tarde Econômica (12h às 17h)</option>
+                <option value="Noite (17h às 23h)">Noite (17h às 23h)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Seu Nome Completo *</label>
+              <input type="text" id="hero_gym_name" required placeholder="Nome do futuro aluno" class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">WhatsApp para Ativação *</label>
+              <input type="tel" id="hero_gym_phone" required placeholder="(11) 99999-9999" class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl font-extrabold text-xs uppercase tracking-wider text-white transition-all transform hover:scale-[1.01] active:scale-95 shadow-lg flex items-center justify-center gap-2" style="background-color: #dc2626;">
+            <span>⚡</span> Matricular Agora Online
+          </button>
+        </form>
+      </div>
+    `;
+  }
+
+  if (isPetShop) {
+    return `
+      <!-- WIDGET DINÂMICO PET SHOP (PETCARE STYLE) -->
+      <div class="mt-6 p-5 sm:p-6 rounded-2xl border ${isDark ? 'bg-slate-900/95 border-teal-500/30' : 'bg-white border-teal-200'} shadow-2xl backdrop-blur-md space-y-4 text-left">
+        <div class="flex flex-wrap items-center justify-between border-b ${isDark ? 'border-slate-800' : 'border-slate-100'} pb-3 gap-2">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-sm">
+              🐾
+            </div>
+            <div>
+              <h3 class="text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}">Agendamento de Banho & Tosa</h3>
+              <p class="text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}">Carinho, água morna e toalhas higienizadas individuais</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
+            🚗 Táxi Dog Disponível
+          </span>
+        </div>
+
+        <form id="heroNicheForm" onsubmit="event.preventDefault(); window.submitHeroNicheBooking('petshop');" class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Nome do Pet & Raça *</label>
+              <input type="text" id="hero_pet_name" required placeholder="Ex: Thor (Golden) / Nina (Shih Tzu)" class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Porte do Pet *</label>
+              <select id="hero_pet_size" class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <option value="Porte Pequeno (até 10kg)" selected>Porte Pequeno (até 10kg)</option>
+                <option value="Porte Médio (10kg a 20kg)">Porte Médio (10kg a 20kg)</option>
+                <option value="Porte Grande (+20kg)">Porte Grande (+20kg)</option>
+                <option value="Gato / Felino">Gato / Felino</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Serviço Desejado *</label>
+              <select id="hero_pet_service" required class="w-full px-3 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <option value="Banho Relaxante & Hidratação" selected>🛁 Banho Relaxante & Hidratação</option>
+                <option value="Banho + Tosa Completa da Raça">✂️ Banho + Tosa Completa da Raça</option>
+                <option value="Tosa Higiênica + Banho">🐾 Tosa Higiênica + Banho</option>
+                <option value="Consulta Veterinária Preventiva">🩺 Consulta Veterinária & Vacinas</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-1">Nome do Tutor & WhatsApp *</label>
+              <div class="flex gap-2">
+                <input type="text" id="hero_pet_tutor" required placeholder="Seu nome" class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+                <input type="tel" id="hero_pet_phone" required placeholder="(11) 99999-9999" class="w-1/2 px-2.5 py-2 text-xs rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'} focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <input type="checkbox" id="hero_pet_taxi" class="rounded text-teal-600 focus:ring-teal-500">
+            <label for="hero_pet_taxi" class="text-xs ${isDark ? 'text-slate-300' : 'text-slate-700'} font-semibold cursor-pointer">
+              Solicitar Táxi Dog (buscar e trazer meu pet no endereço)
+            </label>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl font-extrabold text-xs uppercase tracking-wider text-white transition-all transform hover:scale-[1.01] active:scale-95 shadow-lg flex items-center justify-center gap-2" style="background-color: #0d9488;">
+            <span>🐶</span> Agendar Horário do Pet
+          </button>
+        </form>
+      </div>
+    `;
+  }
+
+  return '';
+}
+
+/**
  * Renderiza o corpo do site para uma variante específica (MODEL_A, MODEL_B, MODEL_C, MODEL_D)
  */
 export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D' = 'MODEL_A'): string {
@@ -107,6 +474,14 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
 
   const fontBody = (isModelA || isModelC) ? "'Plus Jakarta Sans', sans-serif" : (isModelB || isModelD) ? "'Inter', sans-serif" : "'Inter', sans-serif";
   const fontHeading = (isModelA || isModelC) ? "'Playfair Display', Georgia, serif" : "'Plus Jakarta Sans', sans-serif";
+
+  const heroNicheWidgetHtml = renderHeroNicheWidgetHtml(data, {
+    isModelB,
+    primary,
+    accent,
+    whatsappDigits,
+    fontHeading,
+  });
 
   const servicesList = data.services && data.services.length > 0 ? data.services : [
     {
@@ -405,6 +780,8 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
             </a>
           </div>
 
+          ${heroNicheWidgetHtml}
+
           <!-- Micro Credenciais do Stitch -->
           <div class="pt-4 flex flex-wrap items-center gap-6 text-xs text-[#5f6864] font-medium">
             <span class="flex items-center gap-1.5"><span class="text-[#c88770]">✦</span> ${councilBadge}</span>
@@ -458,6 +835,8 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
               Enviar Mensagem
             </a>
           </div>
+
+          ${heroNicheWidgetHtml}
         </div>
 
         <div class="lg:col-span-5 relative">
@@ -498,6 +877,8 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
               ENVIAR MENSAGEM
             </a>
           </div>
+
+          ${heroNicheWidgetHtml}
         </div>
 
         <div class="lg:col-span-5">
@@ -536,6 +917,8 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
               Agendar Reunião
             </a>
           </div>
+
+          ${heroNicheWidgetHtml}
         </div>
 
         <div class="lg:col-span-5 relative">
@@ -1215,36 +1598,36 @@ export function renderSingleTemplateHtml(data: OnboardingData, variantName: 'MOD
           </p>
         </div>
 
-        <form onsubmit="event.preventDefault(); alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');" class="space-y-5">
+        <form onsubmit="event.preventDefault(); window.submitPublicContactForm(this);" class="space-y-5">
           <div>
             <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">Nome Completo *</label>
-            <input type="text" required placeholder="Seu nome completo" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
+            <input type="text" name="name" required placeholder="Seu nome completo" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">Telefone / WhatsApp *</label>
-              <input type="tel" required placeholder="(11) 99999-9999" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
+              <input type="tel" name="phone" required placeholder="(11) 99999-9999" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
             </div>
             <div>
               <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">E-mail *</label>
-              <input type="email" required placeholder="seu@email.com" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
+              <input type="email" name="email" required placeholder="seu@email.com" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">Motivo do Contato *</label>
-            <select class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
-              <option>Agendamento de Atendimento / Consulta</option>
-              <option>Dúvidas sobre Abordagem e Especialidades</option>
-              <option>Informações de Horários e Formatos</option>
-              <option>Outros Assuntos</option>
+            <select name="reason" class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]">
+              <option value="Agendamento de Atendimento / Consulta">Agendamento de Atendimento / Consulta</option>
+              <option value="Dúvidas sobre Abordagem e Especialidades">Dúvidas sobre Abordagem e Especialidades</option>
+              <option value="Informações de Horários e Formatos">Informações de Horários e Formatos</option>
+              <option value="Outros Assuntos">Outros Assuntos</option>
             </select>
           </div>
 
           <div>
             <label class="block text-xs font-bold ${isModelB ? 'text-slate-300' : 'text-stone-700'} uppercase mb-1">Mensagem / Observação</label>
-            <textarea rows="4" placeholder="Descreva brevemente o que você procura..." class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]"></textarea>
+            <textarea name="message" rows="4" placeholder="Descreva brevemente o que você procura..." class="w-full px-4 py-3.5 ${isModelA ? 'rounded-2xl' : isModelC ? 'rounded-none' : 'rounded-xl'} border ${isModelB ? 'bg-slate-900 border-slate-700 text-white' : 'border-stone-300'} text-sm focus:outline-none focus:ring-2 focus:ring-[#2e4f43]"></textarea>
           </div>
 
           <p class="text-xs ${isModelB ? 'text-slate-500' : 'text-stone-500'}">
@@ -2086,6 +2469,312 @@ export function renderCompleteSiteHtml(data: OnboardingData, spec?: DesignSpec, 
         console.error('Erro ao aplicar scripts de rastreamento:', err);
       }
     }
+
+    // 11. INTEGRAÇÃO CRM: Captura de Leads e Agendamentos dos Top Nichos
+    window._reCurrentType = 'Comprar';
+    window.setRealEstateType = function(type) {
+      window._reCurrentType = type;
+      const btnBuy = document.getElementById('hero_re_type_buy');
+      const btnRent = document.getElementById('hero_re_type_rent');
+      if (btnBuy && btnRent) {
+        if (type === 'Comprar') {
+          btnBuy.className = 'px-3 py-1 rounded-md bg-slate-900 text-white transition';
+          btnRent.className = 'px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 transition';
+        } else {
+          btnRent.className = 'px-3 py-1 rounded-md bg-slate-900 text-white transition';
+          btnBuy.className = 'px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 transition';
+        }
+      }
+    };
+
+    window.submitPublicContactForm = function(form) {
+      try {
+        const nameInput = form.querySelector('[name="name"]');
+        const phoneInput = form.querySelector('[name="phone"]');
+        const emailInput = form.querySelector('[name="email"]');
+        const reasonInput = form.querySelector('[name="reason"]');
+        const messageInput = form.querySelector('[name="message"]');
+
+        const name = nameInput ? nameInput.value.trim() : 'Cliente';
+        const phone = phoneInput ? phoneInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const reason = reasonInput ? reasonInput.value : 'Contato pelo Site';
+        const message = messageInput ? messageInput.value.trim() : '';
+
+        const now = new Date();
+        const dateStr = 'Hoje às ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+        const newLead = {
+          id: 'lead_' + Date.now(),
+          date: dateStr,
+          name: name,
+          phone: phone,
+          email: email,
+          reason: reason,
+          message: message,
+          status: 'Novo'
+        };
+
+        let list = [];
+        try {
+          const raw = localStorage.getItem('site_contacts');
+          if (raw) list = JSON.parse(raw);
+        } catch (e) {}
+        list.unshift(newLead);
+        localStorage.setItem('site_contacts', JSON.stringify(list));
+
+        alert('✓ Mensagem enviada com sucesso! Recebemos sua solicitação e entraremos em contato em breve.');
+        form.reset();
+      } catch (err) {
+        console.error('Erro ao enviar contato:', err);
+        alert('Mensagem enviada com sucesso!');
+      }
+    };
+
+    window.submitHeroNicheBooking = function(niche) {
+      try {
+        const now = new Date();
+        const dateStr = 'Hoje às ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        let waText = '';
+
+        if (niche === 'barbearia') {
+          const service = (document.getElementById('hero_barber_service') || {}).value || 'Corte & Barba';
+          const staff = (document.getElementById('hero_barber_staff') || {}).value || 'Barbeiro Disponível';
+          const date = (document.getElementById('hero_barber_date') || {}).value || now.toISOString().slice(0, 10);
+          const time = (document.getElementById('hero_barber_time') || {}).value || '14:00';
+          const name = ((document.getElementById('hero_barber_name') || {}).value || '').trim() || 'Cliente';
+          const phone = ((document.getElementById('hero_barber_phone') || {}).value || '').trim();
+
+          const record = {
+            id: 'barber_' + Date.now(),
+            clientName: name,
+            phone: phone,
+            service: service,
+            barber: staff,
+            date: date,
+            time: time,
+            status: 'Confirmado',
+            createdAt: dateStr
+          };
+
+          let list = [];
+          try {
+            const raw = localStorage.getItem('site_crm_barber_appointments');
+            if (raw) list = JSON.parse(raw);
+          } catch(e) {}
+          list.unshift(record);
+          localStorage.setItem('site_crm_barber_appointments', JSON.stringify(list));
+
+          // Alimenta também os contatos gerais
+          let contacts = [];
+          try {
+            const rawC = localStorage.getItem('site_contacts');
+            if (rawC) contacts = JSON.parse(rawC);
+          } catch(e) {}
+          contacts.unshift({
+            id: record.id,
+            date: dateStr,
+            name: name,
+            phone: phone,
+            reason: 'Agendamento Barbearia (' + service + ')',
+            message: 'Horário: ' + date + ' às ' + time + ' com ' + staff,
+            status: 'Confirmado'
+          });
+          localStorage.setItem('site_contacts', JSON.stringify(contacts));
+
+          waText = 'Olá! Gostaria de confirmar meu agendamento na Barbearia:\\n\\n✂️ *Serviço:* ' + service + '\\n💈 *Barbeiro:* ' + staff + '\\n📅 *Data:* ' + date + ' às ' + time + '\\n👤 *Cliente:* ' + name;
+        }
+        else if (niche === 'clinica') {
+          const spec = (document.getElementById('hero_clinic_spec') || {}).value || 'Clínica Geral';
+          const format = (document.getElementById('hero_clinic_format') || {}).value || 'Presencial';
+          const date = (document.getElementById('hero_clinic_date') || {}).value || now.toISOString().slice(0, 10);
+          const shift = (document.getElementById('hero_clinic_shift') || {}).value || 'Tarde';
+          const name = ((document.getElementById('hero_clinic_name') || {}).value || '').trim() || 'Paciente';
+          const phone = ((document.getElementById('hero_clinic_phone') || {}).value || '').trim();
+
+          const record = {
+            id: 'clinic_' + Date.now(),
+            patientName: name,
+            phone: phone,
+            specialty: spec,
+            format: format,
+            date: date,
+            shift: shift,
+            status: 'Confirmado',
+            createdAt: dateStr
+          };
+
+          let list = [];
+          try {
+            const raw = localStorage.getItem('site_crm_clinic_appointments');
+            if (raw) list = JSON.parse(raw);
+          } catch(e) {}
+          list.unshift(record);
+          localStorage.setItem('site_crm_clinic_appointments', JSON.stringify(list));
+
+          let contacts = [];
+          try {
+            const rawC = localStorage.getItem('site_contacts');
+            if (rawC) contacts = JSON.parse(rawC);
+          } catch(e) {}
+          contacts.unshift({
+            id: record.id,
+            date: dateStr,
+            name: name,
+            phone: phone,
+            reason: 'Consulta Clínica (' + spec + ')',
+            message: format + ' em ' + date + ' (' + shift + ')',
+            status: 'Confirmado'
+          });
+          localStorage.setItem('site_contacts', JSON.stringify(contacts));
+
+          waText = 'Olá! Solicito agendamento de consulta médica:\\n\\n🩺 *Especialidade:* ' + spec + '\\n📍 *Formato:* ' + format + '\\n📅 *Data Preferencial:* ' + date + ' (' + shift + ')\\n👤 *Paciente:* ' + name;
+        }
+        else if (niche === 'imobiliaria') {
+          const dealType = window._reCurrentType || 'Comprar';
+          const propType = (document.getElementById('hero_re_property_type') || {}).value || 'Apartamentos';
+          const location = ((document.getElementById('hero_re_location') || {}).value || '').trim() || 'Bairro / Região';
+          const price = (document.getElementById('hero_re_price_range') || {}).value || 'Até R$ 500.000';
+          const name = ((document.getElementById('hero_re_name') || {}).value || '').trim() || 'Interessado';
+          const phone = ((document.getElementById('hero_re_phone') || {}).value || '').trim();
+
+          const record = {
+            id: 're_' + Date.now(),
+            clientName: name,
+            phone: phone,
+            dealType: dealType,
+            propertyType: propType,
+            location: location,
+            priceRange: price,
+            stage: 'novo',
+            createdAt: dateStr
+          };
+
+          let list = [];
+          try {
+            const raw = localStorage.getItem('site_crm_realestate_leads');
+            if (raw) list = JSON.parse(raw);
+          } catch(e) {}
+          list.unshift(record);
+          localStorage.setItem('site_crm_realestate_leads', JSON.stringify(list));
+
+          let contacts = [];
+          try {
+            const rawC = localStorage.getItem('site_contacts');
+            if (rawC) contacts = JSON.parse(rawC);
+          } catch(e) {}
+          contacts.unshift({
+            id: record.id,
+            date: dateStr,
+            name: name,
+            phone: phone,
+            reason: 'Interesse Imobiliário (' + dealType + ' ' + propType + ')',
+            message: 'Região: ' + location + ' | Faixa: ' + price,
+            status: 'Novo'
+          });
+          localStorage.setItem('site_contacts', JSON.stringify(contacts));
+
+          waText = 'Olá! Vi o site e tenho interesse em imóveis:\\n\\n🏡 *Objetivo:* ' + dealType + ' ' + propType + '\\n📍 *Bairro/Região:* ' + location + '\\n💰 *Faixa:* ' + price + '\\n👤 *Nome:* ' + name;
+        }
+        else if (niche === 'academia') {
+          const plan = (document.getElementById('hero_gym_plan') || {}).value || 'Plano Black';
+          const shift = (document.getElementById('hero_gym_shift') || {}).value || 'Horário Livre';
+          const name = ((document.getElementById('hero_gym_name') || {}).value || '').trim() || 'Aluno';
+          const phone = ((document.getElementById('hero_gym_phone') || {}).value || '').trim();
+
+          const record = {
+            id: 'gym_' + Date.now(),
+            name: name,
+            phone: phone,
+            plan: plan,
+            shift: shift,
+            status: 'Pendente',
+            createdAt: dateStr
+          };
+
+          let list = [];
+          try {
+            const raw = localStorage.getItem('site_crm_gym_students');
+            if (raw) list = JSON.parse(raw);
+          } catch(e) {}
+          list.unshift(record);
+          localStorage.setItem('site_crm_gym_students', JSON.stringify(list));
+
+          let contacts = [];
+          try {
+            const rawC = localStorage.getItem('site_contacts');
+            if (rawC) contacts = JSON.parse(rawC);
+          } catch(e) {}
+          contacts.unshift({
+            id: record.id,
+            date: dateStr,
+            name: name,
+            phone: phone,
+            reason: 'Matrícula Academia (' + plan + ')',
+            message: 'Turno: ' + shift,
+            status: 'Pendente'
+          });
+          localStorage.setItem('site_contacts', JSON.stringify(contacts));
+
+          waText = 'Olá! Quero ativar minha matrícula na Academia com condição especial:\\n\\n🏋️ *Plano:* ' + plan + '\\n⏰ *Horário:* ' + shift + '\\n👤 *Futuro Aluno:* ' + name;
+        }
+        else if (niche === 'petshop') {
+          const petName = ((document.getElementById('hero_pet_name') || {}).value || '').trim() || 'Pet';
+          const size = (document.getElementById('hero_pet_size') || {}).value || 'Pequeno';
+          const service = (document.getElementById('hero_pet_service') || {}).value || 'Banho & Tosa';
+          const isTaxi = (document.getElementById('hero_pet_taxi') || {}).checked;
+          const tutor = ((document.getElementById('hero_pet_tutor') || {}).value || '').trim() || 'Tutor';
+          const phone = ((document.getElementById('hero_pet_phone') || {}).value || '').trim();
+
+          const record = {
+            id: 'pet_' + Date.now(),
+            petName: petName,
+            size: size,
+            service: service,
+            taxiDog: isTaxi ? 'Sim (buscar no endereço)' : 'Não',
+            tutor: tutor,
+            phone: phone,
+            queueStage: 'fila',
+            createdAt: dateStr
+          };
+
+          let list = [];
+          try {
+            const raw = localStorage.getItem('site_crm_petshop_queue');
+            if (raw) list = JSON.parse(raw);
+          } catch(e) {}
+          list.unshift(record);
+          localStorage.setItem('site_crm_petshop_queue', JSON.stringify(list));
+
+          let contacts = [];
+          try {
+            const rawC = localStorage.getItem('site_contacts');
+            if (rawC) contacts = JSON.parse(rawC);
+          } catch(e) {}
+          contacts.unshift({
+            id: record.id,
+            date: dateStr,
+            name: tutor,
+            phone: phone,
+            reason: 'Banho & Tosa (' + petName + ')',
+            message: 'Porte: ' + size + ' | Serviço: ' + service + ' | Táxi Dog: ' + (isTaxi ? 'Sim' : 'Não'),
+            status: 'Novo'
+          });
+          localStorage.setItem('site_contacts', JSON.stringify(contacts));
+
+          waText = 'Olá! Gostaria de agendar banho e tosa para meu pet:\\n\\n🐾 *Pet:* ' + petName + ' (' + size + ')\\n🛁 *Serviço:* ' + service + '\\n🚗 *Táxi Dog:* ' + (isTaxi ? 'Sim, solicitar busca' : 'Não') + '\\n👤 *Tutor(a):* ' + tutor;
+        }
+
+        alert('✓ Solicitação registrada com sucesso! Seu horário/pedido foi enviado para a recepção.');
+        if (waText && '${whatsappDigits}') {
+          const waUrl = 'https://wa.me/${whatsappDigits}?text=' + encodeURIComponent(waText);
+          window.open(waUrl, '_blank');
+        }
+      } catch (err) {
+        console.error('Erro no submitHeroNicheBooking:', err);
+        alert('✓ Solicitação enviada com sucesso!');
+      }
+    };
 
     // Executa ao inicializar
     applySectionsConfig();

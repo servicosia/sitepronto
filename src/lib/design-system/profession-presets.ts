@@ -51,6 +51,307 @@ export interface ProfessionPreset {
 
 export const PRESET_PROFESSIONS: ProfessionPreset[] = [
   // ==========================================
+  // TOP NICHES COM CRM & ALTA CONVERSÃO
+  // ==========================================
+  {
+    id: 'barbearia',
+    label: 'Barbearia / Barber Shop',
+    category: 'Beleza & Cuidados Masculinos',
+    professionTitle: 'Barbearia & Estética Masculina',
+    defaultSpecialty: 'Cortes Modernos, Barboterapia, Degradê e Alinhamento',
+    summaryTemplate: 'Estilo é confiança. Mais que um corte de cabelo e barba, proporcionamos uma experiência de cuidado, toalha quente e atendimento de primeira.',
+    colors: {
+      primary: '#18181b',
+      secondary: '#b45309',
+      accent: '#f59e0b',
+    },
+    services: [
+      {
+        title: 'Corte Tradicional & Degradê (Fade)',
+        shortDescription: 'Corte tesoura ou máquina com acabamento milimétrico e alinhamento na navalha descartável.',
+        icon: 'Scissors',
+        ctaText: 'Agendar Horário',
+      },
+      {
+        title: 'Barboterapia & Toalha Quente',
+        shortDescription: 'Barbear clássico com toalha quente aromatizada, óleos essenciais e massagem facial relaxante.',
+        icon: 'UserCheck',
+        ctaText: 'Agendar Barba',
+      },
+      {
+        title: 'Combo Cabelo + Barba + Sobrancelha',
+        shortDescription: 'Visual renovado completo com higienização, esfoliação leve e finalização com pomada matte.',
+        icon: 'Sparkles',
+        ctaText: 'Garantir Combo',
+      },
+      {
+        title: 'Camuflagem de Fios Brancos & Hidratação',
+        shortDescription: 'Pigmentação natural e discreta dos fios brancos da barba ou cabelo com hidratação profunda.',
+        icon: 'Heart',
+        ctaText: 'Avaliar Fios',
+      },
+    ],
+    images: {
+      hero: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=800&q=80',
+      fallbackHero: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=1200&q=80',
+    },
+    gallery: [
+      { url: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80', title: 'Bancada e Estação de Trabalho', caption: 'Poltronas de couro legítimo e ambiente climatizado' },
+      { url: 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=800&q=80', title: 'Cortes Modernos Masculinos', caption: 'Degradê impecável e texturização de topo' },
+      { url: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=800&q=80', title: 'Barboterapia Tradicional', caption: 'Toalha quente e navalhete descartável para sua segurança' },
+      { url: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=800&q=80', title: 'Produtos Premium e Pomadas', caption: 'Linha exclusiva de pós-barba, balms e pomadas modeladoras' },
+    ],
+    testimonials: [
+      { clientName: 'Rodrigo Medeiros', role: 'Cliente Frequente', content: 'Melhor barbearia da cidade. Cerveja gelada, pontualidade no horário marcado e o degradê fica perfeito.', photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80', rating: 5 },
+      { clientName: 'Felipe Santana', role: 'Cliente Semanal', content: 'A barboterapia é revigorante! Saio relaxado e alinhado para a semana de trabalho.', photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80', rating: 5 },
+    ],
+  },
+
+  {
+    id: 'clinica',
+    label: 'Clínica Médica / Consultório de Saúde',
+    category: 'Medicina & Saúde',
+    professionTitle: 'Clínica Integrada de Saúde & Diagnóstico',
+    defaultSpecialty: 'Consultas Médicas, Exames, Check-up e Telemedicina',
+    summaryTemplate: 'Cuidando do que mais importa: você. Atendimento médico humanizado, tecnologia diagnóstica avançada e agendamento online simplificado.',
+    colors: {
+      primary: '#0891b2',
+      secondary: '#0284c7',
+      accent: '#10b981',
+    },
+    suggestedCouncil: {
+      hasCouncil: true,
+      councilAcronym: 'CRM',
+      councilFullName: 'Conselho Regional de Medicina',
+      exampleNumber: 'CRM/SP 123456',
+    },
+    services: [
+      {
+        title: 'Consultas Médicas & Especialidades',
+        shortDescription: 'Atendimento clínico com médicos especialistas, escuta empática e planos terapêuticos individuais.',
+        icon: 'Heart',
+        ctaText: 'Agendar Consulta',
+      },
+      {
+        title: 'Exames Laboratoriais & Check-up',
+        shortDescription: 'Coleta rápida e confortável com resultados disponibilizados de forma digital e sigilosa.',
+        icon: 'Activity',
+        ctaText: 'Ver Exames',
+      },
+      {
+        title: 'Telemedicina em Todo o Brasil',
+        shortDescription: 'Consultas médicas por videochamada criptografada com emissão de receitas digitais e atestados.',
+        icon: 'Globe',
+        ctaText: 'Consulta Online',
+      },
+      {
+        title: 'Acompanhamento Preventivo Contínuo',
+        shortDescription: 'Programas de prevenção de doenças crônicas, hipertensão, diabetes e saúde da família.',
+        icon: 'Shield',
+        ctaText: 'Conhecer Programas',
+      },
+    ],
+    images: {
+      hero: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&w=800&q=80',
+      fallbackHero: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1200&q=80',
+    },
+    gallery: [
+      { url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80', title: 'Consultório Clínico Acolhedor', caption: 'Estrutura acessível com equipamentos modernos de diagnóstico' },
+      { url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80', title: 'Equipe Multidisciplinar', caption: 'Médicos e profissionais integrados para cuidar de você' },
+      { url: 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&w=800&q=80', title: 'Sala de Coleta e Exames', caption: 'Ambiente higienizado e confortável para todas as idades' },
+      { url: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80', title: 'Atendimento Humanizado', caption: 'Respeito, ética e atenção plena à sua saúde' },
+    ],
+    testimonials: [
+      { clientName: 'Dra. Márcia Fagundes', role: 'Paciente Check-up', content: 'Fui atendida sem atrasos, o médico foi super atencioso e os resultados dos exames saíram no mesmo dia no aplicativo.', photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80', rating: 5 },
+      { clientName: 'Carlos Eduardo Ramos', role: 'Paciente Telemedicina', content: 'A consulta online funcionou perfeitamente. Recebi minha receita digital no celular em minutos.', photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80', rating: 5 },
+    ],
+  },
+
+  {
+    id: 'imobiliaria',
+    label: 'Imobiliária / Gestão de Imóveis',
+    category: 'Mercado Imobiliário',
+    professionTitle: 'Imobiliária & Consultoria Patrimonial',
+    defaultSpecialty: 'Venda, Locação, Captação de Imóveis e Lançamentos',
+    summaryTemplate: 'O imóvel ideal para o seu novo começo. Encontre as melhores oportunidades residenciais e comerciais com assessoria jurídica completa.',
+    colors: {
+      primary: '#0f172a',
+      secondary: '#0284c7',
+      accent: '#10b981',
+    },
+    suggestedCouncil: {
+      hasCouncil: true,
+      councilAcronym: 'CRECI',
+      councilFullName: 'Conselho Regional de Corretores de Imóveis',
+      exampleNumber: 'CRECI-SP 123456-J',
+    },
+    services: [
+      {
+        title: 'Compra & Venda de Imóveis Residenciais',
+        shortDescription: 'Casas, apartamentos e coberturas selecionadas com análise minuciosa de certidões e histórico.',
+        icon: 'Home',
+        ctaText: 'Ver Imóveis',
+      },
+      {
+        title: 'Locação Sem Burocracia',
+        shortDescription: 'Contratos ágeis com garantia locatícia, vistorias detalhadas e repasse pontual ao proprietário.',
+        icon: 'Key',
+        ctaText: 'Alugar Imóvel',
+      },
+      {
+        title: 'Lançamentos & Oportunidades na Planta',
+        shortDescription: 'Investimento imobiliário de alta rentabilidade com condições facilitadas de construtoras.',
+        icon: 'TrendingUp',
+        ctaText: 'Conhecer Projetos',
+      },
+      {
+        title: 'Avaliação Mercadológica & Captação',
+        shortDescription: 'Quer vender ou alugar seu imóvel rápido? Conte com nossa curadoria de clientes qualificados.',
+        icon: 'Award',
+        ctaText: 'Cadastrar Imóvel',
+      },
+    ],
+    images: {
+      hero: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+      fallbackHero: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
+    },
+    gallery: [
+      { url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80', title: 'Casas em Condomínio Fechado', caption: 'Segurança, áreas verdes e lazer completo para sua família' },
+      { url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80', title: 'Apartamentos de Alto Padrão', caption: 'Acabamentos nobres, varanda gourmet e vista panorâmica' },
+      { url: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80', title: 'Atendimento & Sala de Negociação', caption: 'Assessoria jurídica do pré-contrato à escritura' },
+      { url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80', title: 'Oportunidades de Investimento', caption: 'Rentabilidade consistente e liquidez garantida' },
+    ],
+    testimonials: [
+      { clientName: 'Bruno Alencar', role: 'Comprador', content: 'Encontrei meu apartamento dos sonhos em 2 semanas. A assessoria na documentação bancária foi nota 10.', photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80', rating: 5 },
+      { clientName: 'Juliana Vasconcelos', role: 'Proprietária', content: 'Alugaram minha casa sem dor de cabeça e cuidam de toda a cobrança e vistoria.', photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80', rating: 5 },
+    ],
+  },
+
+  {
+    id: 'academia',
+    label: 'Academia / Centro Fitness',
+    category: 'Fitness & Treinamento Físico',
+    professionTitle: 'Centro de Treinamento & Academia Fitness',
+    defaultSpecialty: 'Musculação, Aulas Coletivas, Funcional e Personal',
+    summaryTemplate: 'Disciplina hoje. Resultados sempre. Estrutura completa de musculação, professores certificados, ambiente climatizado e planos flexíveis.',
+    colors: {
+      primary: '#09090b',
+      secondary: '#dc2626',
+      accent: '#ef4444',
+    },
+    suggestedCouncil: {
+      hasCouncil: true,
+      councilAcronym: 'CREF',
+      councilFullName: 'Conselho Regional de Educação Física',
+      exampleNumber: 'CREF 123456-G/SP',
+    },
+    services: [
+      {
+        title: 'Musculação & Equipamentos de Ponta',
+        shortDescription: 'Aparelhos ergonômicos modernos com biomecânica avançada para hipertrofia e fortalecimento seguro.',
+        icon: 'Activity',
+        ctaText: 'Matricular Agora',
+      },
+      {
+        title: 'Aulas Coletivas Dinâmicas',
+        shortDescription: 'Spinning, Cross Training, Dança, Pilates e Funcional para acelerar queima calórica com motivação.',
+        icon: 'Flame',
+        ctaText: 'Ver Grade de Aulas',
+      },
+      {
+        title: 'Acompanhamento com Personal Trainer',
+        shortDescription: 'Treinos exclusivos montados sob medida para o seu objetivo com foco total em evolução constante.',
+        icon: 'UserCheck',
+        ctaText: 'Falar com Personal',
+      },
+      {
+        title: 'Avaliação Física Bioimpedância 3D',
+        shortDescription: 'Mapeamento preciso de percentual de gordura, massa magra e assimetrias para guiar seu progresso.',
+        icon: 'Award',
+        ctaText: 'Agendar Avaliação',
+      },
+    ],
+    images: {
+      hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80',
+      fallbackHero: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1200&q=80',
+    },
+    gallery: [
+      { url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80', title: 'Área Ampla de Musculação', caption: 'Halteres, anilhas olímpicas e máquinas de alta performance' },
+      { url: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80', title: 'Sala de Aulas Coletivas & Spinning', caption: 'Sonorização imersiva e instrutores motivadores' },
+      { url: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80', title: 'Espaço Funcional & Pesos Livres', caption: 'Piso amortecedor para treinos de alta intensidade' },
+      { url: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=800&q=80', title: 'Vestiários e Armários Confortáveis', caption: 'Chuveiros aquecidos, lockers privativos e limpeza rigorosa' },
+    ],
+    testimonials: [
+      { clientName: 'Lucas Brandão', role: 'Aluno Plano Black', content: 'Treino aqui há 1 ano e os resultados foram visíveis. Os professores sempre ajudam na postura.', photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80', rating: 5 },
+      { clientName: 'Priscila Fontes', role: 'Aluna de Aulas Coletivas', content: 'As aulas de spinning e funcional são viciantes! Ambiente acolhedor sem julgamentos.', photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80', rating: 5 },
+    ],
+  },
+
+  {
+    id: 'petshop',
+    label: 'Pet Shop / Banho, Tosa & Veterinária',
+    category: 'Cuidados Animais & Veterinária',
+    professionTitle: 'Centro de Estética Canina & Pet Shop',
+    defaultSpecialty: 'Banho & Tosa, Táxi Dog, Hidratação e Acessórios',
+    summaryTemplate: 'Amor, cuidado e carinho para o seu melhor amigo. Banho relaxante com água morna, tosas especializadas da raça e serviço de leva-e-traz com total segurança.',
+    colors: {
+      primary: '#0d9488',
+      secondary: '#ea580c',
+      accent: '#f59e0b',
+    },
+    services: [
+      {
+        title: 'Banho Relaxante com Água Morna & Ozônio',
+        shortDescription: 'Shampoos dermatológicos hipoalergênicos, toalhas higienizadas individuais e secagem cuidadosa.',
+        icon: 'Sparkles',
+        ctaText: 'Agendar Banho',
+      },
+      {
+        title: 'Tosa Higiênica & Tosa da Raça',
+        shortDescription: 'Corte preciso na tesoura ou máquina respeitando o padrão da raça e o conforto do pet.',
+        icon: 'Scissors',
+        ctaText: 'Agendar Tosa',
+      },
+      {
+        title: 'Táxi Dog (Leva e Traz Seguro)',
+        shortDescription: 'Buscamos e levamos seu pet na sua residência em veículo climatizado com caixas de transporte higienizadas.',
+        icon: 'Package',
+        ctaText: 'Solicitar Táxi Dog',
+      },
+      {
+        title: 'Consulta Veterinária & Vacinas',
+        shortDescription: 'Check-up clínico veterinário preventivo, vermifugação e aplicação de vacinas éticas importadas.',
+        icon: 'Heart',
+        ctaText: 'Consulta Pet',
+      },
+    ],
+    images: {
+      hero: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=80',
+      about: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1000&q=80',
+      practicePattern: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80',
+      fallbackHero: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=80',
+    },
+    gallery: [
+      { url: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80', title: 'Área Envidraçada de Banho & Tosa', caption: 'Acompanhe todo o atendimento do seu pet com transparência' },
+      { url: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80', title: 'Cuidado Acolhedor e Sem Gaiolas', caption: 'Manejo livre de estresse com muito carinho e petiscos' },
+      { url: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80', title: 'Tosa na Tesoura Especializada', caption: 'Acabamento fofinho e pelo hidratado com cheirinho delicioso' },
+      { url: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80', title: 'Boutique Pet & Farmácia', caption: 'Rações super premium, brinquedos educativos e medicamentos' },
+    ],
+    testimonials: [
+      { clientName: 'Fernanda Guimarães', role: 'Tutora do Thor (Golden)', content: 'Meu cachorro ama vir aqui! Ele volta cheiroso, calmo e a tosa na tesoura é impecável.', photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80', rating: 5 },
+      { clientName: 'Marcelo Neves', role: 'Tutor da Luna (Shih Tzu)', content: 'O serviço de leva e traz é muito pontual e salva meu dia a dia. Super recomendo a todos.', photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80', rating: 5 },
+    ],
+  },
+
+  // ==========================================
   // 1. BELEZA & CUIDADOS PESSOAIS
   // ==========================================
   {

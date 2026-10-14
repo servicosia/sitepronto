@@ -137,6 +137,13 @@ export const BRAZILIAN_COUNCILS: CouncilDefinition[] = [
     category: 'Administração & Gestão',
     keywords: ['administrador', 'consultor administrativo', 'gestao empresarial', 'cra'],
     exampleFormat: 'CRA-SP 123456',
+  },
+  {
+    acronym: 'CRMV',
+    fullName: 'Conselho Regional de Medicina Veterinária',
+    category: 'Medicina Veterinária & Cuidados Animais',
+    keywords: ['veterinari', 'vet', 'medico veterinario', 'clinica veterinaria', 'crmv'],
+    exampleFormat: 'CRMV-SP 12345',
   }
 ];
 
