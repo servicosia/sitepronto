@@ -85,7 +85,7 @@ export function validateSameOrigin(req: NextRequest): boolean {
       if (originHost === hostWithoutPort || originHost === 'localhost' || originHost === '127.0.0.1') {
         return true;
       }
-      if (originHost.endsWith('.shardweb.app') || originHost.endsWith('.sitepronto.com.br')) {
+      if (originHost.endsWith('.shardweb.app') || originHost.endsWith('.sitepronto.com.br') || originHost.endsWith('.servicos.ia.br') || originHost === 'servicos.ia.br') {
         return true;
       }
       return false;
@@ -100,7 +100,7 @@ export function validateSameOrigin(req: NextRequest): boolean {
       if (refererHost === hostWithoutPort || refererHost === 'localhost' || refererHost === '127.0.0.1') {
         return true;
       }
-      if (refererHost.endsWith('.shardweb.app') || refererHost.endsWith('.sitepronto.com.br')) {
+      if (refererHost.endsWith('.shardweb.app') || refererHost.endsWith('.sitepronto.com.br') || refererHost.endsWith('.servicos.ia.br') || refererHost === 'servicos.ia.br') {
         return true;
       }
       return false;

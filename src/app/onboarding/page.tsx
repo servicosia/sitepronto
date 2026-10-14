@@ -54,6 +54,15 @@ export default function OnboardingPage() {
   );
 }
 
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (!digits) return '';
+  if (digits.length <= 2) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+}
+
 function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -610,6 +619,13 @@ function OnboardingContent() {
   }
 
   async function handleFinalizeAndProvision() {
+    const digits = (formData.whatsapp || '').replace(/\D/g, '');
+    if (digits.length < 10) {
+      alert('WhatsApp comercial válido com DDD (mínimo 10 dígitos) é obrigatório para agendamentos e atendimento. Por favor, preencha o WhatsApp na Etapa 1.');
+      setCurrentStep(1);
+      return;
+    }
+
     if (!accountEmail || !accountPassword) {
       alert('Por favor, informe seu e-mail e crie uma senha para acessar o painel administrativo do seu site.');
       return;
@@ -621,6 +637,36 @@ function OnboardingContent() {
     }
 
     setProvisioning(true);
+
+    const finalPublicEmail = (formData.publicEmail && formData.publicEmail.includes('@'))
+      ? formData.publicEmail.trim().toLowerCase()
+      : accountEmail.trim().toLowerCase();
+
+    const updatedData: OnboardingData = {
+      ...(formData as OnboardingData),
+      publicEmail: finalPublicEmail,
+      city: formData.city?.trim() || 'São Paulo',
+      state: formData.state?.trim() || 'SP',
+      whatsapp: formData.whatsapp?.trim() || '',
+    };
+
+    setFormData(updatedData);
+
+    // Salva explicitamente no banco antes de disparar o provisionamento
+    try {
+      await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          voucherCode,
+          step: currentStep,
+          data: updatedData,
+          selectedDesign: selectedModel,
+        }),
+      });
+    } catch (saveErr) {
+      console.warn('[Onboarding] Erro ao sincronizar dados antes de provisionar:', saveErr);
+    }
 
     try {
       const res = await fetch('/api/provisioning/start', {
@@ -753,7 +799,7 @@ function OnboardingContent() {
                     type="text"
                     value={formData.fullName || ''}
                     onChange={(e) => handleInputChange('fullName', e.target.value)}
-                    placeholder="Ex: Dra. Maria Silva"
+                    placeholder="Ex: Dra. Maria Silva ou Carlos Barbeiro"
                     className="mt-1 block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-none"
                   />
                 </div>
@@ -764,9 +810,54 @@ function OnboardingContent() {
                     type="text"
                     value={formData.professionalName || ''}
                     onChange={(e) => handleInputChange('professionalName', e.target.value)}
-                    placeholder="Ex: Dra. Maria Silva Fisioterapia"
+                    placeholder="Ex: Barbearia Dom Silva ou Dra. Maria Fisioterapia"
                     className="mt-1 block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-none"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Phone className="w-4 h-4 text-emerald-600" />
+                      WhatsApp Comercial (com DDD) *
+                    </span>
+                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      Obrigatório
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.whatsapp || ''}
+                    onChange={(e) => {
+                      const formatted = formatPhone(e.target.value);
+                      handleInputChange('whatsapp', formatted);
+                    }}
+                    placeholder="Ex: (11) 99999-8888"
+                    className="mt-1 block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-600 focus:outline-none font-medium text-slate-900"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Central de agendamentos, clientes e atendimento do seu CRM e site.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Mail className="w-4 h-4 text-slate-600" />
+                      E-mail de Contato Comercial
+                    </span>
+                    <span className="text-[10px] text-slate-400">Público no site</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.publicEmail || ''}
+                    onChange={(e) => handleInputChange('publicEmail', e.target.value)}
+                    placeholder="contato@seunegocio.com.br"
+                    className="mt-1 block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-none"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Exibido para seus clientes no rodapé e canais de contato.
+                  </p>
                 </div>
 
                 {/* Caixa de seleção de Profissão & Modelo Pronto */}
@@ -841,11 +932,29 @@ function OnboardingContent() {
                   </div>
 
                   {selectedPresetId && selectedPresetId !== 'outra' && (
-                    <div className="flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3.5 py-2.5 rounded-xl">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>
-                        <strong>Modelo aplicado com sucesso!</strong> Cores personalizadas ({formData.primaryColor}), 4 serviços do seu ramo, galeria e depoimentos reais foram carregados no seu projeto.
-                      </span>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3.5 py-2.5 rounded-xl">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>
+                          <strong>Modelo aplicado com sucesso!</strong> Cores personalizadas ({formData.primaryColor}), 4 serviços do seu ramo, galeria e depoimentos reais foram carregados no seu projeto.
+                        </span>
+                      </div>
+
+                      {['barbearia', 'clinica', 'imobiliaria', 'academia', 'petshop'].includes(selectedPresetId) && (
+                        <div className="flex items-start gap-2.5 text-xs text-blue-900 bg-blue-50/90 border border-blue-200 px-3.5 py-2.5 rounded-xl">
+                          <MessageSquare className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold">Módulo CRM & Agendamento Integrado:</span>
+                            <span className="block text-blue-800 mt-0.5">
+                              {formData.whatsapp ? (
+                                <>Os agendamentos dos seus clientes serão recebidos e geridos diretamente pelo WhatsApp: <strong>{formData.whatsapp}</strong>.</>
+                              ) : (
+                                <>Preencha o campo <strong>WhatsApp Comercial (com DDD)</strong> acima para vincular os agendamentos automáticos à sua conta.</>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1450,9 +1559,12 @@ function OnboardingContent() {
                     <input
                       type="text"
                       value={formData.whatsapp || ''}
-                      onChange={(e) => handleInputChange('whatsapp', e.target.value)}
+                      onChange={(e) => {
+                        const formatted = formatPhone(e.target.value);
+                        handleInputChange('whatsapp', formatted);
+                      }}
                       placeholder="Ex: (11) 99999-8888"
-                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm"
+                      className="block w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-900 text-sm font-medium"
                     />
                     <p className="text-[11px] text-slate-500 mt-1">
                       Os botões de agendamento em todo o site direcionarão os clientes para este WhatsApp.
@@ -1521,7 +1633,7 @@ function OnboardingContent() {
                       </p>
                     </div>
                     <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs font-mono text-slate-700">
-                      https://{formData.professionalName ? formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'seusite'}.sitepronto.com.br
+                      https://{formData.professionalName ? formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'seusite'}.servicos.ia.br
                     </div>
                   </div>
 
@@ -2078,6 +2190,21 @@ function OnboardingContent() {
               <button
                 type="button"
                 onClick={() => {
+                  if (currentStep === 1) {
+                    if (!formData.fullName || formData.fullName.trim().length < 3) {
+                      alert('Por favor, informe seu Nome Completo (mínimo 3 caracteres).');
+                      return;
+                    }
+                    if (!formData.professionalName || formData.professionalName.trim().length < 2) {
+                      alert('Por favor, informe seu Nome Profissional ou Comercial.');
+                      return;
+                    }
+                    const digits = (formData.whatsapp || '').replace(/\D/g, '');
+                    if (digits.length < 10) {
+                      alert('Por favor, informe um WhatsApp comercial válido com DDD (mínimo 10 dígitos) para agendamentos e atendimento.');
+                      return;
+                    }
+                  }
                   if (
                     currentStep === 4 &&
                     Boolean(formData.hasCustomDomain) &&

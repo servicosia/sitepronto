@@ -47,7 +47,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Sessão de onboarding não encontrada.' }, { status: 400 });
     }
 
-    const parseResult = OnboardingDataSchema.safeParse(session.data);
+    const rawData = (session.data || {}) as Record<string, any>;
+    const sessionData = {
+      ...rawData,
+      publicEmail: rawData.publicEmail?.trim() || clientEmail.trim().toLowerCase(),
+      city: rawData.city?.trim() || 'São Paulo',
+      state: rawData.state?.trim() || 'SP',
+    };
+
+    const parseResult = OnboardingDataSchema.safeParse(sessionData);
     if (!parseResult.success) {
       const errorMsg = parseResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(' | ');
       return NextResponse.json({ error: `Dados do onboarding incompletos ou inválidos: ${errorMsg}` }, { status: 400 });

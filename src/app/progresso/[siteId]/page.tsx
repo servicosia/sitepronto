@@ -288,7 +288,7 @@ export default function ProgressoPage() {
 
               <div className="pt-4 border-t border-emerald-200/60 flex flex-col sm:flex-row gap-3">
                 <a
-                  href={siteData.vercelUrl || `https://${siteData.slug}.vercel.app`}
+                  href={siteData.vercelUrl || `https://${siteData.slug}.servicos.ia.br`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-slate-900 text-white font-bold text-sm rounded-xl hover:bg-slate-800 shadow-md"
@@ -299,7 +299,7 @@ export default function ProgressoPage() {
                 </a>
 
                 <a
-                  href={`${siteData.vercelUrl || `https://${siteData.slug}.vercel.app`}/master`}
+                  href={`${siteData.vercelUrl || `https://${siteData.slug}.servicos.ia.br`}/master`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-emerald-700 text-white font-bold text-sm rounded-xl hover:bg-emerald-800 shadow-md"

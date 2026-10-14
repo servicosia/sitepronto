@@ -167,14 +167,24 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
         },
       ],
     });
+    const defaultSubdomain = `${slug}.servicos.ia.br`;
+    let primaryUrl = `https://${defaultSubdomain}`;
+
+    try {
+      await vercel.addDomainToProject(vercelProject.name, defaultSubdomain);
+    } catch (eSub) {
+      console.warn(`[Pipeline] Aviso ao vincular subdomínio ${defaultSubdomain} na Vercel:`, eSub);
+      primaryUrl = vercelProject.url;
+    }
+
     await prisma.site.update({
       where: { id: siteId },
       data: {
         vercelProjectId: vercelProject.id,
-        vercelUrl: vercelProject.url,
+        vercelUrl: primaryUrl,
       },
     });
-    await recordStep(siteId, 'CREATING_VERCEL', 'SUCCESS', { vercelUrl: vercelProject.url });
+    await recordStep(siteId, 'CREATING_VERCEL', 'SUCCESS', { vercelUrl: primaryUrl });
 
     // ETAPA 6: CONFIGURAÇÃO DE DOMÍNIO .BR (Vercel + Cloudflare DNS)
     if (params.data.hasCustomDomain && params.data.customDomainName) {

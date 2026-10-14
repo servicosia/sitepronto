@@ -1,8 +1,23 @@
 import os
+import shutil
 import zipfile
+
+def sync_bundle(base_dir):
+    next_dir = os.path.join(base_dir, ".next")
+    bundle_dir = os.path.join(base_dir, "next_bundle")
+    
+    if os.path.exists(bundle_dir):
+        shutil.rmtree(bundle_dir)
+        
+    def ignore_cache(path, names):
+        return ["cache"] if "cache" in names else []
+        
+    shutil.copytree(next_dir, bundle_dir, ignore=ignore_cache)
+    print("next_bundle sincronizado com .next com sucesso!")
 
 def create_zip():
     base_dir = r"d:\APPS\SitePronto"
+    sync_bundle(base_dir)
     zip_path = os.path.join(base_dir, "deploy.zip")
     
     if os.path.exists(zip_path):
@@ -22,7 +37,7 @@ def create_zip():
     include_dirs = [
         "prisma",
         "src",
-        ".next",
+        "next_bundle",
         "data",
     ]
 
