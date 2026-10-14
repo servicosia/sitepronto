@@ -8,7 +8,7 @@ import { isAuthorizedAdmin, validateSameOrigin } from '@/lib/security/auth';
 // Excluir Projeto/Site da Plataforma, Vercel, Neon e Cloudflare
 export async function DELETE(req: NextRequest) {
   try {
-    if (!isAuthorizedAdmin(req) || !validateSameOrigin(req)) {
+    if (!(await isAuthorizedAdmin(req)) || !validateSameOrigin(req)) {
       return NextResponse.json({ error: 'Não autorizado para executar esta ação.' }, { status: 401 });
     }
 

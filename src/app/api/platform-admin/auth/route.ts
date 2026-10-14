@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeCompare } from '@/lib/security/crypto';
-import { getAdminPassword, generateAdminSessionToken } from '@/lib/security/auth';
+import { getAdminPassword, createAdminSession, revokeAdminSession } from '@/lib/security/auth';
 import { checkRateLimit } from '@/lib/rate-limit/limiter';
 import { prisma } from '@/lib/db/client';
 import { sendSecurityAlertEmail } from '@/lib/email/service';
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Sucesso na autenticação
-    const authCookieToken = generateAdminSessionToken();
+    const { token: authCookieToken, expiresAt } = await createAdminSession(req);
 
     await prisma.auditEvent.create({
       data: {
@@ -109,7 +109,8 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 dias
+      expires: expiresAt,
+      maxAge: 60 * 60 * 24,
     });
 
     return res;
@@ -120,6 +121,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  await revokeAdminSession(req);
   const res = NextResponse.json({ success: true, message: 'Desconectado.' });
   res.cookies.delete('platform_admin_session');
   return res;

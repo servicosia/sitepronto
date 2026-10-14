@@ -282,3 +282,19 @@ model PlatformSecurity {
   @@map("platform_security")
 }
 
+// Sessões do painel master são separadas das sessões de clientes: o painel
+// utiliza uma senha global, mas cada login recebe um token aleatório revogável.
+model AdminSession {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime  @default(now())
+
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@map("admin_sessions")
+}
+

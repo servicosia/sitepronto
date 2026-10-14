@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
         siteType: cleanSiteType,
         message: cleanMessage,
         requestId: voucherRequest.id,
+        requestCreatedAt: voucherRequest.createdAt,
       });
 
       if (!emailResult.success) {

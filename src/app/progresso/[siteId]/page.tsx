@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { 
   CheckCircle2, 
   Loader2, 
@@ -25,6 +25,7 @@ interface StepInfo {
 export default function ProgressoPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const siteId = params.siteId as string;
 
   const [siteData, setSiteData] = useState<any>(null);
@@ -87,7 +88,12 @@ export default function ProgressoPage() {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/provisioning/status?siteId=${encodeURIComponent(siteId)}`);
+        const token = searchParams.get('token');
+        if (!token) {
+          setError('Link de acompanhamento inválido ou expirado.');
+          return;
+        }
+        const res = await fetch(`/api/provisioning/status?siteId=${encodeURIComponent(siteId)}&token=${encodeURIComponent(token)}`);
         const data = await res.json();
         if (res.ok) {
           setSiteData(data);
@@ -103,7 +109,7 @@ export default function ProgressoPage() {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [siteId]);
+  }, [siteId, searchParams]);
 
   const pipelineSteps = [
     { key: 'VALIDATING', label: 'Verificação inicial das informações' },
@@ -288,7 +294,7 @@ export default function ProgressoPage() {
 
               <div className="pt-4 border-t border-emerald-200/60 flex flex-col sm:flex-row gap-3">
                 <a
-                  href={siteData.vercelUrl || `https://${siteData.slug}.servicos.ia.br`}
+                  href={siteData.vercelUrl || (siteData.customDomain ? `https://${siteData.customDomain}` : `https://${siteData.slug}.servicos.ia.br`)}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-slate-900 text-white font-bold text-sm rounded-xl hover:bg-slate-800 shadow-md"
@@ -299,7 +305,7 @@ export default function ProgressoPage() {
                 </a>
 
                 <a
-                  href={`${siteData.vercelUrl || `https://${siteData.slug}.servicos.ia.br`}/master`}
+                  href={`${siteData.vercelUrl || (siteData.customDomain ? `https://${siteData.customDomain}` : `https://${siteData.slug}.servicos.ia.br`)}/master`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-emerald-700 text-white font-bold text-sm rounded-xl hover:bg-emerald-800 shadow-md"

@@ -65,12 +65,9 @@ export class VercelProvider implements DeploymentProvider {
         projectId = data.id;
       } else if (res.status === 401 || res.status === 403) {
         const errData = await res.json().catch(() => ({}));
-        console.warn(`[VercelProvider] Autenticação Vercel (HTTP ${res.status}): ${errData.error?.message || 'Token expirado'}. Usando contingência.`);
-        return {
-          id: projectId,
-          name: projectName,
-          url: `https://${projectName}.servicos.ia.br`,
-        };
+        const msg = `Token da Vercel (VERCEL_TOKEN) inválido ou sem permissão (HTTP ${res.status}): ${errData.error?.message || 'invalidToken'}. É necessário configurar um token válido no arquivo .env`;
+        console.error(`[VercelProvider] ${msg}`);
+        throw new Error(msg);
       } else {
         // Se já existir (ex: 409), tenta patch para garantir configuração
         const patchRes = await fetch(`https://api.vercel.com/v9/projects/${projectName}${teamQuery}`, {
@@ -145,18 +142,20 @@ export class VercelProvider implements DeploymentProvider {
       });
 
       if (deployRes.status === 401 || deployRes.status === 403) {
-        console.warn(`[VercelProvider] Deploy Vercel (HTTP ${deployRes.status}): usando fallback.`);
-        return { url: `https://${options.projectName}.servicos.ia.br`, ready: true };
+        const errData = await deployRes.json().catch(() => ({}));
+        const msg = `Falha de autenticação ao fazer deploy na Vercel (HTTP ${deployRes.status}): ${errData.error?.message || 'invalidToken'}.`;
+        console.error(`[VercelProvider] ${msg}`);
+        throw new Error(msg);
       }
 
       const deployData = await deployRes.json().catch(() => ({}));
       return {
-        url: `https://${options.projectName}.servicos.ia.br`,
+        url: `https://${options.projectName}.vercel.app`,
         ready: deployData.readyState === 'READY' || deployRes.status === 200,
       };
     } catch (err: any) {
       console.error('[VercelProvider] Erro ao criar deploy:', err.message);
-      return { url: `https://${options.projectName}.servicos.ia.br`, ready: true };
+      throw err;
     }
   }
 
@@ -185,9 +184,10 @@ export class VercelProvider implements DeploymentProvider {
       });
 
       if (res.status === 401 || res.status === 403) {
+        console.warn(`[VercelProvider] Aviso: VERCEL_TOKEN não autorizado para vincular domínio ${rawDomain} (HTTP ${res.status}).`);
         return {
           name: rawDomain,
-          verified: true,
+          verified: false,
           aRecords: ['76.76.21.21'],
           cnames: ['cname.vercel-dns.com'],
         };

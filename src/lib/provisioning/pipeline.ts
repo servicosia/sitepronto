@@ -167,7 +167,13 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
         },
       ],
     });
-    const requestedSubdomain = (params.data.subdomain?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '') || slug);
+    const fallbackSubdomain = (params.data.professionalName || params.data.companyName || params.data.fullName || 'site')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]/g, '')
+      .slice(0, 30);
+    const requestedSubdomain = (params.data.subdomain?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-|-$/g, '') || fallbackSubdomain || 'site');
     const defaultSubdomain = `${requestedSubdomain}.servicos.ia.br`;
     let primaryUrl = `https://${defaultSubdomain}`;
 

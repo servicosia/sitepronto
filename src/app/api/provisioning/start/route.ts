@@ -48,8 +48,18 @@ export async function POST(req: NextRequest) {
     }
 
     const rawData = (session.data || {}) as Record<string, any>;
+
+    const defaultSub = (rawData.subdomain || rawData.professionalName || rawData.companyName || rawData.fullName || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]/g, '')
+      .slice(0, 30);
+    const resolvedSubdomain = (rawData.subdomain || defaultSub).trim().toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-|-$/g, '');
+
     const sessionData = {
       ...rawData,
+      subdomain: resolvedSubdomain,
       publicEmail: rawData.publicEmail?.trim() || clientEmail.trim().toLowerCase(),
       city: rawData.city?.trim() || 'São Paulo',
       state: rawData.state?.trim() || 'SP',
@@ -94,6 +104,7 @@ export async function POST(req: NextRequest) {
       siteId: site.id,
       jobId: job.id,
       slug: site.slug,
+      statusToken: job.correlationId,
     });
   } catch (error: any) {
     console.error('Provisioning route error:', error);

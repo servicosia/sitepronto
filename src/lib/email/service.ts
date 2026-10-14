@@ -56,13 +56,19 @@ export async function sendAdminVoucherRequestAlert(request: {
   siteType: string;
   message?: string | null;
   requestId?: string;
+  requestCreatedAt?: Date;
 }) {
   const adminEmail = 'alemaia@alemaia.com.br';
   const appUrl = (process.env.APP_URL || 'https://sitepronto.shardweb.app').replace(/\/$/, '');
   const adminPanelUrl = `${appUrl}/platform-admin`;
 
   // Gera link seguro de aprovação direta em 1 clique
-  const approveToken = request.requestId ? generateVoucherApprovalToken(request.requestId, request.email) : '';
+  const approvalExpiresAt = request.requestCreatedAt
+    ? new Date(request.requestCreatedAt.getTime() + 7 * 24 * 60 * 60 * 1000)
+    : null;
+  const approveToken = request.requestId && approvalExpiresAt
+    ? generateVoucherApprovalToken(request.requestId, request.email, approvalExpiresAt)
+    : '';
   const approveUrl = request.requestId
     ? `${appUrl}/api/vouchers/quick-approve?id=${encodeURIComponent(request.requestId)}&token=${encodeURIComponent(approveToken)}`
     : adminPanelUrl;

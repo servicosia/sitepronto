@@ -8,7 +8,7 @@ import { isAuthorizedAdmin, validateSameOrigin } from '@/lib/security/auth';
 
 export async function POST(req: NextRequest) {
   try {
-    if (!isAuthorizedAdmin(req) || !validateSameOrigin(req)) {
+    if (!(await isAuthorizedAdmin(req)) || !validateSameOrigin(req)) {
       return NextResponse.json({ error: 'Não autorizado para executar esta ação.' }, { status: 401 });
     }
 

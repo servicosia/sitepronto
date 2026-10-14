@@ -310,6 +310,7 @@ function OnboardingContent() {
     themePreference: 'claro',
     hasCustomDomain: false,
     registerDomainOnCompletion: false,
+    subdomain: '',
   });
 
   // Carrega dados salvos
@@ -673,8 +674,17 @@ function OnboardingContent() {
       ? formData.publicEmail.trim().toLowerCase()
       : accountEmail.trim().toLowerCase();
 
+    const defaultSub = (formData.subdomain || formData.professionalName || formData.companyName || formData.fullName || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]/g, '')
+      .slice(0, 30);
+    const finalSubdomain = (formData.subdomain || defaultSub).trim().toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-|-$/g, '');
+
     const updatedData: OnboardingData = {
       ...(formData as OnboardingData),
+      subdomain: finalSubdomain,
       publicEmail: finalPublicEmail,
       city: formData.city?.trim() || 'São Paulo',
       state: formData.state?.trim() || 'SP',
@@ -735,8 +745,11 @@ function OnboardingContent() {
       }
 
       // Redireciona para tela de progresso em tempo real
-      const regParam = (formData.hasCustomDomain && formData.registerDomainOnCompletion && formData.customDomainName) ? '?registerDomain=1' : '';
-      router.push(`/progresso/${result.siteId}${regParam}`);
+      const progressParams = new URLSearchParams({ token: result.statusToken });
+      if (formData.hasCustomDomain && formData.registerDomainOnCompletion && formData.customDomainName) {
+        progressParams.set('registerDomain', '1');
+      }
+      router.push(`/progresso/${result.siteId}?${progressParams.toString()}`);
     } catch (err) {
       alert('Falha ao conectar com o servidor.');
       setProvisioning(false);
@@ -1639,6 +1652,15 @@ function OnboardingContent() {
                       handleInputChange('hasCustomDomain', false);
                       handleInputChange('registerDomainOnCompletion', false);
                       handleInputChange('customDomainName', '');
+                      const defSub = (formData.subdomain || formData.professionalName || formData.companyName || formData.fullName || '')
+                        .toLowerCase()
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/[^a-z0-9]/g, '')
+                        .slice(0, 30);
+                      if (!formData.subdomain && defSub) {
+                        handleInputChange('subdomain', defSub);
+                      }
                       setDomainCheckResult(null);
                       setDomainVerified(true);
                       try {
@@ -2336,8 +2358,13 @@ function OnboardingContent() {
                         return;
                       }
                     } else {
-                      const defaultSub = formData.professionalName ? formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
-                      const rawSub = (formData.subdomain || defaultSub).trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+                      const defaultSub = (formData.professionalName || formData.companyName || formData.fullName || '')
+                        .toLowerCase()
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/[^a-z0-9]/g, '')
+                        .slice(0, 30);
+                      const rawSub = (formData.subdomain || defaultSub).trim().toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-|-$/g, '');
                       if (!rawSub || rawSub.length < 3) {
                         alert('Por favor, informe um subdomínio válido com pelo menos 3 caracteres.');
                         return;
@@ -2346,6 +2373,7 @@ function OnboardingContent() {
                         alert(`O subdomínio '${subdomainCheckResult.subdomain}' não está disponível: ${subdomainCheckResult.message}`);
                         return;
                       }
+                      handleInputChange('subdomain', rawSub);
                     }
                   }
                   setCurrentStep(currentStep + 1);

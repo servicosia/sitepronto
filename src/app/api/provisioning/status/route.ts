@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { checkRateLimit } from '@/lib/rate-limit/limiter';
+import { isAuthorizedAdmin } from '@/lib/security/auth';
+import { timingSafeCompare } from '@/lib/security/crypto';
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,6 +17,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const siteId = searchParams.get('siteId');
+    const accessToken = searchParams.get('token');
 
     if (!siteId || typeof siteId !== 'string' || siteId.trim().length < 5) {
       return NextResponse.json({ error: 'siteId inválido' }, { status: 400 });
@@ -39,20 +42,26 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Site não encontrado' }, { status: 404 });
     }
 
+    const isAdmin = await isAuthorizedAdmin(req);
+    const latestJob = site.jobs[0];
+    if (!isAdmin && (!accessToken || !latestJob || !timingSafeCompare(accessToken, latestJob.correlationId))) {
+      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
+    }
+
     return NextResponse.json({
       id: site.id,
       name: site.name,
       slug: site.slug,
       status: site.status,
-      githubRepoUrl: site.githubRepoUrl,
+      githubRepoUrl: isAdmin ? site.githubRepoUrl : undefined,
       vercelUrl: site.vercelUrl,
       customDomain: site.customDomain,
       domainStatus: site.domainStatus,
-      lastError: site.lastError,
+      lastError: isAdmin ? site.lastError : undefined,
       steps: site.steps.map((s) => ({
         step: s.step,
         status: s.status,
-        details: s.details,
+        details: isAdmin ? s.details : undefined,
         completedAt: s.completedAt,
       })),
       completed: site.status === 'COMPLETED',

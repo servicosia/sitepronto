@@ -7,7 +7,7 @@ import { persistVoucherRequestSnapshot } from '@/lib/db/consistency';
 
 export async function GET(req: NextRequest) {
   try {
-    if (!isAuthorizedAdmin(req)) {
+    if (!(await isAuthorizedAdmin(req))) {
       return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
     }
 
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    if (!isAuthorizedAdmin(req) || !validateSameOrigin(req)) {
+    if (!(await isAuthorizedAdmin(req)) || !validateSameOrigin(req)) {
       return NextResponse.json({ error: 'Não autorizado ou requisição inválida.' }, { status: 401 });
     }
 

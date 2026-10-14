@@ -3,16 +3,32 @@ import { prisma } from '@/lib/db/client';
 import { createVoucher } from '@/lib/vouchers/service';
 import { sendClientVoucherEmail } from '@/lib/email/service';
 import { verifyVoucherApprovalToken } from '@/lib/security/auth';
+import { escapeHtml } from '@/lib/security/crypto';
 
 export const dynamic = 'force-dynamic';
 
+// O link de e-mail apenas exibe uma confirmação. Aprovar por GET permite que
+// scanners de e-mail e pré-visualizadores executem uma ação irreversível.
 export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-    const token = searchParams.get('token');
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+  const token = searchParams.get('token');
+  if (!id || !token) {
+    return renderHtmlResponse({ success: false, title: 'Parâmetros Inválidos', message: 'O link de aprovação está incompleto ou inválido.' }, 400);
+  }
 
-    if (!id || !token) {
+  return new NextResponse(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Confirmar aprovação</title></head><body><main><h1>Confirmar aprovação de voucher</h1><p>Revise a solicitação no painel se necessário. Esta ação cria o voucher e envia o e-mail ao cliente.</p><form method="post"><input type="hidden" name="id" value="${escapeHtml(id)}"><input type="hidden" name="token" value="${escapeHtml(token)}"><button type="submit">Aprovar e enviar voucher</button></form></main></body></html>`, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+  });
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const formData = await req.formData();
+    const id = formData.get('id');
+    const token = formData.get('token');
+
+    if (typeof id !== 'string' || typeof token !== 'string' || !id || !token) {
       return renderHtmlResponse({
         success: false,
         title: 'Parâmetros Inválidos',
@@ -33,7 +49,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Valida assinatura de segurança resistente a falsificação
-    const isValidToken = verifyVoucherApprovalToken(request.id, request.email, token);
+    const isValidToken = verifyVoucherApprovalToken(request.id, request.email, request.createdAt, token);
     if (!isValidToken) {
       return renderHtmlResponse({
         success: false,
@@ -133,13 +149,19 @@ function renderHtmlResponse(params: {
 }, status = 200) {
   const appUrl = (process.env.APP_URL || 'https://sitepronto.shardweb.app').replace(/\/$/, '');
   const adminUrl = `${appUrl}/platform-admin`;
+  const title = escapeHtml(params.title);
+  const message = escapeHtml(params.message);
+  const voucherCode = escapeHtml(params.voucherCode);
+  const clientName = escapeHtml(params.clientName);
+  const clientEmail = escapeHtml(params.clientEmail);
+  const siteType = escapeHtml(params.siteType);
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${params.title} — SitePronto</title>
+  <title>${title} — SitePronto</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -272,13 +294,13 @@ function renderHtmlResponse(params: {
     <div class="icon-badge">
       ${params.success ? '✅' : '⚠️'}
     </div>
-    <h1>${params.title}</h1>
-    <p>${params.message}</p>
+    <h1>${title}</h1>
+    <p>${message}</p>
 
     ${params.voucherCode ? `
       <div class="voucher-box">
         <div class="voucher-label">Código Gerado e Enviado</div>
-        <div class="voucher-code">${params.voucherCode}</div>
+        <div class="voucher-code">${voucherCode}</div>
       </div>
     ` : ''}
 
@@ -286,16 +308,16 @@ function renderHtmlResponse(params: {
       <div class="details">
         <div class="details-row">
           <span class="details-label">Cliente:</span>
-          <span class="details-val">${params.clientName}</span>
+          <span class="details-val">${clientName}</span>
         </div>
         <div class="details-row">
           <span class="details-label">E-mail:</span>
-          <span class="details-val">${params.clientEmail}</span>
+          <span class="details-val">${clientEmail}</span>
         </div>
         ${params.siteType ? `
         <div class="details-row">
           <span class="details-label">Ramo / Nicho:</span>
-          <span class="details-val">${params.siteType}</span>
+          <span class="details-val">${siteType}</span>
         </div>
         ` : ''}
         <div class="details-row">

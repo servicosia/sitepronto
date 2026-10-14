@@ -4,9 +4,13 @@ import { VercelProvider } from '@/lib/providers/deployment/vercel';
 import { NeonProvider } from '@/lib/providers/database/neon';
 import { CloudflareProvider } from '@/lib/providers/domains/cloudflare';
 import { checkRateLimit } from '@/lib/rate-limit/limiter';
+import { isAuthorizedAdmin, validateSameOrigin } from '@/lib/security/auth';
 
 export async function POST(req: NextRequest) {
   try {
+    if (!(await isAuthorizedAdmin(req)) || !validateSameOrigin(req)) {
+      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
+    }
     const body = await req.json();
     const { siteId, newDomain } = body;
 
