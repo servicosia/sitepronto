@@ -17,7 +17,7 @@ import { PRESET_PROFESSIONS } from '@/lib/design-system/profession-presets';
 
 export default function DemoPage() {
   const [viewMode, setViewMode] = useState<'site' | 'admin'>('site');
-  const [nicho, setNicho] = useState<string>('odonto');
+  const [nicho, setNicho] = useState<string>('barbearia');
   const [model, setModel] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
   const [key, setKey] = useState(0);
@@ -95,12 +95,21 @@ export default function DemoPage() {
               onChange={(e) => { setNicho(e.target.value); refreshIframe(); }}
               className="bg-slate-900 text-slate-100 font-semibold rounded-lg px-2.5 py-1 text-xs border border-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer max-w-[220px] sm:max-w-[280px]"
             >
-              <option value="odonto">Odontologia (Clínica Sorriso Real)</option>
-              <option value="oficina">Auto Mecânica (Júnior Auto Center)</option>
-              <option value="boutique">Moda & Ateliê (Bella Donna)</option>
-              {Array.from(new Set(PRESET_PROFESSIONS.map((p) => p.category))).map((cat) => (
+              <optgroup label="⭐ Micro-SaaS & CRM Integrado">
+                <option value="barbearia">💈 Barbearia / Barber Shop (Agendamento & CRM)</option>
+                <option value="clinica">🩺 Clínica Médica / Consultório (Prontuário & Lembretes)</option>
+                <option value="imobiliaria">🏡 Imobiliária / Corretores (Funil de Vendas Kanban)</option>
+                <option value="academia">🏋️ Academia / Studio Fitness (Cobrança Automática PIX)</option>
+                <option value="petshop">🐾 Pet Shop / Banho & Tosa (Esteira Operacional)</option>
+              </optgroup>
+              <optgroup label="── Modelos Clássicos ──">
+                <option value="odonto">Odontologia (Clínica Sorriso Real)</option>
+                <option value="oficina">Auto Mecânica (Júnior Auto Center)</option>
+                <option value="boutique">Moda & Ateliê (Bella Donna)</option>
+              </optgroup>
+              {Array.from(new Set(PRESET_PROFESSIONS.filter(p => !['barbearia', 'clinica', 'imobiliaria', 'academia', 'petshop'].includes(p.id)).map((p) => p.category))).map((cat) => (
                 <optgroup key={cat} label={`── ${cat} ──`}>
-                  {PRESET_PROFESSIONS.filter((p) => p.category === cat).map((p) => (
+                  {PRESET_PROFESSIONS.filter((p) => p.category === cat && !['barbearia', 'clinica', 'imobiliaria', 'academia', 'petshop'].includes(p.id)).map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.label}
                     </option>

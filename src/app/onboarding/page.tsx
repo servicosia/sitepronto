@@ -790,9 +790,16 @@ function OnboardingContent() {
                       className="mt-2 block w-full px-4 py-3 border border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:outline-none bg-white text-slate-900 font-medium shadow-xs text-sm"
                     >
                       <option value="">Selecione sua profissão ou nicho...</option>
-                      {Array.from(new Set(PRESET_PROFESSIONS.map((p) => p.category))).map((cat) => (
+                      <optgroup label="⭐ CRM & AGENDAMENTO INTEGRADO (MICRO-SAAS)">
+                        <option value="barbearia">💈 Barbearia / Barber Shop (Agendamento & CRM)</option>
+                        <option value="clinica">🩺 Clínica Médica / Consultório (Prontuário & Lembretes)</option>
+                        <option value="imobiliaria">🏡 Imobiliária / Corretores (Funil Kanban de Vendas)</option>
+                        <option value="academia">🏋️ Academia / Studio Fitness (Cobrança Automática PIX)</option>
+                        <option value="petshop">🐾 Pet Shop / Banho & Tosa (Esteira Operacional 5 Fases)</option>
+                      </optgroup>
+                      {Array.from(new Set(PRESET_PROFESSIONS.filter(p => !['barbearia', 'clinica', 'imobiliaria', 'academia', 'petshop'].includes(p.id)).map((p) => p.category))).map((cat) => (
                         <optgroup key={cat} label={`── ${cat} ──`}>
-                          {PRESET_PROFESSIONS.filter((p) => p.category === cat).map((p) => (
+                          {PRESET_PROFESSIONS.filter((p) => p.category === cat && !['barbearia', 'clinica', 'imobiliaria', 'academia', 'petshop'].includes(p.id)).map((p) => (
                             <option key={p.id} value={p.id}>
                               {p.label}
                             </option>

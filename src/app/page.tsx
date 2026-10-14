@@ -37,12 +37,12 @@ export default function HomePage() {
   const [highContrast, setHighContrast] = useState(false);
 
   // Showcase Tabs Mockup
-  const [activeTab, setActiveTab] = useState<'odonto' | 'oficina' | 'boutique'>('odonto');
+  const [activeTab, setActiveTab] = useState<string>('barbearia');
 
   // Modal de Demonstração
   const [demoModalOpen, setDemoModalOpen] = useState(false);
   const [demoViewMode, setDemoViewMode] = useState<'site' | 'admin'>('site');
-  const [demoNicho, setDemoNicho] = useState<'odonto' | 'oficina' | 'boutique'>('odonto');
+  const [demoNicho, setDemoNicho] = useState<string>('barbearia');
   const [demoModel, setDemoModel] = useState<'MODEL_A' | 'MODEL_B' | 'MODEL_C' | 'MODEL_D'>('MODEL_A');
   const [demoViewport, setDemoViewport] = useState<'desktop' | 'mobile'>('desktop');
 
@@ -50,7 +50,7 @@ export default function HomePage() {
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
   const [reqName, setReqName] = useState('');
   const [reqEmail, setReqEmail] = useState('');
-  const [reqSiteType, setReqSiteType] = useState('Odontologia / Saúde');
+  const [reqSiteType, setReqSiteType] = useState('Barbearia / Barber Shop (com CRM & Agendamento)');
   const [reqCustomType, setReqCustomType] = useState('');
   const [reqMessage, setReqMessage] = useState('');
   const [reqSubmitting, setReqSubmitting] = useState(false);
@@ -94,7 +94,7 @@ export default function HomePage() {
   function resetVoucherForm() {
     setReqName('');
     setReqEmail('');
-    setReqSiteType('Odontologia / Saúde');
+    setReqSiteType('Barbearia / Barber Shop (com CRM & Agendamento)');
     setReqCustomType('');
     setReqMessage('');
     setReqSuccess(false);
@@ -113,7 +113,57 @@ export default function HomePage() {
     message: string;
   } | null>(null);
 
-  const showcaseData = {
+  const showcaseData: Record<string, { url: string; title: string; sub: string; banner: string; meta1: string; meta2: string; image: string; badge: string }> = {
+    barbearia: {
+      url: 'www.barberproexperience.com.br',
+      title: 'Barber Pro & Estética Masculina',
+      sub: 'Av. Paulista, 1500 - Bela Vista, SP',
+      banner: 'Agendamento de horário com barbeiro em tempo real no WhatsApp',
+      meta1: 'Ter a Sáb: 09h às 20h',
+      meta2: 'Agenda Online Ativa',
+      image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80',
+      badge: '💈 Barbearia + CRM'
+    },
+    clinica: {
+      url: 'www.vidamaisclinica.com.br',
+      title: 'Clínica Integrada Vida+ Saúde',
+      sub: 'Rua Oscar Freire, 800 - Jardins, SP',
+      banner: 'Consultas presenciais e telemedicina com prontuário digital',
+      meta1: 'Seg a Sex: 08h às 19h',
+      meta2: 'Lembretes 24h WhatsApp',
+      image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80',
+      badge: '🩺 Clínica + CRM'
+    },
+    imobiliaria: {
+      url: 'www.homekeyimoveis.com.br',
+      title: 'HomeKey Imóveis & Patrimônio',
+      sub: 'Av. Brigadeiro Faria Lima, 2200 - Itaim Bibi, SP',
+      banner: 'Busca inteligente de imóveis e Pipeline Kanban de vendas',
+      meta1: 'Seg a Sáb: 08h às 19h',
+      meta2: 'Funil Comercial Ativo',
+      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+      badge: '🏡 Imobiliária + CRM'
+    },
+    academia: {
+      url: 'www.powerfitstudio.com.br',
+      title: 'PowerFit Studio & Treinamento',
+      sub: 'Av. Ibirapuera, 3100 - Moema, SP',
+      banner: 'Matrícula expressa e régua de cobrança automática via PIX',
+      meta1: 'Seg a Sex: 06h às 23h | Sáb: 08h às 18h',
+      meta2: 'Cobrança PIX Ativa',
+      image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80',
+      badge: '🏋️ Academia + CRM'
+    },
+    petshop: {
+      url: 'www.petcareestetica.com.br',
+      title: 'PetCare Banho, Tosa & Veterinária',
+      sub: 'Rua Harmonia, 450 - Vila Madalena, SP',
+      banner: 'Esteira operacional de banho e tosa com aviso automático ao tutor',
+      meta1: 'Seg a Sáb: 08h30 às 18h30',
+      meta2: 'Táxi Dog Integrado',
+      image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80',
+      badge: '🐾 Pet Shop + CRM'
+    },
     odonto: {
       url: 'www.clinicasorrisoreal.com.br',
       title: 'Clínica Odonto Vida',
@@ -424,33 +474,51 @@ export default function HomePage() {
                   </div>
 
                   {/* Seleção de Nicho */}
-                  <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                  <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1.5 rounded-xl">
                     <button
                       type="button"
-                      onClick={() => setActiveTab('odonto')}
-                      className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition text-center ${
-                        activeTab === 'odonto' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      onClick={() => setActiveTab('barbearia')}
+                      className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition text-center flex items-center gap-1 ${
+                        activeTab === 'barbearia' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Odontologia
+                      <span>💈</span> Barbearia
                     </button>
                     <button
                       type="button"
-                      onClick={() => setActiveTab('oficina')}
-                      className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition text-center ${
-                        activeTab === 'oficina' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      onClick={() => setActiveTab('clinica')}
+                      className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition text-center flex items-center gap-1 ${
+                        activeTab === 'clinica' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Oficina Mecânica
+                      <span>🩺</span> Clínica
                     </button>
                     <button
                       type="button"
-                      onClick={() => setActiveTab('boutique')}
-                      className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition text-center ${
-                        activeTab === 'boutique' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      onClick={() => setActiveTab('imobiliaria')}
+                      className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition text-center flex items-center gap-1 ${
+                        activeTab === 'imobiliaria' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Moda & Loja
+                      <span>🏡</span> Imobiliária
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('academia')}
+                      className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition text-center flex items-center gap-1 ${
+                        activeTab === 'academia' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <span>🏋️</span> Academia
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('petshop')}
+                      className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition text-center flex items-center gap-1 ${
+                        activeTab === 'petshop' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <span>🐾</span> Pet Shop
                     </button>
                   </div>
 
@@ -755,16 +823,23 @@ export default function HomePage() {
                             onChange={(e) => setReqSiteType(e.target.value)}
                             className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                           >
-                            <option value="Odontologia / Saúde">Clínica Odontológica / Saúde</option>
-                            <option value="Oficina Mecânica / Automotivo">Oficina Mecânica / Auto Center</option>
-                            <option value="Advocacia & Serviços Jurídicos">Advocacia & Serviços Jurídicos</option>
-                            <option value="Gastronomia, Restaurante & Buffet">Gastronomia, Restaurante & Buffet</option>
-                            <option value="Estética, Beleza & Barbearia">Estética, Salão de Beleza & Barbearia</option>
-                            <option value="Personal Trainer & Fitness">Personal Trainer, Academia & Fitness</option>
-                            <option value="Arquitetura, Engenharia & Reformas">Arquitetura, Engenharia & Reformas</option>
-                            <option value="Comércio & Loja">Comércio Local & Varejo</option>
-                            <option value="Prestador de Serviços">Prestador de Serviços Gerais</option>
-                            <option value="Outro">Outro segmento...</option>
+                            <optgroup label="⭐ Micro-SaaS & CRM Integrado">
+                              <option value="Barbearia / Barber Shop (com CRM & Agendamento)">💈 Barbearia / Barber Shop (Agendamento & CRM)</option>
+                              <option value="Clínica Médica / Consultório (com CRM & Prontuário)">🩺 Clínica Médica / Consultório (Prontuário & Lembretes)</option>
+                              <option value="Imobiliária / Gestão de Imóveis (com Funil Kanban)">🏡 Imobiliária / Corretores (Funil Kanban de Vendas)</option>
+                              <option value="Academia / Centro Fitness (com Cobrança PIX)">🏋️ Academia & Studio Fitness (Cobrança Automática PIX)</option>
+                              <option value="Pet Shop / Banho & Tosa (com Esteira Operacional)">🐾 Pet Shop / Banho & Tosa (Esteira Operacional)</option>
+                            </optgroup>
+                            <optgroup label="── Outros Segmentos ──">
+                              <option value="Odontologia / Saúde">Clínica Odontológica / Saúde</option>
+                              <option value="Oficina Mecânica / Automotivo">Oficina Mecânica / Auto Center</option>
+                              <option value="Advocacia & Serviços Jurídicos">Advocacia & Serviços Jurídicos</option>
+                              <option value="Gastronomia, Restaurante & Buffet">Gastronomia, Restaurante & Buffet</option>
+                              <option value="Arquitetura, Engenharia & Reformas">Arquitetura, Engenharia & Reformas</option>
+                              <option value="Comércio & Loja">Comércio Local & Varejo</option>
+                              <option value="Prestador de Serviços">Prestador de Serviços Gerais</option>
+                              <option value="Outro">Outro segmento...</option>
+                            </optgroup>
                           </select>
                         </div>
 
@@ -1137,33 +1212,69 @@ export default function HomePage() {
                 </div>
 
                 {/* Nichos */}
-                <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+                <div className="flex flex-wrap bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setDemoNicho('barbearia')}
+                    className={`px-2 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1 ${
+                      demoNicho === 'barbearia' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>💈</span> Barbearia
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoNicho('clinica')}
+                    className={`px-2 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1 ${
+                      demoNicho === 'clinica' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>🩺</span> Clínica
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoNicho('imobiliaria')}
+                    className={`px-2 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1 ${
+                      demoNicho === 'imobiliaria' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>🏡</span> Imobiliária
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoNicho('academia')}
+                    className={`px-2 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1 ${
+                      demoNicho === 'academia' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>🏋️</span> Academia
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDemoNicho('petshop')}
+                    className={`px-2 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1 ${
+                      demoNicho === 'petshop' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>🐾</span> Pet Shop
+                  </button>
                   <button
                     type="button"
                     onClick={() => setDemoNicho('odonto')}
-                    className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
+                    className={`px-2 py-1 rounded-lg font-bold transition text-xs ${
                       demoNicho === 'odonto' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    Odontologia
+                    Odonto
                   </button>
                   <button
                     type="button"
                     onClick={() => setDemoNicho('oficina')}
-                    className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
+                    className={`px-2 py-1 rounded-lg font-bold transition text-xs ${
                       demoNicho === 'oficina' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    Auto Mecânica
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDemoNicho('boutique')}
-                    className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
-                      demoNicho === 'boutique' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    Moda & Ateliê
+                    Oficina
                   </button>
                 </div>
 
@@ -1373,16 +1484,23 @@ export default function HomePage() {
                       onChange={(e) => setReqSiteType(e.target.value)}
                       className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
                     >
-                      <option value="Odontologia / Saúde">Clínica Odontológica / Saúde</option>
-                      <option value="Oficina Mecânica / Automotivo">Oficina Mecânica / Auto Center</option>
-                      <option value="Advocacia & Serviços Jurídicos">Advocacia & Serviços Jurídicos</option>
-                      <option value="Gastronomia, Restaurante & Buffet">Gastronomia, Restaurante & Buffet</option>
-                      <option value="Estética, Beleza & Barbearia">Estética, Salão de Beleza & Barbearia</option>
-                      <option value="Personal Trainer & Fitness">Personal Trainer, Academia & Fitness</option>
-                      <option value="Arquitetura, Engenharia & Reformas">Arquitetura, Engenharia & Reformas</option>
-                      <option value="Comércio & Loja">Comércio Local & Varejo</option>
-                      <option value="Prestador de Serviços">Prestador de Serviços Gerais</option>
-                      <option value="Outro">Outro segmento...</option>
+                      <optgroup label="⭐ Micro-SaaS & CRM Integrado">
+                        <option value="Barbearia / Barber Shop (com CRM & Agendamento)">💈 Barbearia / Barber Shop (Agendamento & CRM)</option>
+                        <option value="Clínica Médica / Consultório (com CRM & Prontuário)">🩺 Clínica Médica / Consultório (Prontuário & Lembretes)</option>
+                        <option value="Imobiliária / Gestão de Imóveis (com Funil Kanban)">🏡 Imobiliária / Corretores (Funil Kanban de Vendas)</option>
+                        <option value="Academia / Centro Fitness (com Cobrança PIX)">🏋️ Academia & Studio Fitness (Cobrança Automática PIX)</option>
+                        <option value="Pet Shop / Banho & Tosa (com Esteira Operacional)">🐾 Pet Shop / Banho & Tosa (Esteira Operacional)</option>
+                      </optgroup>
+                      <optgroup label="── Outros Segmentos ──">
+                        <option value="Odontologia / Saúde">Clínica Odontológica / Saúde</option>
+                        <option value="Oficina Mecânica / Automotivo">Oficina Mecânica / Auto Center</option>
+                        <option value="Advocacia & Serviços Jurídicos">Advocacia & Serviços Jurídicos</option>
+                        <option value="Gastronomia, Restaurante & Buffet">Gastronomia, Restaurante & Buffet</option>
+                        <option value="Arquitetura, Engenharia & Reformas">Arquitetura, Engenharia & Reformas</option>
+                        <option value="Comércio & Loja">Comércio Local & Varejo</option>
+                        <option value="Prestador de Serviços">Prestador de Serviços Gerais</option>
+                        <option value="Outro">Outro segmento...</option>
+                      </optgroup>
                     </select>
                   </div>
 
