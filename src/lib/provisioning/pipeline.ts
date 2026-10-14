@@ -167,14 +167,23 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
         },
       ],
     });
-    const defaultSubdomain = `${slug}.servicos.ia.br`;
+    const requestedSubdomain = (params.data.subdomain?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '') || slug);
+    const defaultSubdomain = `${requestedSubdomain}.servicos.ia.br`;
     let primaryUrl = `https://${defaultSubdomain}`;
 
+    // 1. Cria apontamento CNAME na Cloudflare (zona servicos.ia.br)
+    try {
+      const cfSubResult = await cloudflare.createSubdomainRecord(requestedSubdomain, 'cname.vercel-dns.com');
+      console.log(`[Pipeline] Cloudflare Subdomínio: ${cfSubResult.message}`);
+    } catch (cfErr: any) {
+      console.warn(`[Pipeline] Aviso ao criar CNAME na Cloudflare para ${defaultSubdomain}:`, cfErr.message);
+    }
+
+    // 2. Vincula o subdomínio no projeto da Vercel
     try {
       await vercel.addDomainToProject(vercelProject.name, defaultSubdomain);
     } catch (eSub) {
       console.warn(`[Pipeline] Aviso ao vincular subdomínio ${defaultSubdomain} na Vercel:`, eSub);
-      primaryUrl = vercelProject.url;
     }
 
     await prisma.site.update({
@@ -182,9 +191,11 @@ async function runPipelineSteps(siteId: string, jobId: string, params: Provision
       data: {
         vercelProjectId: vercelProject.id,
         vercelUrl: primaryUrl,
+        customDomain: (!params.data.hasCustomDomain) ? defaultSubdomain : undefined,
+        domainStatus: (!params.data.hasCustomDomain) ? 'ACTIVE' : undefined,
       },
     });
-    await recordStep(siteId, 'CREATING_VERCEL', 'SUCCESS', { vercelUrl: primaryUrl });
+    await recordStep(siteId, 'CREATING_VERCEL', 'SUCCESS', { vercelUrl: primaryUrl, subdomain: defaultSubdomain });
 
     // ETAPA 6: CONFIGURAÇÃO DE DOMÍNIO .BR (Vercel + Cloudflare DNS)
     if (params.data.hasCustomDomain && params.data.customDomainName) {

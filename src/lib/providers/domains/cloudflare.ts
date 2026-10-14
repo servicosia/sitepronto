@@ -267,4 +267,79 @@ export class CloudflareProvider {
       return false;
     }
   }
+
+  /**
+   * Cria ou atualiza apontamento CNAME para subdomínio sob servicos.ia.br apontando para Vercel
+   */
+  async createSubdomainRecord(subdomain: string, target = 'cname.vercel-dns.com'): Promise<{ success: boolean; fqdn: string; message: string }> {
+    const cleanSubdomain = subdomain.trim().toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-|-$/g, '');
+    const fqdn = `${cleanSubdomain}.servicos.ia.br`;
+    
+    const token = process.env.CLOUDFLARE_SERVICOS_TOKEN || process.env.CLOUDFLARE_API_TOKEN || '';
+    const zoneId = process.env.CLOUDFLARE_SERVICOS_ZONE_ID || '';
+
+    if (!token || !zoneId) {
+      console.warn('[CloudflareProvider] Token ou Zone ID não configurados para subdomínio servicos.ia.br');
+      return { success: false, fqdn, message: 'Credenciais Cloudflare não configuradas.' };
+    }
+
+    try {
+      // 1. Procura se o registro CNAME já existe
+      const getRes = await fetch(
+        `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?type=CNAME&name=${cleanSubdomain}.servicos.ia.br`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const getData = await getRes.json();
+
+      const recordPayload = {
+        type: 'CNAME',
+        name: cleanSubdomain,
+        content: target,
+        proxied: false, // DNS Only para Vercel emitir SSL Let's Encrypt rapidamente sem conflito
+        ttl: 1, // Auto
+        comment: 'SitePronto Auto-Provisioned Subdomain',
+      };
+
+      if (getData.success && getData.result && getData.result.length > 0) {
+        const existingId = getData.result[0].id;
+        const putRes = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${existingId}`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(recordPayload),
+        });
+        const putData = await putRes.json();
+        return {
+          success: putData.success || false,
+          fqdn,
+          message: putData.success ? `CNAME ${fqdn} atualizado na Cloudflare.` : `Erro ao atualizar CNAME na Cloudflare: ${putData.errors?.[0]?.message || 'Falha'}`,
+        };
+      } else {
+        const postRes = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(recordPayload),
+        });
+        const postData = await postRes.json();
+        return {
+          success: postData.success || false,
+          fqdn,
+          message: postData.success ? `CNAME ${fqdn} criado na Cloudflare com sucesso.` : `Erro ao criar CNAME na Cloudflare: ${postData.errors?.[0]?.message || 'Falha'}`,
+        };
+      }
+    } catch (err: any) {
+      console.error('[CloudflareProvider] Falha ao configurar subdomínio:', err.message);
+      return { success: false, fqdn, message: err.message };
+    }
+  }
 }

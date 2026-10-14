@@ -26,7 +26,8 @@ import {
   Star,
   ExternalLink,
   Briefcase,
-  ShoppingBag
+  ShoppingBag,
+  AlertCircle
 } from 'lucide-react';
 import { OnboardingData, SectionsConfig, GalleryItem, TestimonialItem, ProductItem } from '@/lib/validation/onboarding';
 import { analyzeProfessionContext } from '@/lib/design-system/profession-intelligence';
@@ -117,6 +118,36 @@ function OnboardingContent() {
       setDomainVerified(true);
     } finally {
       setCheckingDomain(false);
+    }
+  }
+
+  // Estados de verificação de subdomínio (.servicos.ia.br)
+  const [checkingSubdomain, setCheckingSubdomain] = useState(false);
+  const [subdomainCheckResult, setSubdomainCheckResult] = useState<{
+    available: boolean;
+    subdomain: string;
+    fqdn?: string;
+    message: string;
+  } | null>(null);
+
+  async function checkSubdomainAvailability(nameToCheck?: string) {
+    const defaultSub = formData.professionalName ? formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+    const raw = (nameToCheck !== undefined ? nameToCheck : (formData.subdomain || defaultSub)).trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (!raw) return;
+    setCheckingSubdomain(true);
+    try {
+      const res = await fetch(`/api/subdomain/check?subdomain=${encodeURIComponent(raw)}`);
+      const data = await res.json();
+      setSubdomainCheckResult(data);
+    } catch {
+      setSubdomainCheckResult({
+        available: false,
+        subdomain: raw,
+        fqdn: `${raw}.servicos.ia.br`,
+        message: 'Erro de conexão ao consultar disponibilidade do subdomínio.',
+      });
+    } finally {
+      setCheckingSubdomain(false);
     }
   }
 
@@ -1632,8 +1663,93 @@ function OnboardingContent() {
                         Seu site entra no ar imediatamente com SSL grátis sem precisar registrar ou pagar domínio agora.
                       </p>
                     </div>
-                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs font-mono text-slate-700">
-                      https://{formData.professionalName ? formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'seusite'}.servicos.ia.br
+
+                    <div className="space-y-3 mt-3 pt-3 border-t border-slate-200">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                          Personalize seu subdomínio gratuito:
+                        </label>
+                        <div className="flex items-center rounded-xl border border-slate-300 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-slate-900 shadow-xs">
+                          <span className="px-2.5 py-2 text-xs text-slate-400 font-mono bg-slate-50 border-r border-slate-200 select-none">
+                            https://
+                          </span>
+                          <input
+                            type="text"
+                            value={formData.subdomain ?? (formData.professionalName ? formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') : '')}
+                            onChange={(e) => {
+                              const val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                              handleInputChange('subdomain', val);
+                              setSubdomainCheckResult(null);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                checkSubdomainAvailability();
+                              }
+                            }}
+                            placeholder="seunegocio"
+                            className="w-full px-2.5 py-2 text-xs font-mono font-bold text-blue-900 focus:outline-none"
+                          />
+                          <span className="px-2.5 py-2 text-xs text-slate-700 font-mono font-bold bg-slate-100 border-l border-slate-200 select-none">
+                            .servicos.ia.br
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Botão de Verificação de Subdomínio */}
+                      <div className="flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          disabled={checkingSubdomain}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            checkSubdomainAvailability();
+                          }}
+                          className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-bold text-[11px] rounded-lg transition flex items-center justify-center gap-1.5 shadow-xs"
+                        >
+                          {checkingSubdomain ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              Verificando...
+                            </>
+                          ) : (
+                            <>
+                              <Search className="w-3.5 h-3.5" />
+                              Verificar Disponibilidade
+                            </>
+                          )}
+                        </button>
+                        <span className="text-[10px] text-slate-500 text-right">
+                          ☁️ Cloudflare DNS + SSL grátis
+                        </span>
+                      </div>
+
+                      {/* Feedback de Disponibilidade do Subdomínio */}
+                      {subdomainCheckResult && (
+                        <div
+                          className={`p-2.5 rounded-lg border text-xs flex items-start gap-2 ${
+                            subdomainCheckResult.available
+                              ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
+                              : 'bg-red-50 border-red-300 text-red-950'
+                          }`}
+                        >
+                          {subdomainCheckResult.available ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          ) : (
+                            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                          )}
+                          <div>
+                            <p className="font-bold">
+                              {subdomainCheckResult.available
+                                ? '🎉 Subdomínio disponível!'
+                                : 'Atenção: Indisponível'}
+                            </p>
+                            <p className="text-[11px] mt-0.5">
+                              {subdomainCheckResult.message}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -2126,6 +2242,14 @@ function OnboardingContent() {
                     <span className="text-slate-500 font-semibold block text-xs">WhatsApp & Contato:</span>
                     <span className="text-slate-800">{formData.whatsapp} | {formData.publicEmail}</span>
                   </div>
+                  <div>
+                    <span className="text-slate-500 font-semibold block text-xs">Endereço do Site:</span>
+                    <span className="font-bold text-blue-900 font-mono text-xs">
+                      {formData.hasCustomDomain
+                        ? `https://${formData.customDomainName}`
+                        : `https://${formData.subdomain || (formData.professionalName ? formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'site')}.servicos.ia.br`}
+                    </span>
+                  </div>
                   <div className="sm:col-span-2">
                     <span className="text-slate-500 font-semibold block text-xs">Serviços Cadastrados:</span>
                     <span className="text-slate-800">
@@ -2189,7 +2313,7 @@ function OnboardingContent() {
             {currentStep < 7 ? (
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (currentStep === 1) {
                     if (!formData.fullName || formData.fullName.trim().length < 3) {
                       alert('Por favor, informe seu Nome Completo (mínimo 3 caracteres).');
@@ -2205,23 +2329,37 @@ function OnboardingContent() {
                       return;
                     }
                   }
-                  if (
-                    currentStep === 4 &&
-                    Boolean(formData.hasCustomDomain) &&
-                    formData.customDomainName?.trim() &&
-                    !domainVerified
-                  ) {
-                    checkDomainAvailability();
-                    return;
+                  if (currentStep === 4) {
+                    if (Boolean(formData.hasCustomDomain)) {
+                      if (formData.customDomainName?.trim() && !domainVerified) {
+                        checkDomainAvailability();
+                        return;
+                      }
+                    } else {
+                      const defaultSub = formData.professionalName ? formData.professionalName.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+                      const rawSub = (formData.subdomain || defaultSub).trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+                      if (!rawSub || rawSub.length < 3) {
+                        alert('Por favor, informe um subdomínio válido com pelo menos 3 caracteres.');
+                        return;
+                      }
+                      if (subdomainCheckResult && !subdomainCheckResult.available) {
+                        alert(`O subdomínio '${subdomainCheckResult.subdomain}' não está disponível: ${subdomainCheckResult.message}`);
+                        return;
+                      }
+                    }
                   }
                   setCurrentStep(currentStep + 1);
                 }}
-                disabled={checkingDomain}
+                disabled={checkingDomain || checkingSubdomain}
                 className="inline-flex items-center px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 shadow-md disabled:opacity-50"
               >
                 {checkingDomain ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Verificando Registro.br...
+                  </>
+                ) : checkingSubdomain ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Verificando Subdomínio...
                   </>
                 ) : currentStep === 4 && Boolean(formData.hasCustomDomain) && formData.customDomainName?.trim() && !domainVerified ? (
                   <>

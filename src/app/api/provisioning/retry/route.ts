@@ -18,8 +18,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'siteId é obrigatório' }, { status: 400 });
     }
 
-    const site = await prisma.site.findUnique({
-      where: { id: siteId },
+    const site = await prisma.site.findFirst({
+      where: {
+        OR: [{ id: siteId }, { slug: siteId }],
+      },
       include: {
         voucher: true,
         onboardingSession: true,

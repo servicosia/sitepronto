@@ -372,6 +372,7 @@ export const OnboardingDataSchema = z.object({
 
   // Domínio
   hasCustomDomain: z.boolean().default(false),
+  subdomain: z.string().optional(),
   customDomainName: z.string().optional(),
   registerDomainOnCompletion: z.boolean().default(false),
 });

@@ -20,8 +20,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'siteId inválido' }, { status: 400 });
     }
 
-    const site = await prisma.site.findUnique({
-      where: { id: siteId },
+    const site = await prisma.site.findFirst({
+      where: {
+        OR: [{ id: siteId }, { slug: siteId }],
+      },
       include: {
         steps: {
           orderBy: { startedAt: 'asc' },
